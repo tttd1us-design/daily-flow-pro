@@ -1,0 +1,54 @@
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #111827 !important;
+    font-size: 12pt;
+  }
+
+  .sidebar,
+  .top-header,
+  .editor-toolbar,
+  .editor-actions,
+  .journal-sidebar,
+  .editor-footer,
+  .nav-menu,
+  .toast-container,
+  .modal-backdrop {
+    display: none !important;
+  }
+
+  .app-container, .main-content {
+    display: block !important;
+    height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+  }
+
+  .journal-wrapper {
+    display: block !important;
+    height: auto !important;
+  }
+
+  .journal-editor-container {
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .journal-title-input {
+    font-size: 22pt !important;
+    margin-bottom: 20px !important;
+    border-bottom: 2px solid #333 !important;
+    padding-bottom: 8px !important;
+  }
+
+  .journal-textarea {
+    display: none !important;
+  }
+
+  .journal-preview-pane {
+    display: block !important;
+    padding: 0 !important;
+    color: #111827 !important;
+  }
+}

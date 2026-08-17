@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Flow OS Pro - 인생을 바꾸는 1% 실행 & 지식 아카이브 OS</title>
+  <meta name="description" content="무제한 IndexedDB, 딥 포커스 젠 모드, 미완료 과업 자동 이월(Rollover), 냉철한 팩트 폭격 Gemini AI 코칭, 주제별 지식 위키가 결합된 상용급 프로덕트">
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&family=Nanum+Myeongjo:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/print.css">
+</head>
+<body>
+  <div class="app-container" id="appContainer">
+    <!-- 사이드바 -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <span class="logo-icon"><i class="fa-solid fa-fire-flame-curved"></i></span>
+          <div class="logo-info">
+            <span class="logo-text">Daily Flow Pro</span>
+            <span class="logo-badge"><i class="fa-solid fa-crown text-yellow"></i> 1% Life OS</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 시계 & 날짜 -->
+      <div class="current-date-badge">
+        <div class="date-today-label">EXECUTIVE SYSTEM</div>
+        <div class="date-display-main" id="sidebarDate">2026.08.17 (월)</div>
+        <div class="time-display-sub" id="sidebarTime">00:00:00</div>
+      </div>
+
+      <!-- 메인 내비게이션 -->
+      <nav class="nav-menu">
+        <button class="nav-item active" data-tab="dashboard">
+          <i class="fa-solid fa-crosshairs text-indigo"></i>
+          <span>실행 커맨드 센터</span>
+        </button>
+        <button class="nav-item" data-tab="ai-coach">
+          <i class="fa-solid fa-brain text-cyan"></i>
+          <span>Gemini 1% 코칭 센터</span>
+        </button>
+        <button class="nav-item" data-tab="study">
+          <i class="fa-solid fa-cubes-stacked text-yellow"></i>
+          <span>지식 위키 & 학습 아카이브</span>
+        </button>
+        <button class="nav-item" data-tab="goals">
+          <i class="fa-solid fa-bullseye text-emerald"></i>
+          <span>인생 목표 로드맵</span>
+        </button>
+        <button class="nav-item" data-tab="journal">
+          <i class="fa-solid fa-book-open text-purple"></i>
+          <span>오늘의 일기 & 회고</span>
+        </button>
+        <button class="nav-item" data-tab="principles">
+          <i class="fa-solid fa-gem text-amber"></i>
+          <span>인생 원칙 보관소</span>
+        </button>
+        <button class="nav-item" data-tab="calendar">
+          <i class="fa-solid fa-calendar-days"></i>
+          <span>캘린더 & 아카이브</span>
+        </button>
+        <button class="nav-item" data-tab="analytics">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>실행률 분석 리포트</span>
+        </button>
+      </nav>
+
+      <!-- IndexedDB & AI 상태 -->
+      <div class="ai-status-card" id="geminiStatusBtn">
+        <div class="ai-status-header">
+          <span><i class="fa-solid fa-database text-cyan"></i> IndexedDB 엔진</span>
+          <span class="ai-status-badge connected" id="storageBadge">용량 무제한</span>
+        </div>
+        <div class="ai-status-desc" id="aiStatusDesc">Gemini 1% 팩트 코칭 대기 중</div>
+      </div>
+
+      <!-- 뽀모도로 몰입 타이머 -->
+      <div class="timer-widget">
+        <div class="timer-title"><i class="fa-solid fa-stopwatch text-yellow"></i> 딥워크 몰입 타이머</div>
+        <div class="timer-display" id="timerDisplay">25:00</div>
+        <div class="timer-controls">
+          <button id="startTimerBtn" class="btn btn-primary btn-sm"><i class="fa-solid fa-play"></i> 몰입 시작</button>
+          <button id="resetTimerBtn" class="btn btn-secondary btn-sm"><i class="fa-solid fa-rotate-left"></i></button>
+        </div>
+      </div>
+
+      <!-- 푸터 -->
+      <div class="sidebar-footer">
+        <div class="theme-switch-wrapper">
+          <button id="zenModeToggleBtn" class="icon-btn" title="⚡ 딥 포커스 젠 모드 (초집중)">
+            <i class="fa-solid fa-bolt text-yellow"></i>
+          </button>
+          <button id="themeToggle" class="icon-btn" title="다크/라이트 테마">
+            <i class="fa-solid fa-moon" id="themeIcon"></i>
+          </button>
+          <button id="openGeminiModalBtn" class="icon-btn" title="Gemini AI 설정">
+            <i class="fa-solid fa-key text-cyan"></i>
+          </button>
+          <button id="backupBtn" class="icon-btn" title="데이터 안전 백업 및 복원">
+            <i class="fa-solid fa-shield-halved text-emerald"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 메인 콘텐츠 영역 -->
+    <main class="main-content" id="mainContent">
+      
+      <!-- 상단 탑 헤더 -->
+      <header class="top-header">
+        <div class="date-navigator">
+          <button id="prevDayBtn" class="nav-arrow-btn" title="어제"><i class="fa-solid fa-chevron-left"></i></button>
+          <div class="selected-date-wrapper">
+            <input type="date" id="datePicker" class="date-input">
+            <h1 class="selected-date-text" id="headerDateText">2026년 8월 17일 월요일</h1>
+            <span class="today-tag" id="todayTag">오늘</span>
+          </div>
+          <button id="nextDayBtn" class="nav-arrow-btn" title="내일"><i class="fa-solid fa-chevron-right"></i></button>
+          <button id="todayQuickBtn" class="btn btn-secondary btn-sm">오늘</button>
+        </div>
+
+        <div class="header-actions">
+          <button id="zenModeHeaderBtn" class="btn btn-zen-mode">
+            <i class="fa-solid fa-bolt text-yellow"></i> <span>딥 포커스 몰입 모드</span>
+          </button>
+          <div class="quote-banner" id="quoteBanner">
+            <span class="quote-text">"완벽한 계획보다 1%의 즉각적 실행이 인생을 바꾼다."</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- ======================================================== -->
+      <!-- 1. 실행 커맨드 센터 (Executive Command Center)           -->
+      <!-- ======================================================== -->
+      <section class="tab-pane active" id="pane-dashboard">
+        
+        <!-- 🚨 스마트 과업 이월(Rollover) 알림 배너 -->
+        <div class="rollover-banner" id="rolloverBanner" style="display: none;">
+          <div class="rollover-info">
+            <i class="fa-solid fa-triangle-exclamation text-amber"></i>
+            <span>어제 미처 완료하지 못한 <strong><span id="rolloverCount">0</span>개의 과업</strong>이 있습니다. 오늘로 즉시 이월하시겠습니까?</span>
+          </div>
+          <div class="rollover-actions">
+            <button id="rolloverDismissBtn" class="btn btn-secondary btn-sm">무시하기</button>
+            <button id="rolloverApplyBtn" class="btn btn-primary btn-sm"><i class="fa-solid fa-arrow-right-to-bracket"></i> 오늘로 1초 자동 이월</button>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+
+          <!-- 상단 전폭 1: 오늘의 북극성 미션 (One Thing) & 초집중 포커스 -->
+          <div class="card focus-hero-card span-2">
+            <div class="card-header">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="pulse-indicator"></span>
+                <h3><i class="fa-solid fa-crosshairs text-indigo"></i> 오늘의 북극성 미션 (Today's Single Focus)</h3>
+              </div>
+              <div class="mood-selector" id="moodSelector">
+                <span class="mood-label">마인드셋:</span>
+                <button class="mood-btn" data-mood="great" title="최고 😆">😆</button>
+                <button class="mood-btn" data-mood="good" title="좋음 😊">😊</button>
+                <button class="mood-btn" data-mood="neutral" title="보통 😐">😐</button>
+                <button class="mood-btn" data-mood="tired" title="피곤 🥱">🥱</button>
+                <button class="mood-btn" data-mood="stressed" title="스트레스 😣">😣</button>
+              </div>
+            </div>
+            <div class="card-body focus-hero-body">
+              <div class="focus-input-group">
+                <input type="text" id="dailyFocusInput" placeholder="오늘 내 인생과 커리어를 바꿀 단 하나의 결정적 과업을 입력하세요..." class="input-focus-hero">
+                <button id="saveFocusBtn" class="btn btn-primary"><i class="fa-solid fa-check"></i> 확정</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 상단 전폭 2: Gemini 1% 냉철 코칭 멘토 센터 (팩트 폭격 / 전략 코칭) -->
+          <div class="card dashboard-gemini-card span-2">
+            <div class="card-header">
+              <div class="dash-chat-header-title">
+                <div class="dash-chat-avatar"><i class="fa-solid fa-brain"></i></div>
+                <div>
+                  <h3 style="margin-bottom: 2px;"><i class="fa-solid fa-robot text-cyan"></i> Gemini 1% 라이프 코칭 센터</h3>
+                  <p style="font-size: 0.76rem; color: var(--text-secondary); margin: 0;">
+                    단순한 칭찬이 아닌, <strong>실행 실패 원인 분석과 팩트 폭격, 실행 전략</strong>을 날카롭게 코칭합니다.
+                  </p>
+                </div>
+              </div>
+              <div class="dash-chat-persona-switch">
+                <select id="aiPersonaSelect" class="select-sm">
+                  <option value="fact">⚡ 냉철한 팩트 폭격기</option>
+                  <option value="strategy">🧠 전략적 비즈니스 멘토</option>
+                  <option value="care">🌿 마인드셋 & 멘탈 회복</option>
+                </select>
+                <button id="clearDashChatBtn" class="btn btn-secondary btn-sm" title="새 대화"><i class="fa-solid fa-rotate-right"></i></button>
+              </div>
+            </div>
+
+            <div class="card-body dash-chat-body">
+              <div class="dash-chat-messages" id="dashChatMessages">
+                <div class="dash-chat-bubble bot">
+                  <div class="bubble-avatar"><i class="fa-solid fa-robot"></i></div>
+                  <div class="bubble-content">
+                    안녕하세요. 당신의 실행력을 1% 상위권으로 끌어올릴 <strong>Gemini 라이프 코치</strong>입니다.
+                    <br><br>
+                    <strong>"오늘 왜 일을 미루고 계신가요?", "어떤 장애물에 부딪히셨나요?"</strong> 고민을 솔직하게 털어놓으시면, 핑계를 배제하고 <strong>오늘 당장 끝낼 수 있는 초단위 해결책을 대시보드에 직접 꽂아드립니다.</strong>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 퀵 트리거 칩 -->
+              <div class="dash-quick-trouble-bar">
+                <button class="trouble-chip" data-trouble="오늘 해야 할 일이 너무 많아서 압박감이 심해. 덜 중요한 것은 다 쳐내고 오늘 반드시 끝낼 2가지만 골라줘.">
+                  😰 [과부하 해소] 긴급 과업 2개만 선별
+                </button>
+                <button class="trouble-chip" data-trouble="자꾸 딴짓하고 미루는 습관이 발동했어. 핑계 대지 않게 5분 안에 즉시 몰입할 수 있는 스파르타 트리거를 줘.">
+                  ⚡ [미루기 타파] 5분 강제 몰입 트리거
+                </button>
+                <button class="trouble-chip" data-trouble="현재 직무에서 성장 정체를 느껴. 퇴근 후 1시간 나를 바꿀 핵심 공부 주제와 실천법을 명쾌하게 설계해줘.">
+                  💼 [커리어 돌파] 1시간 핵심 공부 로드맵
+                </button>
+                <button class="trouble-chip" data-trouble="에너지가 방전되고 번아웃이 왔어. 죄책감 없이 빠르게 회복하고 멘탈을 리셋할 현실적 루틴을 알려줘.">
+                  🔋 [번아웃 리셋] 멘탈 복구 가이드
+                </button>
+              </div>
+
+              <!-- 입력 폼 -->
+              <form id="dashChatForm" class="dash-chat-input-form">
+                <input type="text" id="dashChatInput" placeholder="고민이나 상황을 가감 없이 적어보세요... (예: 오늘 시간 관리가 완전히 무너졌어)" required>
+                <button type="submit" class="btn btn-gemini" id="sendDashChatBtn">
+                  <i class="fa-solid fa-paper-plane"></i> 팩트 분석 & 연동
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- 좌측 1: 목표 기반 실행 To-Do (Action Items) -->
+          <div class="card todo-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-list-check text-emerald"></i> 오늘 실행 리스트 (Action Items)</h3>
+              <span class="badge" id="todoProgressBadge">0 / 0 완료 (0%)</span>
+            </div>
+            <div class="card-body">
+              <div class="todo-progress-container">
+                <div class="progress-bar-bg">
+                  <div class="progress-bar-fill" id="todoProgressBar" style="width: 0%;"></div>
+                </div>
+              </div>
+              <form id="todoForm" class="todo-add-form">
+                <select id="todoCategory" class="select-sm">
+                  <option value="career">💼 커리어/업무</option>
+                  <option value="study">📚 공부/지식</option>
+                  <option value="wealth">💰 재테크/투자</option>
+                  <option value="health">💪 건강/운동</option>
+                  <option value="routine">🌱 루틴/습관</option>
+                </select>
+                <input type="text" id="todoInput" placeholder="오늘 끝마칠 구체적 행동 추가..." required>
+                <button type="submit" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i></button>
+              </form>
+              <ul class="todo-list" id="todoList"></ul>
+            </div>
+          </div>
+
+          <!-- 우측 1: 오늘 위주 공부 & 지식 정리 -->
+          <div class="card study-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-brain text-yellow"></i> 오늘의 집중 공부 & 지식 정리</h3>
+              <div style="display: flex; gap: 6px;">
+                <button id="aiStudySuggestBtn" class="btn btn-gemini btn-sm" title="Gemini AI 추천">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> AI 추천
+                </button>
+                <button id="quickStudyBtn" class="btn btn-secondary btn-sm"><i class="fa-solid fa-arrow-up-right-from-square"></i> 위키로 이동</button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="study-dashboard-box">
+                <div class="form-group">
+                  <label for="todayStudyTopic">🎯 오늘 파고들 핵심 공부 주제 (Topic)</label>
+                  <input type="text" id="todayStudyTopic" placeholder="예: SQL 데이터 파이프라인, 거시경제 지표 분석" class="input-sm font-bold">
+                </div>
+                <div class="form-group">
+                  <label for="todayStudyTIL">💡 오늘 깨달은 핵심 개념 (TIL 3줄 요약)</label>
+                  <textarea id="todayStudyTIL" rows="2" placeholder="실무나 삶에 바로 써먹을 핵심 인사이트..." class="input-memo"></textarea>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <button id="dashCopyTilBtn" class="btn btn-secondary btn-sm" title="클립보드 복사"><i class="fa-solid fa-copy"></i> TIL 복사</button>
+                  <button id="saveStudyDashBtn" class="btn btn-primary btn-sm"><i class="fa-solid fa-check"></i> 지식 저장</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 좌측 2: 타임블록 플래너 -->
+          <div class="card timeblock-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-timeline text-amber"></i> 타임블록 실행 계획</h3>
+              <button id="addTimeBlockBtn" class="btn btn-secondary btn-sm"><i class="fa-solid fa-plus"></i> 일정 추가</button>
+            </div>
+            <div class="card-body">
+              <div class="timeblock-container" id="timeBlockList"></div>
+            </div>
+          </div>
+
+          <!-- 우측 2: 복리 성장 습관 -->
+          <div class="card habit-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-repeat text-indigo"></i> 매일 반복 복리 습관</h3>
+              <button id="addHabitModalBtn" class="btn btn-secondary btn-sm"><i class="fa-solid fa-plus"></i> 습관 관리</button>
+            </div>
+            <div class="card-body">
+              <div class="habit-list" id="habitList"></div>
+            </div>
+          </div>
+
+          <!-- 하단 전폭: 생체 에너지 컨디션 -->
+          <div class="card condition-card span-2">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-battery-half text-emerald"></i> 생체 에너지 & 컨디션 관리</h3>
+            </div>
+            <div class="card-body condition-grid">
+              <div class="condition-item">
+                <div class="condition-title">
+                  <span><i class="fa-solid fa-droplet text-blue"></i> 수분 충전</span>
+                  <span id="waterCount">0 / 2,000 ml</span>
+                </div>
+                <div class="water-cups" id="waterCups"></div>
+              </div>
+
+              <div class="condition-item">
+                <div class="condition-title">
+                  <span><i class="fa-solid fa-bolt text-yellow"></i> 에너지 레벨</span>
+                  <span id="energyLevelText">보통 (50%)</span>
+                </div>
+                <input type="range" min="10" max="100" step="10" value="50" class="slider" id="energySlider">
+              </div>
+
+              <div class="condition-item">
+                <div class="condition-title">
+                  <span><i class="fa-solid fa-bed text-purple"></i> 수면 시간</span>
+                  <span id="sleepHoursText">7.0 시간</span>
+                </div>
+                <div class="stepper-control">
+                  <button class="step-btn" id="sleepMinusBtn">-0.5h</button>
+                  <input type="number" id="sleepInput" value="7.0" step="0.5" min="0" max="24" class="input-sm text-center">
+                  <button class="step-btn" id="sleepPlusBtn">+0.5h</button>
+                </div>
+              </div>
+
+              <div class="condition-item">
+                <div class="condition-title">
+                  <span><i class="fa-regular fa-comment-dots"></i> 빠른 아이디어 / 메모</span>
+                </div>
+                <input type="text" id="quickMemoInput" placeholder="순간 떠오른 번뜩이는 생각..." class="input-memo">
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- 2. Gemini 1% 전용 라이프 코칭 센터 탭                      -->
+      <!-- ======================================================== -->
+      <section class="tab-pane" id="pane-ai-coach">
+        <div class="ai-coach-container">
+          <div class="card ai-coach-card">
+            <div class="card-header">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div class="logo-icon"><i class="fa-solid fa-brain"></i></div>
+                <div>
+                  <h3>Gemini 1% 엘리트 라이프 코치 & 실행 전략실</h3>
+                  <p style="font-size:0.75rem; color:var(--text-secondary); margin:0;">최근 7일간의 실행률과 미완료 데이터를 기반으로 팩트 중심의 피드백을 제공합니다.</p>
+                </div>
+              </div>
+              <div class="ai-sync-indicator">
+                <span class="pulse-dot"></span>
+                <span>실시간 대시보드 자동 동기화 ON</span>
+              </div>
+            </div>
+            <div class="card-body ai-coach-layout">
+              <div class="ai-chat-messages" id="aiChatMessages"></div>
+
+              <!-- 퀵 프롬프트 칩 -->
+              <div class="quick-prompts-bar">
+                <button class="quick-prompt-btn" data-prompt="내 최근 실행률과 미완료 과업을 냉정하게 분석해서, 내가 자꾸 실패하는 근본 이유와 해결책 3가지를 팩트 폭격해줘.">🔥 [팩트 폭격] 내 실행 실패 패턴 진단</button>
+                <button class="quick-prompt-btn" data-prompt="올해 안에 데이터 분석/전문 역량으로 시니어 이직하고 싶어. 장기 목표와 오늘 당장 실천할 To-Do 3개 짜줘.">🎯 [목표분해] 시니어 이직 로드맵 & 오늘 To-Do 도출</button>
+                <button class="quick-prompt-btn" data-prompt="월 저축률 60% 달성하고 투자 시드머니 1억 모으는 구체적인 실행 계획을 짜줘.">💰 [재테크] 1억 시드머니 목표 & 실천 계획</button>
+                <button class="quick-prompt-btn" data-prompt="오늘 너무 피곤하고 번아웃이 와서 집중이 안 돼. 오늘 대시보드 일정을 가볍고 효과적으로 재조정해줘.">🧘 [번아웃 케어] 핵심 To-Do 최소화 재정렬</button>
+              </div>
+
+              <!-- AI 채팅 입력창 -->
+              <form id="aiChatForm" class="ai-chat-input-form">
+                <input type="text" id="aiChatInput" placeholder="고민이나 필요한 조언을 말씀하세요. 대시보드와 실행 계획에 즉시 반영됩니다..." required>
+                <button type="submit" class="btn btn-gemini" id="sendAiChatBtn">
+                  <i class="fa-solid fa-paper-plane"></i> 상담 & 연동
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- 3. 지식 위키 & 학습 아카이브 (Knowledge Wiki & Hub)       -->
+      <!-- ======================================================== -->
+      <section class="tab-pane" id="pane-study">
+        <div class="study-view-grid">
+          <!-- 좌측: 지식 에디터 & 이미지 업로더 -->
+          <div class="card study-editor-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-book-open-reader text-cyan"></i> 오늘의 학습 메모 & 지식 자산화</h3>
+              <div class="editor-actions">
+                <button id="copyStudyNotesBtn" class="btn btn-secondary btn-sm" title="노트 전체 복사">
+                  <i class="fa-solid fa-copy text-cyan"></i> 노트 전체 복사
+                </button>
+                <button id="aiStudyAnalyzeBtn" class="btn btn-gemini btn-sm" title="Gemini 지식 심화 분석">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> Gemini 지식 심화 분석
+                </button>
+                <button id="saveStudyNotesBtn" class="btn btn-primary btn-sm"><i class="fa-solid fa-floppy-disk"></i> 저장</button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <label>🎯 집중 학습 주제 (Topic / Category)</label>
+                <input type="text" id="studyMainTopicInput" placeholder="예: 데이터 분석 고급 기법, 거시경제 지표 해석, 비즈니스 글쓰기" class="input-focus">
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>⏱️ 목표 / 달성 공부 시간</label>
+                  <div class="study-time-inputs">
+                    <span>목표: <input type="number" id="studyGoalHours" min="0" max="24" step="0.5" value="2.0" class="input-sm" style="width: 65px;">h</span>
+                    <span>달성: <input type="number" id="studyActualHours" min="0" max="24" step="0.5" value="0" class="input-sm" style="width: 65px;">h</span>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>💡 핵심 배움 (TIL 1줄 요약)</label>
+                  <input type="text" id="studyTilSummaryInput" placeholder="오늘 배운 것 중 가장 중요한 핵심 문장..." class="input-sm">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                  <label>📝 지식 요약 및 상세 노트 (Markdown 지원)</label>
+                </div>
+                <textarea id="studyDetailedNotes" rows="9" class="journal-textarea" placeholder="오늘 공부한 핵심 개념, 정리할 내용, 중요한 인사이트를 체계적으로 작성하세요..."></textarea>
+              </div>
+
+              <!-- 이미지 첨부 갤러리 -->
+              <div class="study-photos-section">
+                <div class="study-photos-header">
+                  <label><i class="fa-solid fa-image text-cyan"></i> 학습 이미지 & 캡처 첨부 (무제한 용량 지원)</label>
+                  <label for="studyPhotoInput" class="btn btn-secondary btn-sm" style="cursor:pointer;">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> 이미지 추가
+                  </label>
+                  <input type="file" id="studyPhotoInput" accept="image/*" style="display: none;">
+                </div>
+                <div class="study-photo-gallery" id="studyPhotoGallery"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 우측: 누적 지식 위키 보관소 -->
+          <div class="card study-archive-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-cubes-stacked text-indigo"></i> 누적 지식 위키 (Knowledge Wiki)</h3>
+            </div>
+            <div class="card-body">
+              <div class="study-search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="studySearchInput" placeholder="주제, 핵심 개념, 키워드 검색...">
+              </div>
+              <div class="study-archive-list" id="studyArchiveList"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- 4. 인생 목표 로드맵 (Goals & Roadmap)                     -->
+      <!-- ======================================================== -->
+      <section class="tab-pane" id="pane-goals">
+        <div class="goals-page-container">
+          <div class="goals-header-bar">
+            <div class="goals-header-info">
+              <h2><i class="fa-solid fa-bullseye text-cyan"></i> 인생 목표 로드맵 (Life Goals & Roadmap)</h2>
+              <p>장기 비전(1~3년) ➡️ 중기 마일스톤(1년/분기) ➡️ 단기 목표 ➡️ 일일 To-Do로 이어지는 계층형 실행 체계</p>
+            </div>
+            <button id="openNewGoalModalBtn" class="btn btn-primary"><i class="fa-solid fa-plus"></i> 새로운 목표 수립하기</button>
+          </div>
+
+          <div class="goal-pillar-filters" id="goalPillarFilters">
+            <button class="pillar-btn active" data-pillar="all">🌟 전체 보기</button>
+            <button class="pillar-btn" data-pillar="career">💼 커리어 & 업무</button>
+            <button class="pillar-btn" data-pillar="study">📚 공부 & 역량</button>
+            <button class="pillar-btn" data-pillar="wealth">💰 경제적 자유 & 투자</button>
+            <button class="pillar-btn" data-pillar="health">💪 건강 & 에너지</button>
+            <button class="pillar-btn" data-pillar="mindset">🧘 마인드셋 & 라이프</button>
+          </div>
+
+          <div class="goals-grid" id="goalsGrid"></div>
+        </div>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- 5. 오늘의 일기 & 회고 (Journal & Reflection)             -->
+      <!-- ======================================================== -->
+      <section class="tab-pane" id="pane-journal">
+        <div class="journal-wrapper">
+          <div class="journal-sidebar">
+            <div class="journal-meta-card highlight-gemini-box">
+              <h4><i class="fa-solid fa-wand-magic-sparkles text-yellow"></i> Gemini AI 스마트 분석</h4>
+              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 10px;">
+                작성한 일기에서 <strong>내일의 실행 To-Do, 배움 요약, 인생 원칙</strong>을 한 번에 도출합니다.
+              </p>
+              <button class="btn btn-gemini btn-sm" id="extractActionGuideBtn" style="width: 100%; justify-content: center;">
+                <i class="fa-solid fa-sparkles"></i> Gemini로 실행 가이드 도출
+              </button>
+            </div>
+
+            <div class="journal-meta-card">
+              <h4><i class="fa-solid fa-lightbulb text-cyan"></i> 스마트 질문 가이드</h4>
+              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 10px;">4가지 질문에 답하면 완성도 높은 일기와 실행 계획이 자동 생성됩니다.</p>
+              <button class="btn btn-secondary btn-sm" id="openWizardBtn" style="width: 100%; justify-content: center;">
+                <i class="fa-solid fa-magic"></i> 4문답 가이드로 작성
+              </button>
+            </div>
+
+            <div class="journal-meta-card">
+              <h4><i class="fa-solid fa-layer-group"></i> 성장 서식 템플릿</h4>
+              <div class="template-buttons">
+                <button class="btn btn-outline btn-template" data-template="action">
+                  <i class="fa-solid fa-stairs"></i> 실행 가이드 일기 (사유→행동)
+                </button>
+                <button class="btn btn-outline btn-template" data-template="dalio">
+                  <i class="fa-solid fa-compass"></i> 레이 달리오 5단계 회고
+                </button>
+                <button class="btn btn-outline btn-template" data-template="study">
+                  <i class="fa-solid fa-brain"></i> 학습 회고 일기 (배움과 적용)
+                </button>
+                <button class="btn btn-outline btn-template" data-template="kpt">
+                  <i class="fa-solid fa-chart-gantt"></i> KPT 회고 (Keep, Problem, Try)
+                </button>
+                <button class="btn btn-outline btn-template" data-template="gratitude">
+                  <i class="fa-solid fa-hands-praying"></i> 감사 일기 (3 Good Things)
+                </button>
+              </div>
+
+              <hr class="divider">
+
+              <h4><i class="fa-solid fa-tags"></i> 태그 관리</h4>
+              <div class="tags-input-container">
+                <div class="tags-list" id="journalTagsList"></div>
+                <div class="tag-input-row">
+                  <input type="text" id="journalTagInput" placeholder="#태그 입력 후 Enter" class="input-sm">
+                  <button id="addTagBtn" class="btn btn-secondary btn-sm">추가</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 중앙 에디터 -->
+          <div class="journal-editor-container">
+            <div class="editor-header">
+              <input type="text" id="journalTitle" placeholder="오늘 하루를 나타내는 제목..." class="journal-title-input">
+              <div class="editor-actions">
+                <span class="auto-save-indicator" id="autoSaveIndicator"><i class="fa-solid fa-check"></i> 저장됨</span>
+                <button id="speechBtn" class="btn btn-secondary btn-sm" title="음성 입력"><i class="fa-solid fa-microphone"></i> 음성</button>
+                <button id="journalPreviewToggle" class="btn btn-secondary btn-sm" title="미리보기"><i class="fa-solid fa-eye"></i> 미리보기</button>
+                <button id="exportMdBtn" class="btn btn-secondary btn-sm" title="마크다운 다운로드"><i class="fa-solid fa-download"></i> .MD</button>
+                <button id="printJournalBtn" class="btn btn-secondary btn-sm" title="인쇄/PDF"><i class="fa-solid fa-print"></i> 인쇄</button>
+                <button id="saveJournalBtn" class="btn btn-primary btn-sm"><i class="fa-solid fa-floppy-disk"></i> 저장</button>
+              </div>
+            </div>
+
+            <!-- 툴바 -->
+            <div class="editor-toolbar" id="editorToolbar">
+              <button class="tool-btn" data-cmd="bold" title="굵게"><i class="fa-solid fa-bold"></i></button>
+              <button class="tool-btn" data-cmd="italic" title="기울임"><i class="fa-solid fa-italic"></i></button>
+              <button class="tool-btn" data-cmd="heading" title="제목"><i class="fa-solid fa-heading"></i></button>
+              <button class="tool-btn" data-cmd="action-block" title="실행 가이드 블록"><i class="fa-solid fa-person-running"></i></button>
+              <button class="tool-btn" data-cmd="quote" title="인용구"><i class="fa-solid fa-quote-left"></i></button>
+              <button class="tool-btn" data-cmd="list" title="글머리 기호"><i class="fa-solid fa-list-ul"></i></button>
+              <button class="tool-btn" data-cmd="task" title="체크리스트"><i class="fa-solid fa-list-check"></i></button>
+              <button class="tool-btn" data-cmd="code" title="코드 블록"><i class="fa-solid fa-code"></i></button>
+              <button class="tool-btn" data-cmd="hr" title="구분선"><i class="fa-solid fa-minus"></i></button>
+            </div>
+
+            <div class="editor-body">
+              <textarea id="journalContent" class="journal-textarea" placeholder="오늘 있었던 일, 느낀 감정, 배운 점, 내일을 위한 다짐과 구체적 실행 계획을 자유롭게 적어보세요..."></textarea>
+              <div id="journalPreview" class="journal-preview-pane markdown-body" style="display: none;"></div>
+            </div>
+
+            <div class="editor-footer">
+              <div class="word-counter">
+                <span>글자 수: <strong id="charCount">0</strong>자</span>
+                <span class="divider-dot">·</span>
+                <span>단어 수: <strong id="wordCount">0</strong>단어</span>
+                <span class="divider-dot">·</span>
+                <span>예상 읽는 시간: <strong id="readTime">0</strong>분</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 우측 미니 캘린더 -->
+          <div class="journal-right-sidebar">
+            <div class="journal-meta-card journal-cal-widget">
+              <div class="journal-cal-header">
+                <button id="jCalPrev" class="nav-mini-btn"><i class="fa-solid fa-chevron-left"></i></button>
+                <h4 id="jCalTitle" class="jcal-title-text">2026년 8월</h4>
+                <button id="jCalNext" class="nav-mini-btn"><i class="fa-solid fa-chevron-right"></i></button>
+                <button id="jCalToday" class="btn btn-secondary btn-sm" style="padding: 2px 8px; font-size: 0.75rem;">오늘</button>
+              </div>
+              <div class="jcal-weekdays">
+                <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+              </div>
+              <div class="jcal-days-grid" id="jCalGrid"></div>
+            </div>
+
+            <div class="journal-meta-card" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+              <h4><i class="fa-solid fa-bookmark text-blue"></i> 이달의 기록 아카이브</h4>
+              <div class="jcal-month-list" id="jCalMonthList"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- 6. 인생 원칙 보관소 (Principles OS)                       -->
+      <!-- ======================================================== -->
+      <section class="tab-pane" id="pane-principles">
+        <div class="principles-container">
+          <div class="card principles-header-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-gem text-yellow"></i> 나만의 인생 원칙 & 의사결정 규칙</h3>
+              <div style="display: flex; gap: 6px;">
+                <button id="aiPrincipleSuggestBtn" class="btn btn-gemini btn-sm">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> Gemini 원칙 추천
+                </button>
+                <button id="addPrincipleModalBtn" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> 원칙 추가</button>
+              </div>
+            </div>
+            <div class="card-body">
+              <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">
+                실패와 배움에서 얻은 인생의 통찰, 타협하지 않을 나만의 행동 원칙들을 누적하고 수시로 되새깁니다.
+              </p>
+              <div class="principles-grid" id="principlesGrid"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- 7. 캘린더 & 아카이브 (Calendar Tab)                      -->
+      <!-- ======================================================== -->
+      <section class="tab-pane" id="pane-calendar">
+        <div class="calendar-page-grid">
+          <div class="card calendar-card">
+            <div class="card-header">
+              <div class="calendar-header-controls">
+                <button id="calPrevMonth" class="icon-btn"><i class="fa-solid fa-chevron-left"></i></button>
+                <h3 id="calendarMonthTitle">2026년 8월</h3>
+                <button id="calNextMonth" class="icon-btn"><i class="fa-solid fa-chevron-right"></i></button>
+              </div>
+              <button id="calTodayBtn" class="btn btn-secondary btn-sm">이번 달</button>
+            </div>
+            <div class="card-body">
+              <div class="calendar-grid-header">
+                <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+              </div>
+              <div class="calendar-grid-days" id="calendarDaysGrid"></div>
+            </div>
+          </div>
+
+          <div class="card archive-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-box-archive"></i> 지난 일기 & 성장 아카이브</h3>
+            </div>
+            <div class="card-body">
+              <div class="archive-search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="archiveSearchInput" placeholder="일기, 공부 내용, 키워드 검색...">
+              </div>
+              <div class="filter-pills" id="archiveMoodFilters">
+                <button class="filter-pill active" data-filter="all">전체</button>
+                <button class="filter-pill" data-filter="great">😆 최고</button>
+                <button class="filter-pill" data-filter="good">😊 좋음</button>
+                <button class="filter-pill" data-filter="neutral">😐 보통</button>
+                <button class="filter-pill" data-filter="tired">🥱 피곤</button>
+                <button class="filter-pill" data-filter="stressed">😣 스트레스</button>
+              </div>
+              <div class="archive-list" id="archiveList"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- 8. 성장 통계 & 실행률 분석 (Analytics)                   -->
+      <!-- ======================================================== -->
+      <section class="tab-pane" id="pane-analytics">
+        <div class="analytics-grid">
+          <div class="metric-card">
+            <div class="metric-icon bg-indigo"><i class="fa-solid fa-fire"></i></div>
+            <div class="metric-info">
+              <div class="metric-label">연속 성장 기록 (Streak)</div>
+              <div class="metric-val" id="streakDays">0일</div>
+              <div class="metric-sub" id="streakSub">꾸준함이 비범함을 만듭니다</div>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-icon bg-emerald"><i class="fa-solid fa-bullseye"></i></div>
+            <div class="metric-info">
+              <div class="metric-label">목표 달성 진행률</div>
+              <div class="metric-val" id="totalGoalRateVal">0%</div>
+              <div class="metric-sub" id="totalGoalCountVal">총 0개 목표 관리 중</div>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-icon bg-cyan"><i class="fa-solid fa-graduation-cap"></i></div>
+            <div class="metric-info">
+              <div class="metric-label">이번 달 공부 누적 시간</div>
+              <div class="metric-val" id="totalStudyHoursVal">0시간</div>
+              <div class="metric-sub" id="totalStudyCountVal">총 0개 주제 학습</div>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-icon bg-amber"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="metric-info">
+              <div class="metric-label">최근 7일 실행 완료율</div>
+              <div class="metric-val" id="todoRateVal">0%</div>
+              <div class="metric-sub" id="todoRateSub">실행 폐루프 분석</div>
+            </div>
+          </div>
+
+          <div class="card span-2">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-chart-pie"></i> 이번 달 마인드셋 분포 (Mood Breakdown)</h3>
+            </div>
+            <div class="card-body">
+              <div class="mood-bars-container" id="moodAnalyticsBars"></div>
+            </div>
+          </div>
+
+          <div class="card span-2">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-chart-bar"></i> 습관별 달성 현황</h3>
+            </div>
+            <div class="card-body">
+              <div class="habit-stats-container" id="habitAnalyticsBars"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ======================================================== -->
+    <!-- ⚡⚡⚡ 딥 포커스 몰입 젠 모드 (Zen Mode Overlay) ⚡⚡⚡       -->
+    <!-- ======================================================== -->
+    <div class="zen-mode-overlay" id="zenModeOverlay" style="display: none;">
+      <div class="zen-mode-container">
+        <div class="zen-header">
+          <div class="zen-badge"><i class="fa-solid fa-bolt text-yellow"></i> 딥 포커스 몰입 모드 (DEEP WORK)</div>
+          <button id="exitZenModeBtn" class="btn btn-secondary btn-sm"><i class="fa-solid fa-xmark"></i> 몰입 모드 종료 (ESC)</button>
+        </div>
+
+        <div class="zen-body">
+          <div class="zen-focus-title-label">지금 이 순간 몰입해야 할 단 하나의 과업</div>
+          <h1 class="zen-focus-title" id="zenFocusTitle">오늘의 북극성 미션을 설정해주세요</h1>
+          
+          <div class="zen-timer-display" id="zenTimerDisplay">25:00</div>
+          
+          <div class="zen-controls">
+            <button id="zenStartTimerBtn" class="btn btn-primary btn-lg"><i class="fa-solid fa-play"></i> 몰입 시작</button>
+            <button id="zenResetTimerBtn" class="btn btn-secondary btn-lg"><i class="fa-solid fa-rotate-left"></i> 리셋</button>
+          </div>
+
+          <div class="zen-todo-checklist">
+            <div class="zen-todo-header">오늘의 핵심 실행 리스트</div>
+            <ul class="zen-todo-list" id="zenTodoList"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODALS                                                   -->
+  <!-- ======================================================== -->
+
+  <!-- 1. Google Gemini API 키 설정 모달 -->
+  <div class="modal-backdrop" id="geminiModal">
+    <div class="modal-card" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> Google Gemini AI 연동 설정</h3>
+        <button class="modal-close-btn" id="closeGeminiModalBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">
+          Google AI Studio에서 무료로 발급받은 Gemini API 키를 등록하면, <strong>실시간 팩트 폭격 코칭, 목표 세부 계획 자동 설계, 일기 실행 가이드 연동</strong>이 완벽하게 가동됩니다.
+        </p>
+
+        <div class="form-group">
+          <label for="geminiApiKeyInput">🔑 Google Gemini API Key</label>
+          <input type="password" id="geminiApiKeyInput" placeholder="AIzaSy..." class="input-focus">
+          <div style="margin-top: 6px; font-size: 0.78rem; color: var(--text-muted);">
+            * <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--accent-secondary); text-decoration: underline;">Google AI Studio에서 무료로 1분 만에 발급받기 &nearr;</a>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="geminiModelSelect">사용할 Gemini 모델</label>
+          <select id="geminiModelSelect" class="select-sm">
+            <option value="gemini-1.5-flash">Gemini 1.5 Flash (초고속 & 추천)</option>
+            <option value="gemini-1.5-pro">Gemini 1.5 Pro (고도화된 깊은 추론)</option>
+            <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+          </select>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="cancelGeminiModalBtn">취소</button>
+          <button type="button" class="btn btn-danger btn-sm" id="removeGeminiKeyBtn">키 삭제</button>
+          <button type="button" class="btn btn-primary" id="saveGeminiKeyBtn"><i class="fa-solid fa-check"></i> 저장 및 테스트</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. 새로운 목표 수립 모달 -->
+  <div class="modal-backdrop" id="goalModal">
+    <div class="modal-card" style="max-width: 620px;">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-bullseye text-cyan"></i> 새로운 인생 목표 & 실행 로드맵 수립</h3>
+        <button class="modal-close-btn" id="closeGoalModalBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="goalForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label>라이프 영역 (Pillar)</label>
+              <select id="goalPillar" class="select-sm">
+                <option value="career">💼 커리어 & 업무 성과</option>
+                <option value="study">📚 공부 & 역량 개발</option>
+                <option value="wealth">💰 경제적 자유 & 재테크</option>
+                <option value="health">💪 건강 & 에너지</option>
+                <option value="mindset">🧘 마인드셋 & 라이프</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>목표 기간 (Time Horizon)</label>
+              <select id="goalHorizon" class="select-sm">
+                <option value="long">🚀 장기 비전 (1~3년)</option>
+                <option value="mid">🎯 중기 마일스톤 (올해 / 분기)</option>
+                <option value="short">⚡ 단기 목표 (이번 달)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <label>목표 명칭 (Goal Statement)</label>
+              <button type="button" id="aiGoalBreakdownBtn" class="btn btn-gemini btn-sm" style="padding:2px 8px; font-size:0.75rem;">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Gemini로 자동 계획 완성
+              </button>
+            </div>
+            <input type="text" id="goalTitle" placeholder="예: 시니어 데이터 분석가 이직 / 금융 자격증 취득" required>
+          </div>
+
+          <div class="form-group">
+            <label>핵심 측정 지표 (Key Results / 성공 기준)</label>
+            <input type="text" id="goalKeyResult" placeholder="예: 포트폴리오 3개 완성 및 깃허브 공개" required>
+          </div>
+
+          <div class="form-group">
+            <label>구체적 실행 액션 리스트 (Action Steps - 줄바꿈 구분)</label>
+            <textarea id="goalActionSteps" rows="3" class="input-memo" placeholder="1. 주 3회 퇴근 후 1시간 강의 수강&#10;2. 실전 프로젝트 코드 1개 깃허브 업로드"></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>마감 목표일</label>
+              <input type="date" id="goalDeadline" required>
+            </div>
+            <div class="form-group">
+              <label>현재 진행률 (%)</label>
+              <input type="number" id="goalProgress" min="0" max="100" value="0" class="input-sm text-center">
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" id="cancelGoalBtn">취소</button>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> 목표 등록</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 스마트 질문 가이드 모달 -->
+  <div class="modal-backdrop" id="wizardModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-wand-magic-sparkles"></i> 스마트 질문 가이드 저널링</h3>
+        <button class="modal-close-btn" id="closeWizardModalBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">아래 4가지 질문에 편안하게 답해보세요. 완성 버튼을 누르면 정돈된 일기와 실행 가이드로 자동 조합됩니다.</p>
+        <div class="form-group">
+          <label><strong>1. Fact (사실):</strong> 오늘 가장 기억에 남는 사건이나 공부한 내용은?</label>
+          <textarea id="qFact" class="input-memo" rows="2"></textarea>
+        </div>
+        <div class="form-group">
+          <label><strong>2. Feeling (감정):</strong> 그 과정에서 느꼈던 솔직한 감정은?</label>
+          <textarea id="qFeeling" class="input-memo" rows="2"></textarea>
+        </div>
+        <div class="form-group">
+          <label><strong>3. Lesson (깨달음):</strong> 오늘 하루를 통해 얻은 핵심 원칙은?</label>
+          <textarea id="qLesson" class="input-memo" rows="2"></textarea>
+        </div>
+        <div class="form-group">
+          <label><strong>4. Next Action (실행):</strong> 내일 반드시 실천할 구체적 행동 1~2가지는?</label>
+          <textarea id="qNext" class="input-memo" rows="2"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-primary" id="applyWizardBtn"><i class="fa-solid fa-check"></i> 일기로 생성</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. 원칙 추가 모달 -->
+  <div class="modal-backdrop" id="principleModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-gem text-yellow"></i> 나만의 인생 원칙 추가</h3>
+        <button class="modal-close-btn" id="closePrincipleModalBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="principleForm">
+          <div class="form-group">
+            <label>원칙 카테고리</label>
+            <select id="pCategory" class="select-sm" style="width: 100%;">
+              <option value="growth">🚀 성장 & 학습</option>
+              <option value="execution">⚡ 실행 & 몰입</option>
+              <option value="mindset">🧘 마인드셋 & 태도</option>
+              <option value="relationship">🤝 인간관계 & 소통</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>핵심 원칙 (한 줄 명제)</label>
+            <input type="text" id="pTitle" placeholder="예: 행동하지 않는 지식은 힘이 아니다." required>
+          </div>
+          <div class="form-group">
+            <label>원칙의 상세 이유 & 행동 지침</label>
+            <textarea id="pContent" rows="3" class="input-memo" placeholder="이 원칙을 지키기 위한 구체적 행동 규칙..."></textarea>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" id="cancelPrincipleBtn">취소</button>
+            <button type="submit" class="btn btn-primary">원칙 저장</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. 습관 관리 모달 -->
+  <div class="modal-backdrop" id="habitModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-gear"></i> 습관 관리</h3>
+        <button class="modal-close-btn" id="closeHabitModalBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="newHabitForm" class="new-habit-form">
+          <input type="text" id="newHabitName" placeholder="새로운 습관 이름" required>
+          <input type="text" id="newHabitIcon" placeholder="이모지 (e.g. 📖)" maxlength="2" value="✨">
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus"></i> 추가</button>
+        </form>
+        <hr class="divider">
+        <h4>현재 등록된 습관</h4>
+        <div class="modal-habit-list" id="modalHabitList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. 타임블록 모달 -->
+  <div class="modal-backdrop" id="timeBlockModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-calendar-plus"></i> 타임블록 일정 추가</h3>
+        <button class="modal-close-btn" id="closeTimeBlockModalBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="timeBlockForm" class="timeblock-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="tbStartTime">시작 시간</label>
+              <input type="time" id="tbStartTime" value="09:00" required>
+            </div>
+            <div class="form-group">
+              <label for="tbEndTime">종료 시간</label>
+              <input type="time" id="tbEndTime" value="10:00" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="tbTitle">일정 내용</label>
+            <input type="text" id="tbTitle" placeholder="예: 오전 딥워크 집중 공부" required>
+          </div>
+          <div class="form-group">
+            <label for="tbCategory">카테고리</label>
+            <select id="tbCategory">
+              <option value="career">💼 커리어/업무</option>
+              <option value="study">📚 공부/역량</option>
+              <option value="health">💪 운동/건강</option>
+              <option value="rest">☕ 휴식/여가</option>
+            </select>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" id="cancelTimeBlockBtn">취소</button>
+            <button type="submit" class="btn btn-primary">추가</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. 데이터 백업 & 안전 복원 모달 -->
+  <div class="modal-backdrop" id="backupModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-shield-halved text-emerald"></i> IndexedDB 무제한 백업 & 데이터 안전망</h3>
+        <button class="modal-close-btn" id="closeBackupModalBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">모든 데이터와 대용량 이미지는 브라우저의 <strong>IndexedDB 데이터베이스</strong>에 안전하게 영구 보관됩니다.</p>
+        <div class="backup-action-boxes">
+          <div class="backup-box">
+            <h4><i class="fa-solid fa-file-export text-cyan"></i> 전체 데이터 백업 파일 생성 (JSON)</h4>
+            <p>모든 목표 로드맵과 학습/이미지/실행 기록을 단일 파일로 다운로드합니다.</p>
+            <button id="exportJsonBtn" class="btn btn-primary"><i class="fa-solid fa-download"></i> 백업 파일 다운로드</button>
+          </div>
+
+          <div class="backup-box">
+            <h4><i class="fa-solid fa-file-import text-yellow"></i> 데이터 안전 복원 (JSON)</h4>
+            <p>이전에 백업해둔 JSON 파일을 업로드하여 데이터를 100% 복구합니다.</p>
+            <input type="file" id="importJsonInput" accept=".json" style="display: none;">
+            <button id="triggerImportBtn" class="btn btn-secondary"><i class="fa-solid fa-upload"></i> 백업 파일 선택 및 복원</button>
+          </div>
+        </div>
+
+        <hr class="divider">
+        <div class="danger-zone">
+          <h4>초기화</h4>
+          <p>모든 데이터를 초기 상태로 리셋합니다.</p>
+          <button id="resetDataBtn" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash-can"></i> 전체 데이터 초기화</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 토스트 알림 -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- 번들 스크립트 -->
+  <script src="js/app.bundle.js"></script>
+</body>
+</html>
