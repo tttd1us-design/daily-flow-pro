@@ -1549,6 +1549,61 @@ class DailyFlowApp {
       });
     }
 
+    // ==========================================
+    // 📖 Journal Aesthetic & Quick Mood/Weather Events
+    // ==========================================
+    const weatherBar = document.getElementById('journalWeatherBar');
+    if (weatherBar) {
+      weatherBar.querySelectorAll('.weather-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          weatherBar.querySelectorAll('.weather-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const dayData = storage.getDayData(this.currentDate);
+          storage.updateDayData(this.currentDate, {
+            journal: { ...dayData.journal, weather: btn.dataset.weather }
+          });
+          this.renderJournalRightCalendar();
+          this.showToast(`날씨가 [${btn.dataset.weather}]로 설정되었습니다!`);
+        });
+      });
+    }
+
+    const jMoodBar = document.getElementById('journalMoodBar');
+    if (jMoodBar) {
+      jMoodBar.querySelectorAll('.jmood-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          jMoodBar.querySelectorAll('.jmood-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const mood = btn.dataset.mood;
+          this.setMood(mood);
+          this.renderJournalRightCalendar();
+          this.showToast(`오늘의 기분이 [${btn.innerText}]으로 기록되었습니다! ✨`);
+        });
+      });
+    }
+
+    // Ctrl+V 클립보드 이미지 붙여넣기 지원
+    this.journalContent.addEventListener('paste', (e) => {
+      const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+      for (let index in items) {
+        const item = items[index];
+        if (item.kind === 'file' && item.type.startsWith('image/')) {
+          const blob = item.getAsFile();
+          const reader = new FileReader();
+          reader.onload = (evt) => {
+            const dayData = storage.getDayData(this.currentDate);
+            const photos = dayData.journal.photos || [];
+            photos.push(evt.target.result);
+            storage.updateDayData(this.currentDate, { journal: { ...dayData.journal, photos } });
+            this.renderJournalPhotos();
+            this.renderJournalRightCalendar();
+            this.showToast('클립보드 이미지가 일기에 즉시 첨부되었습니다! 📸');
+          };
+          reader.readAsDataURL(blob);
+        }
+      }
+    });
+
     if (this.copyJournalTextBtn) {
       this.copyJournalTextBtn.addEventListener('click', () => {
         const title = this.journalTitle.value.trim();
@@ -2956,6 +3011,23 @@ class DailyFlowApp {
     this.updateJournalStats();
     this.autoSaveIndicator.innerHTML = '<i class="fa-solid fa-check"></i> 저장됨';
 
+    // Weather & Mood Bar Sync
+    const weather = journal.weather || '☀️ 맑음';
+    const weatherBar = document.getElementById('journalWeatherBar');
+    if (weatherBar) {
+      weatherBar.querySelectorAll('.weather-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.weather === weather);
+      });
+    }
+
+    const jMoodBar = document.getElementById('journalMoodBar');
+    if (jMoodBar) {
+      const mood = dayData.mood || 'good';
+      jMoodBar.querySelectorAll('.jmood-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.mood === mood);
+      });
+    }
+
     this.renderAllTabCalendars();
     this.renderPrinciples();
   }
@@ -3849,6 +3921,12 @@ class DailyFlowApp {
   applyTemplate(type) {
     let tpl = '';
     switch (type) {
+      case 'quick1min':
+        tpl = `### ⚡ 1분 초간단 핵심 회고 (3문장)
+1. 💡 **오늘 가장 보람찼던 1가지:** 
+2. 🧘 **오늘 나에게 가장 고마웠던 순간:** 
+3. 🚀 **내일 퇴근 후 반드시 끝낼 1% 행동:** `;
+        break;
       case 'action':
         tpl = `### 🌟 오늘의 생각과 사유\n\n오늘 하루 나를 스쳐 지나간 생각과 직무/공부 경험을 자유롭게 적어봅니다.\n\n### 📚 오늘 위주로 공부한 핵심 주제\n- \n\n### 🚀 내일을 위한 구체적 실행 가이드\n- [ ] [커리어] \n- [ ] [재테크/공부] \n- [ ] [건강/루틴] \n\n### 💎 오늘 얻은 인생 원칙 & 지혜\n> "`;
         break;
@@ -3984,12 +4062,13 @@ class DailyFlowApp {
   }
 
   // ==========================================
-  // 17. Journal Right Sidebar Calendar
+  // 17. Journal Right Sidebar Calendar (고화질 감성 캘린더)
   // ==========================================
   renderJournalRightCalendar() {
     const titleEl = document.getElementById('jCalTitle');
     const gridEl = document.getElementById('jCalGrid');
     const listEl = document.getElementById('jCalMonthList');
+    const countBadge = document.getElementById('journalMonthCountBadge');
     if (!titleEl || !gridEl) return;
 
     const st = this.tabCalState.journal;
@@ -4004,12 +4083,13 @@ class DailyFlowApp {
     const prevLast = new Date(st.year, st.month, 0).getDate();
     for (let i = startDay - 1; i >= 0; i--) {
       const cell = document.createElement('div');
-      cell.className = 'tab-cal-day-cell other-month';
-      cell.innerHTML = `<span>${prevLast - i}</span>`;
+      cell.className = 'jcal-day-cell other-month';
+      cell.innerHTML = `<span class="jcal-day-num">${prevLast - i}</span>`;
       gridEl.appendChild(cell);
     }
 
     const todayStr = new Date().toISOString().split('T')[0];
+    const moodEmojis = { great: '😆', good: '😊', neutral: '😐', tired: '🥱', stressed: '😣' };
 
     for (let d = 1; d <= totalDays; d++) {
       const mStr = String(st.month + 1).padStart(2, '0');
@@ -4017,16 +4097,19 @@ class DailyFlowApp {
       const fullDate = `${st.year}-${mStr}-${dStr}`;
 
       const cell = document.createElement('div');
-      cell.className = 'tab-cal-day-cell';
+      cell.className = 'jcal-day-cell';
       if (fullDate === todayStr) cell.classList.add('today');
       if (fullDate === this.currentDate) cell.classList.add('selected');
 
       const dayData = storage.data.days[fullDate];
       const hasJournal = dayData && dayData.journal && (dayData.journal.title || dayData.journal.content);
+      const hasPhotos = dayData && dayData.journal && dayData.journal.photos && dayData.journal.photos.length > 0;
+      const mood = dayData && dayData.mood ? moodEmojis[dayData.mood] || '' : '';
 
       cell.innerHTML = `
-        <span>${d}</span>
-        ${hasJournal ? '<span class="tab-cal-badge-dot" style="background:#818cf8;"></span>' : ''}
+        <span class="jcal-day-num">${d}</span>
+        <span class="jcal-mood-emoji">${mood || (hasJournal ? '📝' : '')}</span>
+        ${hasPhotos ? '<span class="jcal-photo-dot" title="사진 포함"></span>' : ''}
       `;
 
       cell.addEventListener('click', () => {
@@ -4042,21 +4125,29 @@ class DailyFlowApp {
       const allJournals = storage.getAllJournals();
       const monthJournals = allJournals.filter(j => j.date.startsWith(targetYM));
 
+      if (countBadge) countBadge.textContent = `${monthJournals.length}편`;
+
       if (monthJournals.length === 0) {
-        listEl.innerHTML = `<div style="text-align:center; color: var(--text-muted); padding: 14px; font-size: 0.75rem;">이달에 작성된 일기가 없습니다.</div>`;
+        listEl.innerHTML = `<div style="text-align:center; color: var(--text-muted); padding: 24px 10px; font-size: 0.78rem;">이달에 작성된 일기가 없습니다.<br>[AI 일기 자동 생성]으로 첫 일기를 써보세요! ✨</div>`;
       } else {
-        const moodEmojis = { great: '😆', good: '😊', neutral: '😐', tired: '🥱', stressed: '😣' };
         monthJournals.forEach(j => {
-          const item = document.createElement('div');
-          item.className = `tab-cal-list-row ${j.date === this.currentDate ? 'active' : ''}`;
+          const card = document.createElement('div');
+          card.className = `jfeed-card ${j.date === this.currentDate ? 'active' : ''}`;
           const dayNum = j.date.split('-')[2];
-          item.innerHTML = `
-            <span class="tab-cal-row-date">${dayNum}일</span>
-            <span class="tab-cal-row-title" title="${this.escapeHtml(j.title)}">${this.escapeHtml(j.title || '제목 없음')}</span>
-            <span>${moodEmojis[j.mood] || '📝'}</span>
+          const mood = moodEmojis[j.mood] || '📝';
+          const weather = j.weather || '☀️';
+          const snippet = (j.content || '').replace(/[#*`_]/g, '').substring(0, 70);
+
+          card.innerHTML = `
+            <div class="jfeed-card-header">
+              <span class="jfeed-date"><i class="fa-regular fa-calendar"></i> ${dayNum}일 (${j.date})</span>
+              <span>${weather} ${mood}</span>
+            </div>
+            <div class="jfeed-title">${this.escapeHtml(j.title || '무제')}</div>
+            <div class="jfeed-snippet">${this.escapeHtml(snippet || '내용 없음...')}</div>
           `;
-          item.addEventListener('click', () => this.setDate(j.date));
-          listEl.appendChild(item);
+          card.addEventListener('click', () => this.setDate(j.date));
+          listEl.appendChild(card);
         });
       }
     }

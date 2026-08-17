@@ -1000,50 +1000,67 @@
       </section>
 
       <!-- ======================================================== -->
-      <!-- 7. 오늘의 일기 & 회고 (우측 캘린더 연동 & 효율 극대화)     -->
+      <!-- 7. 오늘의 일기 & 회고 (Apple Journal & Moleskine 에디션) -->
       <!-- ======================================================== -->
       <section class="tab-pane" id="pane-journal">
         <div class="journal-wrapper">
-          <!-- 좌측: AI 자동완성 & 스마트 툴바 -->
+          <!-- 좌측: AI 자동완성, 스마트 템플릿 & 원터치 무드/날씨 바 -->
           <div class="journal-sidebar">
+            
+            <!-- 1초 AI 자동완성 프리미엄 카드 -->
             <div class="journal-meta-card highlight-gemini-box">
-              <h4><i class="fa-solid fa-wand-magic-sparkles text-yellow"></i> 1초 AI 일기 자동 완성</h4>
-              <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 8px;">
-                오늘 완료한 <strong>To-Do, 공부 시간, 컨디션 데이터</strong>를 분석해 완성도 높은 하루 성장 일기를 1초 만에 자동 작성합니다.
+              <div class="journal-ai-badge"><i class="fa-solid fa-sparkles"></i> 1초 AI 자동 저널링</div>
+              <h4 style="font-size:0.85rem; font-weight:800; margin:4px 0 6px; color:var(--text-primary);">오늘 활동 기반 하루 회고</h4>
+              <p style="font-size: 0.76rem; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.5;">
+                오늘 완료한 <strong>To-Do, 저녁 몰입, 공부 시간</strong>을 바탕으로 깊이 있는 하루 성장 일기를 1초 만에 완성합니다.
               </p>
-              <button class="btn btn-gemini btn-sm" id="aiAutoDraftJournalBtn" style="width: 100%; justify-content: center; margin-bottom: 6px;">
+              <button class="btn btn-gemini btn-sm" id="aiAutoDraftJournalBtn" style="width: 100%; justify-content: center; padding: 7px 10px; margin-bottom: 6px;">
                 <i class="fa-solid fa-pen-nib"></i> 오늘 활동 기반 AI 일기 자동 생성
               </button>
               <button class="btn btn-secondary btn-sm" id="extractActionGuideBtn" style="width: 100%; justify-content: center;">
-                <i class="fa-solid fa-sparkles"></i> 작성 일기에서 실행 To-Do 도출
+                <i class="fa-solid fa-list-check text-emerald"></i> 일기에서 내일 실행 To-Do 도출
               </button>
             </div>
 
+            <!-- 오늘의 날씨 & 원터치 무드 셀렉터 -->
             <div class="journal-meta-card">
-              <h4><i class="fa-solid fa-stopwatch text-yellow"></i> 3분 패스트트랙 회고</h4>
-              <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 8px;">피곤한 날에도 부담 없이 3분 만에 하루를 정리하는 질문 가이드입니다.</p>
-              <button class="btn btn-secondary btn-sm" id="openWizardBtn" style="width: 100%; justify-content: center;">
-                <i class="fa-solid fa-magic"></i> 4문답 가이드로 작성
-              </button>
+              <h4><i class="fa-solid fa-cloud-sun text-yellow"></i> 오늘의 날씨 & 기분</h4>
+              <div class="journal-weather-bar" id="journalWeatherBar">
+                <button class="weather-btn active" data-weather="☀️ 맑음" title="맑음">☀️</button>
+                <button class="weather-btn" data-weather="⛅ 구름" title="구름">⛅</button>
+                <button class="weather-btn" data-weather="🌧️ 비" title="비">🌧️</button>
+                <button class="weather-btn" data-weather="❄️ 눈" title="눈">❄️</button>
+                <button class="weather-btn" data-weather="⚡ 천둥" title="천둥">⚡</button>
+              </div>
+              <div class="journal-mood-bar" id="journalMoodBar" style="margin-top: 6px;">
+                <button class="jmood-btn active" data-mood="great" title="최고 😆">😆 최고</button>
+                <button class="jmood-btn" data-mood="good" title="좋음 😊">😊 좋음</button>
+                <button class="jmood-btn" data-mood="neutral" title="보통 😐">😐 보통</button>
+                <button class="jmood-btn" data-mood="tired" title="피곤 🥱">🥱 피곤</button>
+              </div>
             </div>
 
+            <!-- 1분 초간단 퀵 템플릿 서식 -->
             <div class="journal-meta-card">
-              <h4><i class="fa-solid fa-layer-group"></i> 성장 서식 템플릿</h4>
+              <h4><i class="fa-solid fa-layer-group text-cyan"></i> 성장 서식 & 1분 퀵 템플릿</h4>
               <div class="template-buttons">
+                <button class="btn btn-outline btn-template" data-template="quick1min">
+                  <i class="fa-solid fa-bolt text-yellow"></i> ⚡ 1분 초간단 회고 (3문장)
+                </button>
                 <button class="btn btn-outline btn-template" data-template="action">
-                  <i class="fa-solid fa-stairs"></i> 실행 가이드 일기 (사유→행동)
+                  <i class="fa-solid fa-stairs text-cyan"></i> 🏃 실행 가이드 일기 (사유→행동)
                 </button>
                 <button class="btn btn-outline btn-template" data-template="dalio">
-                  <i class="fa-solid fa-compass"></i> 레이 달리오 5단계 회고
+                  <i class="fa-solid fa-compass text-indigo"></i> 🧭 레이 달리오 5단계 회고
                 </button>
                 <button class="btn btn-outline btn-template" data-template="study">
-                  <i class="fa-solid fa-brain"></i> 학습 회고 일기 (배움과 적용)
-                </button>
-                <button class="btn btn-outline btn-template" data-template="kpt">
-                  <i class="fa-solid fa-chart-gantt"></i> KPT 회고 (Keep, Problem, Try)
+                  <i class="fa-solid fa-brain text-purple"></i> 📚 학습 회고 일기 (배움과 적용)
                 </button>
                 <button class="btn btn-outline btn-template" data-template="gratitude">
-                  <i class="fa-solid fa-hands-praying"></i> 감사 일기 (3 Good Things)
+                  <i class="fa-solid fa-hands-praying text-emerald"></i> 🙏 감사 일기 (3 Good Things)
+                </button>
+                <button class="btn btn-secondary btn-sm" id="openWizardBtn" style="margin-top: 4px; justify-content: center;">
+                  <i class="fa-solid fa-magic text-yellow"></i> 4문답 심층 질문 가이드
                 </button>
               </div>
 
@@ -1060,13 +1077,13 @@
             </div>
           </div>
 
-          <!-- 중앙: 고효율 스마트 에디터 (분할 뷰 & 사진 첨부) -->
+          <!-- 중앙: 고효율 감성 스마트 에디터 (분할 뷰 & 사진 첨부) -->
           <div class="journal-editor-container">
             <div class="editor-header">
               <input type="text" id="journalTitle" placeholder="오늘 하루를 관통하는 명쾌한 제목..." class="journal-title-input">
               <div class="editor-actions">
                 <span class="auto-save-indicator" id="autoSaveIndicator"><i class="fa-solid fa-check"></i> 저장됨</span>
-                <button id="speechBtn" class="btn btn-secondary btn-sm" title="음성 입력"><i class="fa-solid fa-microphone"></i> 음성</button>
+                <button id="speechBtn" class="btn btn-secondary btn-sm" title="말로 쓰는 실시간 음성 타이핑"><i class="fa-solid fa-microphone text-cyan"></i> 음성</button>
                 <button id="journalSplitToggle" class="btn btn-secondary btn-sm" title="에디터/미리보기 좌우 분할 뷰"><i class="fa-solid fa-table-columns"></i> 분할 뷰</button>
                 <button id="journalPreviewToggle" class="btn btn-secondary btn-sm" title="전체 미리보기"><i class="fa-solid fa-eye"></i> 미리보기</button>
                 <button id="copyJournalTextBtn" class="btn btn-secondary btn-sm" title="전체 복사"><i class="fa-solid fa-copy"></i> 복사</button>
@@ -1086,7 +1103,9 @@
               <button class="tool-btn" data-cmd="task" title="체크리스트"><i class="fa-solid fa-list-check text-emerald"></i></button>
               <button class="tool-btn" data-cmd="code" title="코드 블록"><i class="fa-solid fa-code"></i></button>
               <button class="tool-btn" data-cmd="hr" title="구분선"><i class="fa-solid fa-minus"></i></button>
+              
               <div style="margin-left: auto; display: flex; align-items: center; gap: 6px;">
+                <span class="journal-paste-tip"><i class="fa-solid fa-paste"></i> 사진 복사/붙여넣기(Ctrl+V) 지원</span>
                 <label for="journalPhotoInput" class="btn btn-secondary btn-sm" style="cursor: pointer; padding: 2px 8px; font-size: 0.75rem;">
                   <i class="fa-solid fa-image text-cyan"></i> 사진 첨부
                 </label>
@@ -1113,13 +1132,14 @@
                 <span class="divider-dot">·</span>
                 <span>예상 읽는 시간: <strong id="readTime">0</strong>분</span>
               </div>
-              <div style="font-size: 0.72rem; color: var(--text-muted);">
-                ⚡ 실시간 자동 저장 및 IndexedDB 동기화 지원
+              <div style="font-size: 0.72rem; color: var(--text-muted); display:flex; align-items:center; gap:6px;">
+                <span class="pulse-indicator" style="width:6px; height:6px;"></span>
+                <span>실시간 자동 저장 및 IndexedDB 동기화 지원</span>
               </div>
             </div>
           </div>
 
-          <!-- 우측 일기 캘린더 사이드바 -->
+          <!-- 우측 고화질 일기 & 감정 캘린더 사이드바 -->
           <div class="journal-right-sidebar">
             <div class="journal-meta-card journal-cal-widget">
               <div class="journal-cal-header">
@@ -1135,7 +1155,10 @@
             </div>
 
             <div class="journal-meta-card" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
-              <h4><i class="fa-solid fa-bookmark text-blue"></i> 이달의 일기 아카이브</h4>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <h4><i class="fa-solid fa-bookmark text-purple"></i> 이달의 감성 일기 피드</h4>
+                <span class="hierarchy-count-badge" id="journalMonthCountBadge">0편</span>
+              </div>
               <div class="jcal-month-list" id="jCalMonthList"></div>
             </div>
           </div>
