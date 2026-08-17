@@ -713,16 +713,34 @@ body {
   padding-bottom: 10px;
 }
 
-.hierarchy-section-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.hierarchy-count-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
 }
 
-.hierarchy-section-title h3 {
-  font-size: 0.95rem;
-  font-weight: 800;
-  margin: 0;
+/* 인라인 빠른 추가 폼 */
+.hierarchy-inline-form {
+  display: flex;
+  gap: 6px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 6px 10px;
+  border-radius: var(--radius-md);
+}
+.hierarchy-inline-form input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  outline: none;
+  font-size: 0.82rem;
+}
+.hierarchy-inline-form input:focus {
+  color: var(--text-primary);
 }
 
 .hierarchy-badge {
@@ -741,6 +759,53 @@ body {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
+}
+
+/* 하위 목표 파생 및 퀵 진행률 버튼 */
+.hgoal-cascade-bar {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--border-color);
+}
+.hgoal-cascade-btn {
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: #a5b4fc;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all var(--transition-fast);
+}
+.hgoal-cascade-btn:hover {
+  background: var(--accent-primary);
+  color: #ffffff;
+}
+
+.hgoal-quick-progress-group {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+.hgoal-step-btn {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.hgoal-step-btn:hover {
+  background: var(--accent-secondary);
+  color: #fff;
 }
 
 /* Goals Tab Legacy Styles */
