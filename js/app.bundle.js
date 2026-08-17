@@ -284,9 +284,62 @@ class IndexedDBStorageManager {
     }
   }
 
-  deleteMemo(id) {
-    if (!this.data.memos) this.data.memos = [];
-    this.data.memos = this.data.memos.filter(m => m.id !== id);
+  // ==========================================
+  // 🏛️ Trillion Lifetime Mastery Storage (비전, 가치, 아이디어뱅크)
+  // ==========================================
+  getTrillionMastery() {
+    if (!this.data.trillionMastery) {
+      this.data.trillionMastery = {
+        vision: '',
+        val1: '',
+        val2: '',
+        val3: '',
+        ideas: [
+          {
+            id: 'tidea_1',
+            title: '글로벌 엔터프라이즈 AI 자동화 파이프라인 플랫폼',
+            content: '기업의 반복 노동을 90% 제거하는 소프트웨어 시스템. SaaS 구독 모델로 전 세계 B2B 확장성 확보.',
+            category: 'business',
+            createdAt: new Date().toISOString()
+          },
+          {
+            id: 'tidea_2',
+            title: '독점적 현금흐름 창출 부동산 및 우량 인덱스 복리 매수',
+            content: '매월 창출되는 잉여 현금을 가장 안전하고 강력한 배당/인덱스 자산으로 기계적 재투자.',
+            category: 'invest',
+            createdAt: new Date().toISOString()
+          }
+        ]
+      };
+      this.saveData();
+    }
+    return this.data.trillionMastery;
+  }
+
+  updateTrillionMastery(partial) {
+    const current = this.getTrillionMastery();
+    this.data.trillionMastery = { ...current, ...partial };
+    this.saveData();
+    return this.data.trillionMastery;
+  }
+
+  addTrillionIdea(idea) {
+    const mastery = this.getTrillionMastery();
+    const newIdea = {
+      id: 'tidea_' + Date.now(),
+      title: idea.title || '10조 아이디어',
+      content: idea.content || '',
+      category: idea.category || 'business',
+      createdAt: new Date().toISOString()
+    };
+    mastery.ideas.unshift(newIdea);
+    this.saveData();
+    return newIdea;
+  }
+
+  deleteTrillionIdea(id) {
+    const mastery = this.getTrillionMastery();
+    mastery.ideas = mastery.ideas.filter(i => i.id !== id);
     this.saveData();
   }
 
@@ -1231,6 +1284,111 @@ class DailyFlowApp {
     const aiTrillionCoachBtn = document.getElementById('aiTrillionCoachBtn');
     const trillionAiBox = document.getElementById('trillionAiResponseBox');
     const pushAllTrillionTodosBtn = document.getElementById('pushAllTrillionTodosBtn');
+    const trillionSubnavBar = document.getElementById('trillionSubnavBar');
+
+    // 10조 서브탭 전환
+    if (trillionSubnavBar) {
+      trillionSubnavBar.querySelectorAll('.tsub-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          trillionSubnavBar.querySelectorAll('.tsub-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const sub = btn.dataset.sub;
+          document.querySelectorAll('.trillion-subview').forEach(view => {
+            view.style.display = view.id === `tsub-view-${sub}` ? 'block' : 'none';
+          });
+          if (sub === 'ideabank') this.renderTrillionIdeas();
+          if (sub === 'vision') this.loadTrillionVision();
+        });
+      });
+    }
+
+    // 비전 캔버스 저장
+    const saveTrillionVisionBtn = document.getElementById('saveTrillionVisionBtn');
+    if (saveTrillionVisionBtn) {
+      saveTrillionVisionBtn.addEventListener('click', () => {
+        const vision = document.getElementById('trillionVisionInput')?.value.trim() || '';
+        const val1 = document.getElementById('trillionVal1')?.value.trim() || '';
+        const val2 = document.getElementById('trillionVal2')?.value.trim() || '';
+        const val3 = document.getElementById('trillionVal3')?.value.trim() || '';
+
+        storage.updateTrillionMastery({ vision, val1, val2, val3 });
+        this.showToast('나의 평생 10조 비전과 핵심가치가 안전하게 저장되었습니다! 🏛️');
+      });
+    }
+
+    // 10조 아이디어 뱅크 폼 제출
+    const trillionIdeaForm = document.getElementById('trillionIdeaForm');
+    if (trillionIdeaForm) {
+      trillionIdeaForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const title = document.getElementById('tideaTitle')?.value.trim();
+        const content = document.getElementById('tideaContent')?.value.trim();
+        const category = document.getElementById('tideaCategory')?.value || 'business';
+        if (!title) return;
+
+        storage.addTrillionIdea({ title, content, category });
+        document.getElementById('tideaTitle').value = '';
+        document.getElementById('tideaContent').value = '';
+        this.renderTrillionIdeas();
+        this.showToast('10조 스케일업 아이디어가 아이디어 뱅크에 저장되었습니다! 💡');
+      });
+    }
+
+    // AI 10조 아이디어 발굴 브레인스토밍
+    const aiTrillionBrainstormBtn = document.getElementById('aiTrillionBrainstormBtn');
+    if (aiTrillionBrainstormBtn) {
+      aiTrillionBrainstormBtn.addEventListener('click', async () => {
+        aiTrillionBrainstormBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 발굴 중...';
+        const mastery = storage.getTrillionMastery();
+        const vision = mastery.vision || '글로벌 초격차 복리 비즈니스 시스템 구축';
+
+        const prompt = `나의 10조 비전: [${vision}]
+위 비전에 부합하는 10조 규모 잠재력을 가진 차세대 비즈니스/소프트웨어 아이디어 2가지를 제안해줘. (아이디어 제목, 독점적 해자 Moat, 4대 레버리지 적용 방안).`;
+
+        const res = await geminiClient.generateText(prompt);
+        aiTrillionBrainstormBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> AI 10조 아이디어 발굴';
+
+        storage.addTrillionIdea({
+          title: '🤖 [AI 제안] 글로벌 복리 스케일업 비즈니스',
+          content: res,
+          category: 'business'
+        });
+
+        this.renderTrillionIdeas();
+        this.showToast('Gemini가 10조 아이디어를 아이디어 뱅크에 꽂아드렸습니다! 💡');
+      });
+    }
+
+    // 일일 행동 감사 (Action Audit) 실행
+    const runActionAuditBtn = document.getElementById('runActionAuditBtn');
+    const auditResultBox = document.getElementById('auditResultBox');
+    if (runActionAuditBtn) {
+      runActionAuditBtn.addEventListener('click', async () => {
+        if (!auditResultBox) return;
+        auditResultBox.innerHTML = '<div style="text-align:center; padding:16px;"><i class="fa-solid fa-spinner fa-spin text-emerald" style="font-size:1.5rem;"></i><p style="margin-top:6px; color:var(--text-secondary);">제미나이 행동 감사관이 오늘 하루를 냉정하게 판정 중입니다...</p></div>';
+
+        const userRef = document.getElementById('dailyAuditUserReflection')?.value.trim() || '자가 성찰 미입력';
+        const dayData = storage.getDayData(this.currentDate);
+        const todos = dayData.todos || [];
+        const done = todos.filter(t => t.completed).length;
+
+        const prompt = `[10조 자산가 일일 행동 냉정 감사(Audit) 리포트]
+오늘 날짜: ${this.currentDate}
+완료한 과업: ${done}/${todos.length}개 (${todos.map(t => (t.completed ? '✅' : '❌') + ' ' + t.text).join(', ')})
+사용자의 오늘 행동 자가 검증: "${userRef}"
+
+당신은 10조 자산가의 냉정한 행동 감사관 AI입니다.
+아래 포맷으로 단호하게 평가해 주세요:
+1. ⚖️ **10조 적합도 등급:** (Grade S / Grade A / Grade B / Grade C 중 택1)
+2. 🎯 **오늘 가장 칭찬할 10조급 행동:**
+3. ⚠️ **반드시 제거해야 할 1차원적 시간 낭비 요소:**
+4. 🚀 **내일 아침 즉시 실행할 10조 레버리지 수정 지침:**`;
+
+        const res = await geminiClient.generateText(prompt);
+        auditResultBox.innerHTML = this.parseMarkdown(res);
+        this.showToast('제미나이 10조 행동 감사 결과가 도착했습니다! ⚖️');
+      });
+    }
 
     const updateQuestScore = () => {
       const checks = ['tquest_mindset', 'tquest_habit', 'tquest_ability', 'tquest_learning', 'tquest_action'];
@@ -3301,7 +3459,11 @@ class DailyFlowApp {
     }
 
     if (tabName === 'dashboard') this.renderTabCalendar('dashboard');
-    if (tabName === 'ten-trillion') this.renderTabCalendar('trillion');
+    if (tabName === 'ten-trillion') {
+      this.loadTrillionVision();
+      this.renderTrillionIdeas();
+      this.renderTabCalendar('trillion');
+    }
     if (tabName === 'quick-memo') {
       this.renderMemos();
       this.renderTabCalendar('memo');
@@ -3350,6 +3512,110 @@ class DailyFlowApp {
     const d = new Date(this.currentDate);
     d.setDate(d.getDate() + delta);
     this.setDate(d.toISOString().split('T')[0]);
+  }
+
+  // ==========================================
+  // 🏛️ 10조 자산가 비전 & 아이디어 뱅크 렌더러
+  // ==========================================
+  loadTrillionVision() {
+    const mastery = storage.getTrillionMastery();
+    const visInput = document.getElementById('trillionVisionInput');
+    const val1 = document.getElementById('trillionVal1');
+    const val2 = document.getElementById('trillionVal2');
+    const val3 = document.getElementById('trillionVal3');
+
+    if (visInput) visInput.value = mastery.vision || '';
+    if (val1) val1.value = mastery.val1 || '';
+    if (val2) val2.value = mastery.val2 || '';
+    if (val3) val3.value = mastery.val3 || '';
+  }
+
+  renderTrillionIdeas() {
+    const grid = document.getElementById('trillionIdeaGrid');
+    if (!grid) return;
+    const mastery = storage.getTrillionMastery();
+    const ideas = mastery.ideas || [];
+    grid.innerHTML = '';
+
+    if (ideas.length === 0) {
+      grid.innerHTML = `<div style="grid-column: 1 / -1; text-align:center; color: var(--text-muted); padding: 30px;">
+        <i class="fa-solid fa-lightbulb" style="font-size: 2rem; opacity: 0.5; margin-bottom: 8px;"></i>
+        <p>아이디어 뱅크가 비어있습니다. 상단 입력창이나 [AI 10조 아이디어 발굴]로 첫 아이디어를 등록해보세요!</p>
+      </div>`;
+      return;
+    }
+
+    const catMap = {
+      business: { label: '🏗️ 비즈니스/SaaS', cls: 'category-career' },
+      invest: { label: '💰 자본/자산 인수', cls: 'category-wealth' },
+      automation: { label: '⚡ 시스템/자동화', cls: 'category-study' },
+      network: { label: '🌐 미디어/네트워크', cls: 'category-routine' }
+    };
+
+    ideas.forEach(idea => {
+      const card = document.createElement('div');
+      card.className = 'memo-card';
+      const cat = catMap[idea.category] || { label: '아이디어', cls: 'category-career' };
+
+      card.innerHTML = `
+        <div class="memo-card-header">
+          <span class="category-tag ${cat.cls}">${cat.label}</span>
+          <button class="todo-delete-btn delete-tidea-btn" title="아이디어 삭제"><i class="fa-solid fa-trash"></i></button>
+        </div>
+        <div class="memo-card-title">${this.escapeHtml(idea.title)}</div>
+        <div class="memo-card-content">${this.escapeHtml(idea.content || '내용 없음')}</div>
+        <div class="memo-card-footer">
+          <span><i class="fa-regular fa-clock"></i> ${new Date(idea.createdAt).toLocaleDateString()}</span>
+          <div class="memo-actions-group">
+            <button class="memo-action-btn ai-scale-tidea-btn" title="Gemini 10조 스케일업 및 해자(Moat) 심화 분석">
+              <i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> 10조 스케일업
+            </button>
+            <button class="memo-action-btn push-tidea-todo-btn" title="오늘의 실행 To-Do로 즉시 등록">
+              <i class="fa-solid fa-bolt text-yellow"></i> To-Do 등록
+            </button>
+          </div>
+        </div>
+      `;
+
+      // Push to Todo
+      card.querySelector('.push-tidea-todo-btn').addEventListener('click', () => {
+        this.pushActionToTodayTodo(`[10조 파이프라인] ${idea.title}`, 'wealth');
+        this.showToast('10조 아이디어가 오늘의 실행 To-Do로 등록되었습니다! ⚡');
+      });
+
+      // AI Scale-up Analysis
+      card.querySelector('.ai-scale-tidea-btn').addEventListener('click', async () => {
+        const btn = card.querySelector('.ai-scale-tidea-btn');
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 분석 중...';
+
+        const prompt = `10조 아이디어: [${idea.title}]
+내용: [${idea.content}]
+
+위 아이디어를 10조 규모로 스케일업하기 위한 3대 핵심 전략을 날카롭게 기획해줘:
+1. 🏰 **독점적 해자(Moat) 구축 방안:**
+2. 🚀 **4대 레버리지(자본, 시스템, 코드, 미디어) 적용 계획:**
+3. ⚡ **오늘 퇴근 후 1시간 만에 만들 수 있는 1단계 프로토타입 액션:**`;
+
+        const res = await geminiClient.generateText(prompt);
+        btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> 10조 스케일업';
+
+        idea.content = `${idea.content}\n\n---\n### 🤖 Gemini 10조 스케일업 기획서\n${res}`;
+        storage.saveData();
+        this.renderTrillionIdeas();
+        this.showToast('Gemini가 10조 스케일업 기획서를 아이디어에 추가했습니다! 🚀');
+      });
+
+      // Delete
+      card.querySelector('.delete-tidea-btn').addEventListener('click', () => {
+        if (confirm(`'${idea.title}' 아이디어를 삭제하시겠습니까?`)) {
+          storage.deleteTrillionIdea(idea.id);
+          this.renderTrillionIdeas();
+          this.showToast('아이디어가 삭제되었습니다.');
+        }
+      });
+
+      grid.appendChild(card);
+    });
   }
 
   // ==========================================

@@ -442,7 +442,7 @@
       </section>
 
       <!-- ======================================================== -->
-      <!-- 2. 10조자산가되기 (10-Trillion 5-Column Scientific OS)     -->
+      <!-- 2. 10조자산가되기 (10-Trillion Lifetime Mastery OS)        -->
       <!-- ======================================================== -->
       <section class="tab-pane" id="pane-ten-trillion">
         <div class="tab-with-calendar-layout">
@@ -450,190 +450,322 @@
             
             <div class="goals-header-bar">
               <div class="goals-header-info">
-                <h2><i class="fa-solid fa-crown text-yellow"></i> 10조자산가되기 (5-Column Scientific OS)</h2>
-                <p>초거대 자산 형성을 위한 <strong>5대 과학적 영역(마인드셋·습관·능력·학습·행동)</strong>을 5열로 체계화하고, 제미나이가 실시간 전략과 일일 지침을 코칭합니다.</p>
+                <h2><i class="fa-solid fa-crown text-yellow"></i> 10조자산가되기 (Lifetime Mastery OS)</h2>
+                <p>당신이 10조 자산가가 될 때까지 평생 함께하는 <strong>핵심가치 보관소, 10조 아이디어 뱅크, 일일 행동 확인 감사(Audit), 제미나이 최고전략고문</strong> 시스템입니다.</p>
               </div>
               <div style="display:flex; gap:6px; flex-wrap:wrap;">
                 <button id="pushAllTrillionTodosBtn" class="btn btn-primary btn-sm">
                   <i class="fa-solid fa-bolt"></i> 5대 지침 오늘 To-Do로 일괄 등록
                 </button>
                 <button id="aiTrillionCoachBtn" class="btn btn-gemini btn-sm">
-                  <i class="fa-solid fa-wand-magic-sparkles"></i> 👑 Gemini 오늘의 10조 5열 지침 브리핑
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> 👑 Gemini 오늘의 10조 지침 브리핑
                 </button>
               </div>
             </div>
 
-            <!-- 10조 자산가 매일의 5대 필수 퀘스트 체크리스트 위젯 -->
-            <div class="card" style="background: linear-gradient(135deg, rgba(250, 204, 21, 0.12), rgba(19, 27, 46, 0.95)); border: 1px solid rgba(250, 204, 21, 0.35); margin-bottom: 14px;">
-              <div class="card-header" style="border-bottom: 1px solid rgba(250, 204, 21, 0.2);">
-                <h3 style="color: var(--accent-gold);"><i class="fa-solid fa-list-check"></i> 10조 자산가 매일 5대 필수 퀘스트 체크리스트</h3>
-                <span class="badge badge-warning" id="trillionQuestScoreBadge">0/5 달성</span>
+            <!-- 서브 내비게이션 탭 바 (5대 핵심 기능 탭) -->
+            <div class="trillion-subnav-bar" id="trillionSubnavBar">
+              <button class="tsub-btn active" data-sub="roadmap"><i class="fa-solid fa-sitemap text-yellow"></i> 5열 로드맵 & 퀘스트</button>
+              <button class="tsub-btn" data-sub="vision"><i class="fa-solid fa-landmark text-amber"></i> 평생 핵심가치 & 비전</button>
+              <button class="tsub-btn" data-sub="ideabank"><i class="fa-solid fa-lightbulb text-cyan"></i> 10조 아이디어 뱅크</button>
+              <button class="tsub-btn" data-sub="audit"><i class="fa-solid fa-scale-balanced text-emerald"></i> 일일 행동 확인 & 감사</button>
+              <button class="tsub-btn" data-sub="handbook"><i class="fa-solid fa-book-bookmark text-indigo"></i> 제미나이 평생 지침서</button>
+            </div>
+
+            <!-- ==================================================== -->
+            <!-- SUB-VIEW 1: 5열 로드맵 & 5대 퀘스트                  -->
+            <!-- ==================================================== -->
+            <div class="trillion-subview" id="tsub-view-roadmap">
+              <!-- 10조 자산가 매일의 5대 필수 퀘스트 체크리스트 위젯 -->
+              <div class="card" style="background: linear-gradient(135deg, rgba(250, 204, 21, 0.12), rgba(19, 27, 46, 0.95)); border: 1px solid rgba(250, 204, 21, 0.35); margin-bottom: 14px;">
+                <div class="card-header" style="border-bottom: 1px solid rgba(250, 204, 21, 0.2);">
+                  <h3 style="color: var(--accent-gold);"><i class="fa-solid fa-list-check"></i> 10조 자산가 매일 5대 필수 퀘스트 체크리스트</h3>
+                  <span class="badge badge-warning" id="trillionQuestScoreBadge">0/5 달성</span>
+                </div>
+                <div class="card-body">
+                  <div class="trillion-quest-grid-5" id="trillionQuestGrid">
+                    <label class="trillion-quest-item">
+                      <input type="checkbox" id="tquest_mindset" class="tquest-check">
+                      <div>
+                        <strong>🧠 [1열. 마인드셋]</strong>
+                        <p>노동 탈피 & 비대칭 기회 레버리지 사고</p>
+                      </div>
+                    </label>
+                    <label class="trillion-quest-item">
+                      <input type="checkbox" id="tquest_habit" class="tquest-check">
+                      <div>
+                        <strong>💎 [2열. 습관]</strong>
+                        <p>방해 없는 4시간 딥워크 & 에너지 최적화</p>
+                      </div>
+                    </label>
+                    <label class="trillion-quest-item">
+                      <input type="checkbox" id="tquest_ability" class="tquest-check">
+                      <div>
+                        <strong>🚀 [3열. 능력]</strong>
+                        <p>자본 배분 & 시스템 확장성(해자) 설계</p>
+                      </div>
+                    </label>
+                    <label class="trillion-quest-item">
+                      <input type="checkbox" id="tquest_learning" class="tquest-check">
+                      <div>
+                        <strong>📚 [4열. 학습]</strong>
+                        <p>1시간 메가트렌드·자본 시장 심층 리서치</p>
+                      </div>
+                    </label>
+                    <label class="trillion-quest-item">
+                      <input type="checkbox" id="tquest_action" class="tquest-check">
+                      <div>
+                        <strong>⚡ [5열. 행동]</strong>
+                        <p>월급 외 자립 파이프라인 1호 가동</p>
+                      </div>
+                    </label>
+                  </div>
+                </div>
               </div>
-              <div class="card-body">
-                <div class="trillion-quest-grid-5" id="trillionQuestGrid">
-                  <label class="trillion-quest-item">
-                    <input type="checkbox" id="tquest_mindset" class="tquest-check">
-                    <div>
-                      <strong>🧠 [1열. 마인드셋]</strong>
-                      <p>노동 탈피 & 비대칭 기회 레버리지 사고</p>
+
+              <!-- 🏛️ 10조 자산가 혁신 5열 아키텍처 카드 그리드 -->
+              <div class="trillion-5col-grid">
+                
+                <!-- 1열. 🧠 마인드셋 -->
+                <div class="card trillion-card">
+                  <div class="card-header">
+                    <h3><i class="fa-solid fa-brain text-cyan"></i> 1. 마인드셋</h3>
+                    <span class="badge badge-primary">Mindset</span>
+                  </div>
+                  <div class="card-body">
+                    <ul class="trillion-list">
+                      <li><strong>노동 탈피:</strong> 시간 판매형 소득을 멈추고 자본과 시스템이 일하게 한다.</li>
+                      <li><strong>비대칭 베팅:</strong> 하방 리스크는 막히고 상방은 무한한 비즈니스 집중.</li>
+                      <li><strong>극단적 장기 시계:</strong> 10년 이상 유지될 복리 자산에만 자원 투입.</li>
+                    </ul>
+                    <div class="trillion-card-actions">
+                      <button class="btn btn-outline btn-sm w-full trillion-action-btn" data-action="[10조 마인드셋] 오늘 내가 직접 하지 않고 시스템화/자동화할 1가지 정의">
+                        <i class="fa-solid fa-plus"></i> To-Do 등록
+                      </button>
+                      <button class="btn btn-secondary btn-sm w-full trillion-prompt-btn" data-type="mindset">
+                        <i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> AI 마인드셋 코칭
+                      </button>
                     </div>
-                  </label>
-                  <label class="trillion-quest-item">
-                    <input type="checkbox" id="tquest_habit" class="tquest-check">
-                    <div>
-                      <strong>💎 [2열. 습관]</strong>
-                      <p>방해 없는 4시간 딥워크 & 에너지 최적화</p>
+                  </div>
+                </div>
+
+                <!-- 2열. 💎 초격차 습관 -->
+                <div class="card trillion-card">
+                  <div class="card-header">
+                    <h3><i class="fa-solid fa-award text-yellow"></i> 2. 초격차 습관</h3>
+                    <span class="badge badge-warning">Habits</span>
+                  </div>
+                  <div class="card-body">
+                    <ul class="trillion-list">
+                      <li><strong>4시간 딥워크 블록:</strong> 방해 없는 아침/야간 4시간 핵심 비즈니스 몰입.</li>
+                      <li><strong>신체 에너지 극대화:</strong> 7시간 양질 수면과 주 4회 운동으로 최상의 뇌 상태.</li>
+                      <li><strong>결정 단순화:</strong> 사소한 일상 결정을 없애고 오직 핵심 결정만 수행.</li>
+                    </ul>
+                    <div class="trillion-card-actions">
+                      <button class="btn btn-outline btn-sm w-full trillion-action-btn" data-action="[10조 습관] 방해 없는 2시간 딥워크로 핵심 복리 비즈니스 시스템 구축">
+                        <i class="fa-solid fa-plus"></i> To-Do 등록
+                      </button>
+                      <button class="btn btn-secondary btn-sm w-full trillion-prompt-btn" data-type="habit">
+                        <i class="fa-solid fa-wand-magic-sparkles text-yellow"></i> AI 습관 최적화
+                      </button>
                     </div>
-                  </label>
-                  <label class="trillion-quest-item">
-                    <input type="checkbox" id="tquest_ability" class="tquest-check">
-                    <div>
-                      <strong>🚀 [3열. 능력]</strong>
-                      <p>자본 배분 & 시스템 확장성(해자) 설계</p>
+                  </div>
+                </div>
+
+                <!-- 3열. 🚀 초격차 능력 -->
+                <div class="card trillion-card">
+                  <div class="card-header">
+                    <h3><i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> 3. 핵심 능력</h3>
+                    <span class="badge badge-info">Abilities</span>
+                  </div>
+                  <div class="card-body">
+                    <ul class="trillion-list">
+                      <li><strong>자본 배분(Allocation):</strong> 잉여 현금을 가장 높은 ROI 자산으로 재투자.</li>
+                      <li><strong>시스템 아키텍처:</strong> 해자(Moat)와 전 세계적 확장성(Scalability) 설계.</li>
+                      <li><strong>설득 & 세일즈:</strong> 최고의 인재와 투자자를 끌어모으는 비전 제시.</li>
+                    </ul>
+                    <div class="trillion-card-actions">
+                      <button class="btn btn-outline btn-sm w-full trillion-action-btn" data-action="[10조 능력] 내 비즈니스의 독보적 경쟁력(해자)과 확장성 1페이지 설계">
+                        <i class="fa-solid fa-plus"></i> To-Do 등록
+                      </button>
+                      <button class="btn btn-secondary btn-sm w-full trillion-prompt-btn" data-type="ability">
+                        <i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> AI 능력 훈련
+                      </button>
                     </div>
-                  </label>
-                  <label class="trillion-quest-item">
-                    <input type="checkbox" id="tquest_learning" class="tquest-check">
-                    <div>
-                      <strong>📚 [4열. 학습]</strong>
-                      <p>1시간 메가트렌드·자본 시장 심층 리서치</p>
+                  </div>
+                </div>
+
+                <!-- 4열. 📚 매일 학습 -->
+                <div class="card trillion-card">
+                  <div class="card-header">
+                    <h3><i class="fa-solid fa-book-open-reader text-indigo"></i> 4. 매일 학습</h3>
+                    <span class="badge badge-primary">Learning</span>
+                  </div>
+                  <div class="card-body">
+                    <ul class="trillion-list">
+                      <li><strong>1시간 메가트렌드:</strong> AI, 로보틱스, 에너지 등 10년 뒤 글로벌 기술 리서치.</li>
+                      <li><strong>거인들의 원칙 연구:</strong> 록펠러, 버핏, 머스크의 의사결정 프레임워크 체화.</li>
+                      <li><strong>실패의 데이터화:</strong> 망한 비즈니스 원인을 분석하여 리스크 사전 차단.</li>
+                    </ul>
+                    <div class="trillion-card-actions">
+                      <button class="btn btn-outline btn-sm w-full trillion-action-btn" data-action="[10조 학습] 10조급 자산가들의 의사결정 원칙 도서 1챕터 요약 및 실무 적용">
+                        <i class="fa-solid fa-plus"></i> To-Do 등록
+                      </button>
+                      <button class="btn btn-secondary btn-sm w-full trillion-prompt-btn" data-type="learning">
+                        <i class="fa-solid fa-wand-magic-sparkles text-indigo"></i> AI 학습 추천
+                      </button>
                     </div>
-                  </label>
-                  <label class="trillion-quest-item">
-                    <input type="checkbox" id="tquest_action" class="tquest-check">
-                    <div>
-                      <strong>⚡ [5열. 행동]</strong>
-                      <p>월급 외 자립 파이프라인 1호 가동</p>
+                  </div>
+                </div>
+
+                <!-- 5열. ⚡ 즉각 행동 -->
+                <div class="card trillion-card">
+                  <div class="card-header">
+                    <h3><i class="fa-solid fa-bolt text-emerald"></i> 5. 즉각 행동</h3>
+                    <span class="badge badge-success">Actions</span>
+                  </div>
+                  <div class="card-body">
+                    <ul class="trillion-list">
+                      <li><strong>자립 파이프라인 1호:</strong> 월급 외 스스로 첫 매출을 발생시키는 실전 런칭.</li>
+                      <li><strong>기계적 복리 매수:</strong> 매월 번 돈의 50% 이상을 우량 자산에 영구 락업.</li>
+                      <li><strong>오늘의 원씽(The One Thing):</strong> 10조 로드맵을 1단계 전진시킬 핵심 행동.</li>
+                    </ul>
+                    <div class="trillion-card-actions">
+                      <button class="btn btn-outline btn-sm w-full trillion-action-btn" data-action="[10조 행동] 월급 외 자립형 파이프라인 1호 프로토타입 런칭/실행">
+                        <i class="fa-solid fa-plus"></i> To-Do 등록
+                      </button>
+                      <button class="btn btn-secondary btn-sm w-full trillion-prompt-btn" data-type="action">
+                        <i class="fa-solid fa-wand-magic-sparkles text-emerald"></i> AI 행동 지침
+                      </button>
                     </div>
-                  </label>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- ==================================================== -->
+            <!-- SUB-VIEW 2: 평생 핵심가치 & 비전 캔버스             -->
+            <!-- ==================================================== -->
+            <div class="trillion-subview" id="tsub-view-vision" style="display:none;">
+              <div class="card" style="margin-bottom: 14px;">
+                <div class="card-header">
+                  <h3><i class="fa-solid fa-landmark text-amber"></i> 나의 평생 10조 비전 & 3대 불변 원칙 (Vision Canvas)</h3>
+                  <button id="saveTrillionVisionBtn" class="btn btn-primary btn-sm"><i class="fa-solid fa-floppy-disk"></i> 비전 저장</button>
+                </div>
+                <div class="card-body">
+                  <div class="form-group">
+                    <label class="form-label font-bold text-yellow"><i class="fa-solid fa-crown"></i> 나의 10조 궁극적 비전 선언문 (Ultimate Vision Statement)</label>
+                    <input type="text" id="trillionVisionInput" placeholder="예: 전 인류의 시간과 생산성을 혁신하는 글로벌 AI 인프라 기업을 구축하여 10조 자산가가 된다." class="input-focus-hero font-bold" style="font-size: 1rem;">
+                  </div>
+                  <div class="grid grid-3" style="margin-top: 12px;">
+                    <div class="form-group">
+                      <label class="form-label font-bold text-cyan">💎 핵심가치 1: 비즈니스 & 레버리지</label>
+                      <textarea id="trillionVal1" rows="3" class="journal-textarea" placeholder="시간당 노동을 배제하고 무한 확장 가능한 시스템과 소프트웨어에만 집중한다."></textarea>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label font-bold text-emerald">💎 핵심가치 2: 자본 배분 & 복리</label>
+                      <textarea id="trillionVal2" rows="3" class="journal-textarea" placeholder="모든 잉여 수익은 더 높은 ROI를 창출하는 독점적 자산에 기계적으로 재투자한다."></textarea>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label font-bold text-indigo">💎 핵심가치 3: 인재 & 영향력</label>
+                      <textarea id="trillionVal3" rows="3" class="journal-textarea" placeholder="나보다 뛰어난 인재들과 연대하며 세상에 측정 가능한 가치를 제공한다."></textarea>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <!-- 🏛️ 10조 자산가 혁신 5열 아키텍처 카드 그리드 (5-Column Grid) -->
-            <div class="trillion-5col-grid">
-              
-              <!-- 1열. 🧠 마인드셋 (Mindset & Scale) -->
-              <div class="card trillion-card">
+            <!-- ==================================================== -->
+            <!-- SUB-VIEW 3: 10조 아이디어 뱅크 & 파이프라인 볼트    -->
+            <!-- ==================================================== -->
+            <div class="trillion-subview" id="tsub-view-ideabank" style="display:none;">
+              <div class="card memo-editor-card" style="margin-bottom: 14px;">
                 <div class="card-header">
-                  <h3><i class="fa-solid fa-brain text-cyan"></i> 1. 마인드셋</h3>
-                  <span class="badge badge-primary">Mindset</span>
+                  <h3><i class="fa-solid fa-lightbulb text-yellow"></i> 10조 스케일업 아이디어 뱅크 (Idea Vault)</h3>
+                  <button id="aiTrillionBrainstormBtn" class="btn btn-gemini btn-sm"><i class="fa-solid fa-wand-magic-sparkles"></i> AI 10조 아이디어 발굴</button>
                 </div>
                 <div class="card-body">
-                  <ul class="trillion-list">
-                    <li><strong>노동 탈피:</strong> 시간 판매형 소득을 멈추고 자본과 시스템이 일하게 한다.</li>
-                    <li><strong>비대칭 베팅:</strong> 하방 리스크는 막히고 상방은 무한한 비즈니스 집중.</li>
-                    <li><strong>극단적 장기 시계:</strong> 10년 이상 유지될 복리 자산에만 자원 투입.</li>
-                  </ul>
-                  <div class="trillion-card-actions">
-                    <button class="btn btn-outline btn-sm w-full trillion-action-btn" data-action="[10조 마인드셋] 오늘 내가 직접 하지 않고 시스템화/자동화할 1가지 정의">
-                      <i class="fa-solid fa-plus"></i> To-Do 등록
-                    </button>
-                    <button class="btn btn-secondary btn-sm w-full trillion-prompt-btn" data-type="mindset">
-                      <i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> AI 마인드셋 코칭
-                    </button>
+                  <form id="trillionIdeaForm">
+                    <input type="text" id="tideaTitle" placeholder="10조 규모 잠재력을 가진 사업/자산/시스템 아이디어..." class="input-focus-hero font-bold" style="margin-bottom:8px;" required>
+                    <textarea id="tideaContent" rows="2" class="journal-textarea" placeholder="해당 아이디어의 해자(Moat), 4대 레버리지 적용 방안, 1단계 실험 계획을 적어보세요..."></textarea>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                      <select id="tideaCategory" class="date-input" style="padding:4px 8px; font-size:0.75rem;">
+                        <option value="business">🏗️ 비즈니스/소프트웨어</option>
+                        <option value="invest">💰 자본/자산 인수</option>
+                        <option value="automation">⚡ 시스템/자동화</option>
+                        <option value="network">🌐 미디어/네트워크</option>
+                      </select>
+                      <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus"></i> 10조 아이디어 뱅크에 저장</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+              <div class="memo-cards-grid" id="trillionIdeaGrid"></div>
+            </div>
+
+            <!-- ==================================================== -->
+            <!-- SUB-VIEW 4: 일일 행동 확인 & 제미나이 행동 감사(Audit) -->
+            <!-- ==================================================== -->
+            <div class="trillion-subview" id="tsub-view-audit" style="display:none;">
+              <div class="card" style="margin-bottom: 14px;">
+                <div class="card-header">
+                  <h3><i class="fa-solid fa-scale-balanced text-emerald"></i> 오늘 하루 행동 확인 & 제미나이 행동 감사 (Action Audit)</h3>
+                  <button id="runActionAuditBtn" class="btn btn-gemini btn-sm"><i class="fa-solid fa-gavel"></i> 제미나이 냉정 감사 실행</button>
+                </div>
+                <div class="card-body">
+                  <p style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:12px;">
+                    10조 자산가는 매일 밤 자신의 하루를 냉정하게 감사(Audit)합니다. 오늘 내가 한 행동이 1차원적 시간 때우기였는지, 아니면 복리 자산을 쌓는 10조급 행동이었는지 판정합니다.
+                  </p>
+                  <div class="grid grid-2" style="gap:12px;">
+                    <div>
+                      <h4 style="font-size:0.85rem; font-weight:700; color:var(--text-primary); margin-bottom:6px;">오늘 나의 행동 자가 검증</h4>
+                      <textarea id="dailyAuditUserReflection" rows="4" class="journal-textarea" placeholder="오늘 내가 한 가장 높은 레버리지 행동과, 반대로 낭비된 시간/사소한 결정을 적어보세요..."></textarea>
+                    </div>
+                    <div id="auditResultBox" class="trillion-ai-box" style="min-height:100px;">
+                      <p style="color:var(--text-muted); font-size:0.85rem;">[제미나이 냉정 감사 실행]을 누르면 오늘 To-Do 완료율, 몰입 시간, 자가 검증을 종합 분석하여 10조 기준 적합도(Grade S/A/B/C)와 내일의 수정 지침을 하달합니다.</p>
+                    </div>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <!-- 2열. 💎 초격차 습관 (High-Leverage Habits) -->
-              <div class="card trillion-card">
+            <!-- ==================================================== -->
+            <!-- SUB-VIEW 5: 제미나이 평생 마스터 지침서 뷰어       -->
+            <!-- ==================================================== -->
+            <div class="trillion-subview" id="tsub-view-handbook" style="display:none;">
+              <div class="card">
                 <div class="card-header">
-                  <h3><i class="fa-solid fa-award text-yellow"></i> 2. 초격차 습관</h3>
-                  <span class="badge badge-warning">Habits</span>
+                  <h3><i class="fa-solid fa-book-bookmark text-indigo"></i> 10조 자산가 평생 불변 마스터 지침서 (Billionaire Handbook)</h3>
                 </div>
-                <div class="card-body">
-                  <ul class="trillion-list">
-                    <li><strong>4시간 딥워크 블록:</strong> 방해 없는 아침/야간 4시간 핵심 비즈니스 몰입.</li>
-                    <li><strong>신체 에너지 극대화:</strong> 7시간 양질 수면과 주 4회 운동으로 최상의 뇌 상태.</li>
-                    <li><strong>결정 단순화:</strong> 사소한 일상 결정을 없애고 오직 핵심 결정만 수행.</li>
-                  </ul>
-                  <div class="trillion-card-actions">
-                    <button class="btn btn-outline btn-sm w-full trillion-action-btn" data-action="[10조 습관] 방해 없는 2시간 딥워크로 핵심 복리 비즈니스 시스템 구축">
-                      <i class="fa-solid fa-plus"></i> To-Do 등록
-                    </button>
-                    <button class="btn btn-secondary btn-sm w-full trillion-prompt-btn" data-type="habit">
-                      <i class="fa-solid fa-wand-magic-sparkles text-yellow"></i> AI 습관 최적화
-                    </button>
+                <div class="card-body" style="line-height:1.9; font-size:0.92rem; color:var(--text-primary);">
+                  <div style="background:var(--bg-secondary); padding:16px; border-radius:var(--radius-sm); border-left:4px solid var(--accent-gold); margin-bottom:14px;">
+                    <h4 style="color:var(--accent-gold); font-weight:800; margin-bottom:6px;">👑 제 1원칙: 시간 레버리지의 절대 법칙</h4>
+                    <p style="margin:0; font-size:0.85rem; color:var(--text-secondary);">
+                      "당신이 잠자는 동안에도 돈이 들어오는 방법을 찾아내지 못한다면, 당신은 죽을 때까지 일해야만 할 것이다." — 워런 버핏<br>
+                      내 몸이 직접 움직여서 버는 소득은 0으로 수렴시키고, 소프트웨어/자본/시스템이 24시간 일하게 만드는 비즈니스에만 인생을 베팅하라.
+                    </p>
+                  </div>
+                  <div style="background:var(--bg-secondary); padding:16px; border-radius:var(--radius-sm); border-left:4px solid #00b7c3; margin-bottom:14px;">
+                    <h4 style="color:#00b7c3; font-weight:800; margin-bottom:6px;">🚀 제 2원칙: 비대칭적 기회와 해자(Moat)</h4>
+                    <p style="margin:0; font-size:0.85rem; color:var(--text-secondary);">
+                      10조는 치열한 경쟁 시장에서 열심히 해서 얻는 것이 아니다. 경쟁자가 흉내 낼 수 없는 강력한 기술적·네트워크적 해자를 파고, 잃을 것은 적고 얻을 것은 1,000배인 비대칭 영역을 독점하라.
+                    </p>
+                  </div>
+                  <div style="background:var(--bg-secondary); padding:16px; border-radius:var(--radius-sm); border-left:4px solid #10b981;">
+                    <h4 style="color:#10b981; font-weight:800; margin-bottom:6px;">💎 제 3원칙: 복리와 지속성의 힘</h4>
+                    <p style="margin:0; font-size:0.85rem; color:var(--text-secondary);">
+                      단기 급등을 쫓지 마라. 매일 1%의 개선이 10년 동안 쌓이면 37배가 아니라 수천 배의 격차를 만든다. 포기하지 않고 매일 4대 퀘스트를 완수하는 자만이 10조의 왕관을 쓴다.
+                    </p>
                   </div>
                 </div>
               </div>
-
-              <!-- 3열. 🚀 초격차 능력 (Core Abilities & Scale) -->
-              <div class="card trillion-card">
-                <div class="card-header">
-                  <h3><i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> 3. 핵심 능력</h3>
-                  <span class="badge badge-info">Abilities</span>
-                </div>
-                <div class="card-body">
-                  <ul class="trillion-list">
-                    <li><strong>자본 배분(Allocation):</strong> 잉여 현금을 가장 높은 ROI 자산으로 재투자.</li>
-                    <li><strong>시스템 아키텍처:</strong> 해자(Moat)와 전 세계적 확장성(Scalability) 설계.</li>
-                    <li><strong>설득 & 세일즈:</strong> 최고의 인재와 투자자를 끌어모으는 비전 제시.</li>
-                  </ul>
-                  <div class="trillion-card-actions">
-                    <button class="btn btn-outline btn-sm w-full trillion-action-btn" data-action="[10조 능력] 내 비즈니스의 독보적 경쟁력(해자)과 확장성 1페이지 설계">
-                      <i class="fa-solid fa-plus"></i> To-Do 등록
-                    </button>
-                    <button class="btn btn-secondary btn-sm w-full trillion-prompt-btn" data-type="ability">
-                      <i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> AI 능력 훈련
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 4열. 📚 매일 학습 (Daily Deep Learning) -->
-              <div class="card trillion-card">
-                <div class="card-header">
-                  <h3><i class="fa-solid fa-book-open-reader text-indigo"></i> 4. 매일 학습</h3>
-                  <span class="badge badge-primary">Learning</span>
-                </div>
-                <div class="card-body">
-                  <ul class="trillion-list">
-                    <li><strong>1시간 메가트렌드:</strong> AI, 로보틱스, 에너지 등 10년 뒤 글로벌 기술 리서치.</li>
-                    <li><strong>거인들의 원칙 연구:</strong> 록펠러, 버핏, 머스크의 의사결정 프레임워크 체화.</li>
-                    <li><strong>실패의 데이터화:</strong> 망한 비즈니스 원인을 분석하여 리스크 사전 차단.</li>
-                  </ul>
-                  <div class="trillion-card-actions">
-                    <button class="btn btn-outline btn-sm w-full trillion-action-btn" data-action="[10조 학습] 10조급 자산가들의 의사결정 원칙 도서 1챕터 요약 및 실무 적용">
-                      <i class="fa-solid fa-plus"></i> To-Do 등록
-                    </button>
-                    <button class="btn btn-secondary btn-sm w-full trillion-prompt-btn" data-type="learning">
-                      <i class="fa-solid fa-wand-magic-sparkles text-indigo"></i> AI 학습 추천
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 5열. ⚡ 즉각 행동 지침 (Action Directives) -->
-              <div class="card trillion-card">
-                <div class="card-header">
-                  <h3><i class="fa-solid fa-bolt text-emerald"></i> 5. 즉각 행동</h3>
-                  <span class="badge badge-success">Actions</span>
-                </div>
-                <div class="card-body">
-                  <ul class="trillion-list">
-                    <li><strong>자립 파이프라인 1호:</strong> 월급 외 스스로 첫 매출을 발생시키는 실전 런칭.</li>
-                    <li><strong>기계적 복리 매수:</strong> 매월 번 돈의 50% 이상을 우량 자산에 영구 락업.</li>
-                    <li><strong>오늘의 원씽(The One Thing):</strong> 10조 로드맵을 1단계 전진시킬 핵심 행동.</li>
-                  </ul>
-                  <div class="trillion-card-actions">
-                    <button class="btn btn-outline btn-sm w-full trillion-action-btn" data-action="[10조 행동] 월급 외 자립형 파이프라인 1호 프로토타입 런칭/실행">
-                      <i class="fa-solid fa-plus"></i> To-Do 등록
-                    </button>
-                    <button class="btn btn-secondary btn-sm w-full trillion-prompt-btn" data-type="action">
-                      <i class="fa-solid fa-wand-magic-sparkles text-emerald"></i> AI 행동 지침
-                    </button>
-                  </div>
-                </div>
-              </div>
-
             </div>
 
             <!-- Gemini 10조 자산가 맞춤형 AI 지침 & 컨설팅 창 -->
             <div class="card" style="margin-top: 14px;">
               <div class="card-header">
-                <h3><i class="fa-solid fa-robot text-cyan"></i> Gemini 10조 자산가 5열 맞춤형 전략 컨설팅 브리핑</h3>
+                <h3><i class="fa-solid fa-robot text-cyan"></i> Gemini 10조 자산가 최고전략고문 브리핑 콘솔</h3>
               </div>
               <div class="card-body">
                 <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
@@ -653,8 +785,8 @@
 
                 <div id="trillionAiResponseBox" class="trillion-ai-box">
                   <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.8;">
-                    <strong>Gemini가 당신이 10조 자산가가 될 수 있도록 5개 영역에서 과학적인 지침을 내려드립니다.</strong><br>
-                    위 버튼을 클릭하시거나 <strong>[👑 Gemini 오늘의 10조 5열 지침 브리핑]</strong> 버튼을 누르면 오늘의 마인드셋, 습관, 능력, 학습, 행동에 대한 날카로운 지침을 실시간으로 확인하실 수 있습니다. ✨
+                    <strong>Gemini가 당신이 10조 자산가가 될 수 있도록 평생의 핵심가치와 행동을 코칭합니다.</strong><br>
+                    위 버튼을 클릭하시거나 <strong>[👑 Gemini 오늘의 10조 지침 브리핑]</strong> 버튼을 누르면 실시간 전략 지침을 확인하실 수 있습니다. ✨
                   </p>
                 </div>
               </div>
