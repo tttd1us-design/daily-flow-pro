@@ -568,8 +568,52 @@ body {
 }
 
 /* ==========================================================================
-   🏛️ 10조 자산가 로드맵 & 마인드셋 OS (Billionaire Framework)
+   🏛️ 10조자산가되기 (Billionaire Framework & Quests)
    ========================================================================== */
+.trillion-quest-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+@media (max-width: 768px) {
+  .trillion-quest-grid { grid-template-columns: 1fr; }
+}
+
+.trillion-quest-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--bg-card);
+  border: 1px solid rgba(250, 204, 21, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.trillion-quest-item:hover {
+  border-color: var(--accent-gold);
+  background: rgba(250, 204, 21, 0.06);
+}
+.trillion-quest-item strong {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+.trillion-quest-item p {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin: 0;
+}
+.tquest-check {
+  margin-top: 3px;
+  width: 17px;
+  height: 17px;
+  accent-color: #facc15;
+  cursor: pointer;
+}
+
 .trillion-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

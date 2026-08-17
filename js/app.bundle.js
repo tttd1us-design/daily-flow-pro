@@ -1226,50 +1226,91 @@ class DailyFlowApp {
     });
 
     // ==========================================
-    // 🏛️ 10조 자산가 로드맵 & 마인드셋 OS Events
+    // 🏛️ 10조자산가되기 (Billionaire OS) Events
     // ==========================================
     const aiTrillionCoachBtn = document.getElementById('aiTrillionCoachBtn');
     const trillionAiBox = document.getElementById('trillionAiResponseBox');
+    const pushAllTrillionTodosBtn = document.getElementById('pushAllTrillionTodosBtn');
 
-    const requestTrillionCoaching = async (topicType = 'general') => {
+    const updateQuestScore = () => {
+      const checks = ['tquest_habit', 'tquest_learning', 'tquest_ability', 'tquest_action'];
+      let done = 0;
+      const questData = {};
+      checks.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && el.checked) {
+          done++;
+          questData[id] = true;
+        } else {
+          questData[id] = false;
+        }
+      });
+      const badge = document.getElementById('trillionQuestScoreBadge');
+      if (badge) {
+        badge.textContent = `${done}/4 달성`;
+        badge.className = `badge ${done === 4 ? 'badge-success' : 'badge-warning'}`;
+      }
+      storage.updateDayData(this.currentDate, { trillionQuests: questData });
+    };
+
+    ['tquest_habit', 'tquest_learning', 'tquest_ability', 'tquest_action'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('change', updateQuestScore);
+    });
+
+    if (pushAllTrillionTodosBtn) {
+      pushAllTrillionTodosBtn.addEventListener('click', () => {
+        const tasks = [
+          { text: '[10조 습관] 방해 없는 2시간 핵심 딥워크 완수', category: 'career' },
+          { text: '[10조 학습] 글로벌 산업·자본 리서치 1시간 분석', category: 'study' },
+          { text: '[10조 능력] 4대 레버리지(시스템·코드) 구조 설계', category: 'career' },
+          { text: '[10조 행동] 월급 외 자립형 파이프라인 1단계 실행', category: 'wealth' }
+        ];
+        tasks.forEach(t => this.pushActionToTodayTodo(t.text, t.category));
+        this.showToast('👑 10조 자산가 4대 필수 지침이 오늘의 To-Do로 일괄 등록되었습니다! ⚡');
+      });
+    }
+
+    const requestTrillionCoaching = async (topicType = 'daily') => {
       if (!trillionAiBox) return;
-      trillionAiBox.innerHTML = '<div style="text-align:center; padding:20px;"><i class="fa-solid fa-spinner fa-spin text-amber" style="font-size:1.5rem;"></i><p style="margin-top:8px; color:var(--text-secondary);">Gemini 10조 자산가 AI 전략 고문이 분석 중입니다...</p></div>';
+      trillionAiBox.innerHTML = '<div style="text-align:center; padding:20px;"><i class="fa-solid fa-spinner fa-spin text-amber" style="font-size:1.5rem;"></i><p style="margin-top:8px; color:var(--text-secondary); font-weight:700;">Gemini 10조 자산가 최고전략고문이 당신을 위한 오늘의 지침을 작성 중입니다...</p></div>';
 
       const dayData = storage.getDayData(this.currentDate);
       const focus = dayData.focus || '비즈니스 자동화 및 자산 증식';
 
       let promptText = '';
-      if (topicType === 'leverage') {
-        promptText = `[10조 자산가 관점 레버리지 진단]
+      if (topicType === 'daily') {
+        promptText = `[Gemini 10조 자산가 일일 최고전략 지침서]
+오늘 날짜: ${this.currentDate}
+오늘 사용자 관심사: "${focus}"
+
+당신은 사용자가 '10조 자산가'가 될 수 있도록 돕는 최고전략고문 AI입니다.
+아래 4대 핵심 축에 대해 오늘 당장 실천할 수 있는 날카롭고 구체적인 지침을 내려주세요:
+1. 💎 **오늘의 10조 습관 지침:** (방해 없는 딥워크 및 에너지 관리 1가지)
+2. 🚀 **오늘의 10조 능력 지침:** (자본 배분, 시스템 해자 구축을 위한 실전 훈련 1가지)
+3. 📚 **오늘의 10조 학습 지침:** (오늘 반드시 파고들어야 할 메가트렌드/비즈니스 분석 1가지)
+4. ⚡ **오늘의 10조 즉각 행동 지침:** (월급 외 독자적 가치를 만드는 오늘 퇴근 후 1% 액션)
+
+군더더기 없이 단호하고 지혜로운 어조로 작성해줘.`;
+      } else if (topicType === 'leverage') {
+        promptText = `[10조 자산가 관점 4대 레버리지 전환 지침]
 나의 오늘 핵심 과업: "${focus}"
-질문: 이 과업에서 나의 1차원적 시간 노동을 덜어내고, 자본/시스템/코드/미디어 4대 레버리지를 극대화하여 100배의 결과물을 낼 수 있는 3단계 레버리지 전략을 제시해줘.`;
+질문: 이 과업에서 나의 1차원적 시간 노동을 덜어내고, 자본/시스템/코드/미디어 4대 레버리지를 극대화하여 100배의 결과물을 낼 수 있는 3단계 레버리지 전환 전략을 제시해줘.`;
       } else if (topicType === 'pipeline') {
-        promptText = `[독자적 비즈니스 파이프라인 3단계 설계]
+        promptText = `[자립형 비즈니스 파이프라인 3단계 설계]
 직장인/개인이 월급을 넘어 10조 자산가로 향하는 첫 번째 독자적 현금흐름 파이프라인 구축 3단계(1단계 프로토타입 검증, 2단계 수익화 시스템, 3단계 스케일업 및 자본화)를 현실적이고 날카롭게 설계해줘.`;
       } else if (topicType === 'allocation') {
         promptText = `[자본 배분 & 복리 재투자 원칙]
 10조 자산가(워런 버핏, 레이 달리오 등)가 지키는 최고의 자본 배분(Capital Allocation) 및 복리 법칙 4가지를 알려주고, 오늘 하루 벌어들인 자원(시간, 돈, 에너지)을 어떻게 재투자해야 하는지 구체적인 행동 가이드를 제시해줘.`;
-      } else if (topicType === 'mindset') {
-        promptText = `[초격차 10조 마인드셋 & 멘탈 코칭]
-실패의 두려움과 단기적인 유혹을 극복하고, 10년 뒤 초거대 자산을 완성하기 위해 오늘 내가 가져야 할 흔들리지 않는 극단적 장기적 사고(Extreme Long-term Horizon)와 멘탈 원칙을 강력하게 코칭해줘.`;
-      } else {
-        promptText = `[10조 자산가 일일 종합 전략 브리핑]
-오늘 날짜: ${this.currentDate}
-오늘 나의 목표: "${focus}"
-10조 자산가 최고전략고문으로서, 오늘 하루 내가 실천해야 할:
-1. 💡 오늘의 핵심 레버리지 결정 (1문장)
-2. 💎 초격차 딥워크 4시간 행동 지침
-3. 🚀 복리 비즈니스 시스템 구축 행동 1가지
-를 명확하고 단호하게 지침을 내려줘.`;
       }
 
       const res = await geminiClient.generateText(promptText);
       trillionAiBox.innerHTML = this.parseMarkdown(res);
-      this.showToast('Gemini 10조 자산가 전략 지침이 도착했습니다! 🏛️');
+      this.showToast('Gemini 10조 자산가 전략 지침이 도착했습니다! 👑');
     };
 
     if (aiTrillionCoachBtn) {
-      aiTrillionCoachBtn.addEventListener('click', () => requestTrillionCoaching('general'));
+      aiTrillionCoachBtn.addEventListener('click', () => requestTrillionCoaching('daily'));
     }
 
     document.querySelectorAll('.trillion-prompt-btn').forEach(btn => {
@@ -3442,6 +3483,22 @@ class DailyFlowApp {
     this.renderEveningOS();
     this.renderGoalHierarchy();
     this.calculateEES();
+
+    // 10조 자산가 퀘스트 체크리스트 복원
+    const tQuests = dayData.trillionQuests || {};
+    let tDone = 0;
+    ['tquest_habit', 'tquest_learning', 'tquest_ability', 'tquest_action'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.checked = !!tQuests[id];
+        if (el.checked) tDone++;
+      }
+    });
+    const tBadge = document.getElementById('trillionQuestScoreBadge');
+    if (tBadge) {
+      tBadge.textContent = `${tDone}/4 달성`;
+      tBadge.className = `badge ${tDone === 4 ? 'badge-success' : 'badge-warning'}`;
+    }
 
     // Journal
     const journal = dayData.journal || {};
