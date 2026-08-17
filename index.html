@@ -614,24 +614,28 @@
       </section>
 
       <!-- ======================================================== -->
-      <!-- 5. 오늘의 일기 & 회고 (우측 캘린더 연동)                   -->
+      <!-- 5. 오늘의 일기 & 회고 (우측 캘린더 연동 & 효율 극대화)     -->
       <!-- ======================================================== -->
       <section class="tab-pane" id="pane-journal">
         <div class="journal-wrapper">
+          <!-- 좌측: AI 자동완성 & 스마트 툴바 -->
           <div class="journal-sidebar">
             <div class="journal-meta-card highlight-gemini-box">
-              <h4><i class="fa-solid fa-wand-magic-sparkles text-yellow"></i> Gemini AI 스마트 분석</h4>
-              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 10px;">
-                작성한 일기에서 <strong>내일의 실행 To-Do, 배움 요약, 인생 원칙</strong>을 한 번에 도출합니다.
+              <h4><i class="fa-solid fa-wand-magic-sparkles text-yellow"></i> 1초 AI 일기 자동 완성</h4>
+              <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 8px;">
+                오늘 완료한 <strong>To-Do, 공부 시간, 컨디션 데이터</strong>를 분석해 완성도 높은 하루 성장 일기를 1초 만에 자동 작성합니다.
               </p>
-              <button class="btn btn-gemini btn-sm" id="extractActionGuideBtn" style="width: 100%; justify-content: center;">
-                <i class="fa-solid fa-sparkles"></i> Gemini로 실행 가이드 도출
+              <button class="btn btn-gemini btn-sm" id="aiAutoDraftJournalBtn" style="width: 100%; justify-content: center; margin-bottom: 6px;">
+                <i class="fa-solid fa-pen-nib"></i> 오늘 활동 기반 AI 일기 자동 생성
+              </button>
+              <button class="btn btn-secondary btn-sm" id="extractActionGuideBtn" style="width: 100%; justify-content: center;">
+                <i class="fa-solid fa-sparkles"></i> 작성 일기에서 실행 To-Do 도출
               </button>
             </div>
 
             <div class="journal-meta-card">
-              <h4><i class="fa-solid fa-lightbulb text-cyan"></i> 스마트 질문 가이드</h4>
-              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 10px;">4가지 질문에 답하면 완성도 높은 일기와 실행 계획이 자동 생성됩니다.</p>
+              <h4><i class="fa-solid fa-stopwatch text-yellow"></i> 3분 패스트트랙 회고</h4>
+              <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 8px;">피곤한 날에도 부담 없이 3분 만에 하루를 정리하는 질문 가이드입니다.</p>
               <button class="btn btn-secondary btn-sm" id="openWizardBtn" style="width: 100%; justify-content: center;">
                 <i class="fa-solid fa-magic"></i> 4문답 가이드로 작성
               </button>
@@ -670,14 +674,16 @@
             </div>
           </div>
 
-          <!-- 중앙 에디터 -->
+          <!-- 중앙: 고효율 스마트 에디터 (분할 뷰 & 사진 첨부) -->
           <div class="journal-editor-container">
             <div class="editor-header">
-              <input type="text" id="journalTitle" placeholder="오늘 하루를 나타내는 제목..." class="journal-title-input">
+              <input type="text" id="journalTitle" placeholder="오늘 하루를 관통하는 명쾌한 제목..." class="journal-title-input">
               <div class="editor-actions">
                 <span class="auto-save-indicator" id="autoSaveIndicator"><i class="fa-solid fa-check"></i> 저장됨</span>
                 <button id="speechBtn" class="btn btn-secondary btn-sm" title="음성 입력"><i class="fa-solid fa-microphone"></i> 음성</button>
-                <button id="journalPreviewToggle" class="btn btn-secondary btn-sm" title="미리보기"><i class="fa-solid fa-eye"></i> 미리보기</button>
+                <button id="journalSplitToggle" class="btn btn-secondary btn-sm" title="에디터/미리보기 좌우 분할 뷰"><i class="fa-solid fa-table-columns"></i> 분할 뷰</button>
+                <button id="journalPreviewToggle" class="btn btn-secondary btn-sm" title="전체 미리보기"><i class="fa-solid fa-eye"></i> 미리보기</button>
+                <button id="copyJournalTextBtn" class="btn btn-secondary btn-sm" title="전체 복사"><i class="fa-solid fa-copy"></i> 복사</button>
                 <button id="exportMdBtn" class="btn btn-secondary btn-sm" title="마크다운 다운로드"><i class="fa-solid fa-download"></i> .MD</button>
                 <button id="printJournalBtn" class="btn btn-secondary btn-sm" title="인쇄/PDF"><i class="fa-solid fa-print"></i> 인쇄</button>
                 <button id="saveJournalBtn" class="btn btn-primary btn-sm"><i class="fa-solid fa-floppy-disk"></i> 저장</button>
@@ -685,20 +691,32 @@
             </div>
 
             <div class="editor-toolbar" id="editorToolbar">
-              <button class="tool-btn" data-cmd="bold" title="굵게"><i class="fa-solid fa-bold"></i></button>
-              <button class="tool-btn" data-cmd="italic" title="기울임"><i class="fa-solid fa-italic"></i></button>
-              <button class="tool-btn" data-cmd="heading" title="제목"><i class="fa-solid fa-heading"></i></button>
-              <button class="tool-btn" data-cmd="action-block" title="실행 가이드 블록"><i class="fa-solid fa-person-running"></i></button>
-              <button class="tool-btn" data-cmd="quote" title="인용구"><i class="fa-solid fa-quote-left"></i></button>
+              <button class="tool-btn" data-cmd="bold" title="굵게 (Ctrl+B)"><i class="fa-solid fa-bold"></i></button>
+              <button class="tool-btn" data-cmd="italic" title="기울임 (Ctrl+I)"><i class="fa-solid fa-italic"></i></button>
+              <button class="tool-btn" data-cmd="heading" title="소제목 (H3)"><i class="fa-solid fa-heading"></i></button>
+              <button class="tool-btn" data-cmd="action-block" title="실행 가이드 블록 삽입"><i class="fa-solid fa-person-running text-cyan"></i></button>
+              <button class="tool-btn" data-cmd="quote" title="인용구/원칙"><i class="fa-solid fa-quote-left"></i></button>
               <button class="tool-btn" data-cmd="list" title="글머리 기호"><i class="fa-solid fa-list-ul"></i></button>
-              <button class="tool-btn" data-cmd="task" title="체크리스트"><i class="fa-solid fa-list-check"></i></button>
+              <button class="tool-btn" data-cmd="task" title="체크리스트"><i class="fa-solid fa-list-check text-emerald"></i></button>
               <button class="tool-btn" data-cmd="code" title="코드 블록"><i class="fa-solid fa-code"></i></button>
               <button class="tool-btn" data-cmd="hr" title="구분선"><i class="fa-solid fa-minus"></i></button>
+              <div style="margin-left: auto; display: flex; align-items: center; gap: 6px;">
+                <label for="journalPhotoInput" class="btn btn-secondary btn-sm" style="cursor: pointer; padding: 2px 8px; font-size: 0.75rem;">
+                  <i class="fa-solid fa-image text-cyan"></i> 사진 첨부
+                </label>
+                <input type="file" id="journalPhotoInput" accept="image/*" style="display: none;">
+              </div>
             </div>
 
-            <div class="editor-body">
-              <textarea id="journalContent" class="journal-textarea" placeholder="오늘 있었던 일, 느낀 감정, 배운 점, 내일을 위한 다짐과 구체적 실행 계획을 자유롭게 적어보세요..."></textarea>
+            <div class="editor-body" id="journalEditorBody">
+              <textarea id="journalContent" class="journal-textarea" placeholder="오늘 있었던 일, 느낀 감정, 배운 점, 내일을 위한 다짐과 구체적 실행 계획을 자유롭게 적어보세요... (좌측 'AI 일기 자동 생성'을 누르면 오늘 활동 기반으로 1초 만에 작성됩니다)"></textarea>
               <div id="journalPreview" class="journal-preview-pane markdown-body" style="display: none;"></div>
+            </div>
+
+            <!-- 사진 갤러리 영역 (첨부 시 표시) -->
+            <div class="journal-photos-bar" id="journalPhotosBar" style="display: none;">
+              <div class="journal-photos-title"><i class="fa-solid fa-images text-cyan"></i> 오늘의 기록 사진 (IndexedDB 보관)</div>
+              <div class="journal-photo-gallery" id="journalPhotoGallery"></div>
             </div>
 
             <div class="editor-footer">
@@ -708,6 +726,9 @@
                 <span>단어 수: <strong id="wordCount">0</strong>단어</span>
                 <span class="divider-dot">·</span>
                 <span>예상 읽는 시간: <strong id="readTime">0</strong>분</span>
+              </div>
+              <div style="font-size: 0.72rem; color: var(--text-muted);">
+                ⚡ 실시간 자동 저장 및 IndexedDB 동기화 지원
               </div>
             </div>
           </div>

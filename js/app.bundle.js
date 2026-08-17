@@ -711,7 +711,10 @@ class DailyFlowApp {
     this.journalTitle = document.getElementById('journalTitle');
     this.journalContent = document.getElementById('journalContent');
     this.journalPreview = document.getElementById('journalPreview');
+    this.journalEditorBody = document.getElementById('journalEditorBody');
+    this.journalSplitToggle = document.getElementById('journalSplitToggle');
     this.journalPreviewToggle = document.getElementById('journalPreviewToggle');
+    this.copyJournalTextBtn = document.getElementById('copyJournalTextBtn');
     this.saveJournalBtn = document.getElementById('saveJournalBtn');
     this.exportMdBtn = document.getElementById('exportMdBtn');
     this.printJournalBtn = document.getElementById('printJournalBtn');
@@ -723,7 +726,12 @@ class DailyFlowApp {
     this.journalTagsList = document.getElementById('journalTagsList');
     this.journalTagInput = document.getElementById('journalTagInput');
     this.addTagBtn = document.getElementById('addTagBtn');
+    this.aiAutoDraftJournalBtn = document.getElementById('aiAutoDraftJournalBtn');
     this.extractActionGuideBtn = document.getElementById('extractActionGuideBtn');
+    this.journalPhotoInput = document.getElementById('journalPhotoInput');
+    this.journalPhotosBar = document.getElementById('journalPhotosBar');
+    this.journalPhotoGallery = document.getElementById('journalPhotoGallery');
+    this.isSplitView = false;
 
     // Wizard Modal
     this.openWizardBtn = document.getElementById('openWizardBtn');
@@ -1247,20 +1255,83 @@ class DailyFlowApp {
     });
 
     // Journal Actions
+    if (this.aiAutoDraftJournalBtn) {
+      this.aiAutoDraftJournalBtn.addEventListener('click', () => {
+        this.generateAiJournalDraft();
+      });
+    }
+
     if (this.extractActionGuideBtn) {
       this.extractActionGuideBtn.addEventListener('click', () => {
         this.extractActionGuideFromJournal();
       });
     }
 
+    if (this.journalSplitToggle) {
+      this.journalSplitToggle.addEventListener('click', () => {
+        this.toggleSplitView();
+      });
+    }
+
+    if (this.copyJournalTextBtn) {
+      this.copyJournalTextBtn.addEventListener('click', () => {
+        const title = this.journalTitle.value.trim();
+        const content = this.journalContent.value;
+        const dayData = storage.getDayData(this.currentDate);
+        const tags = (dayData.journal.tags || []).map(t => `#${t}`).join(' ');
+
+        const fullText = `[${this.currentDate} 일기 & 회고]\n제목: ${title || '무제'}\n${tags ? `태그: ${tags}\n` : ''}\n${content}`;
+        navigator.clipboard.writeText(fullText).then(() => {
+          this.showToast('📋 일기 전문이 클립보드에 복사되었습니다!');
+        });
+      });
+    }
+
+    if (this.journalPhotoInput) {
+      this.journalPhotoInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          const dayData = storage.getDayData(this.currentDate);
+          const photos = dayData.journal.photos || [];
+          photos.push(evt.target.result);
+          storage.updateDayData(this.currentDate, { journal: { ...dayData.journal, photos } });
+          this.renderJournalPhotos();
+          this.showToast('일기 사진이 IndexedDB에 안전하게 첨부되었습니다! 📷');
+        };
+        reader.readAsDataURL(file);
+        this.journalPhotoInput.value = '';
+      });
+    }
+
     const triggerAutoSave = () => {
       this.updateJournalStats();
+      if (this.isSplitView) {
+        this.journalPreview.innerHTML = this.parseMarkdown(this.journalContent.value);
+      }
       clearTimeout(this.autoSaveTimer);
       this.autoSaveIndicator.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 저장 중...';
-      this.autoSaveTimer = setTimeout(() => this.saveJournal(false), 800);
+      this.autoSaveTimer = setTimeout(() => this.saveJournal(false), 600);
     };
     this.journalTitle.addEventListener('input', triggerAutoSave);
     this.journalContent.addEventListener('input', triggerAutoSave);
+
+    // Ctrl+S & Shortcut support
+    this.journalContent.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        this.saveJournal(true);
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+        e.preventDefault();
+        this.applyToolbarCmd('bold');
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'i') {
+        e.preventDefault();
+        this.applyToolbarCmd('italic');
+      }
+    });
 
     this.saveJournalBtn.addEventListener('click', () => this.saveJournal(true));
     this.journalPreviewToggle.addEventListener('click', () => this.togglePreview());
@@ -2224,7 +2295,118 @@ class DailyFlowApp {
   }
 
   // ==========================================
-  // 9. Journal Action Guide Extractor
+  // 9-1. AI 1-Click Auto Draft Generator
+  // ==========================================
+  async generateAiJournalDraft() {
+    const dayData = storage.getDayData(this.currentDate);
+    const todos = dayData.todos || [];
+    const completedTodos = todos.filter(t => t.completed).map(t => t.text);
+    const uncompletedTodos = todos.filter(t => !t.completed).map(t => t.text);
+    const studyTopic = dayData.study?.topic || '';
+    const studyHours = dayData.study?.actualHours || 0;
+    const studyTil = dayData.study?.til || '';
+    const mood = dayData.mood || 'good';
+    const energy = dayData.condition?.energy || 60;
+    const focus = dayData.focus || '';
+
+    this.aiAutoDraftJournalBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 오늘 활동 데이터 분석 및 작성 중...';
+
+    const prompt = `[오늘 ${this.currentDate} 활동 데이터]
+- 오늘의 북극성 미션(One Thing): ${focus || '기본 집중'}
+- 완료한 실행 To-Do: ${completedTodos.length > 0 ? completedTodos.join(', ') : '없음'}
+- 미완료 과업: ${uncompletedTodos.length > 0 ? uncompletedTodos.join(', ') : '없음'}
+- 오늘 공부한 주제: ${studyTopic ? `${studyTopic} (${studyHours}시간 달성, 배움: ${studyTil})` : '없음'}
+- 기분 및 에너지 상태: 마인드셋 ${mood}, 에너지 ${energy}%
+
+위 데이터를 바탕으로, 오늘 하루를 진지하게 성찰하고 내일의 압도적 성장을 다짐하는 **최고급 1% 회고 일기**를 작성해줘.
+형식:
+1. 매력적이고 통찰력 있는 일기 제목 1줄 (예: 장기 비전을 오늘의 구체적 실행으로 연결한 하루)
+2. 본문 내용 (오늘의 사유와 성찰, 배운 점, 내일을 위한 1% 실행 가이드, 핵심 명언 인용)`;
+
+    const aiResult = await geminiClient.generateText(prompt);
+    this.aiAutoDraftJournalBtn.innerHTML = '<i class="fa-solid fa-pen-nib"></i> 오늘 활동 기반 AI 일기 자동 생성';
+
+    const lines = aiResult.split('\n');
+    let title = '';
+    let body = aiResult;
+
+    if (lines[0].startsWith('#') || lines[0].startsWith('제목:')) {
+      title = lines[0].replace(/^[#\s*제목:\s*]+/, '').trim();
+      body = lines.slice(1).join('\n').trim();
+    } else {
+      title = `${this.currentDate}의 사유와 실행 회고`;
+    }
+
+    this.journalTitle.value = title;
+    this.journalContent.value = body;
+    this.saveJournal(false);
+
+    if (this.isSplitView) {
+      this.journalPreview.innerHTML = this.parseMarkdown(this.journalContent.value);
+    }
+    this.updateJournalStats();
+    this.showToast('✨ Gemini AI가 오늘의 활동을 분석하여 일기를 1초 만에 완성했습니다!');
+  }
+
+  toggleSplitView() {
+    this.isSplitView = !this.isSplitView;
+    if (this.isSplitView) {
+      this.journalEditorBody.classList.add('split-mode');
+      this.journalPreview.innerHTML = this.parseMarkdown(this.journalContent.value);
+      this.journalPreview.style.display = 'block';
+      this.journalContent.style.display = 'block';
+      this.journalSplitToggle.innerHTML = '<i class="fa-solid fa-table-cells-large text-cyan"></i> 분할 뷰 ON';
+      this.journalSplitToggle.classList.add('btn-primary');
+      this.journalSplitToggle.classList.remove('btn-secondary');
+    } else {
+      this.journalEditorBody.classList.remove('split-mode');
+      this.journalPreview.style.display = 'none';
+      this.journalContent.style.display = 'block';
+      this.journalSplitToggle.innerHTML = '<i class="fa-solid fa-table-columns"></i> 분할 뷰';
+      this.journalSplitToggle.classList.remove('btn-primary');
+      this.journalSplitToggle.classList.add('btn-secondary');
+    }
+  }
+
+  renderJournalPhotos() {
+    if (!this.journalPhotoGallery || !this.journalPhotosBar) return;
+    const dayData = storage.getDayData(this.currentDate);
+    const photos = dayData.journal?.photos || [];
+    this.journalPhotoGallery.innerHTML = '';
+
+    if (photos.length === 0) {
+      this.journalPhotosBar.style.display = 'none';
+      return;
+    }
+
+    this.journalPhotosBar.style.display = 'block';
+    photos.forEach((photo, idx) => {
+      const card = document.createElement('div');
+      card.className = 'journal-photo-card';
+      card.innerHTML = `
+        <img src="${photo}" alt="일기 사진">
+        <button class="journal-photo-delete-btn" title="사진 삭제"><i class="fa-solid fa-xmark"></i></button>
+      `;
+
+      card.querySelector('.journal-photo-delete-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        photos.splice(idx, 1);
+        storage.updateDayData(this.currentDate, { journal: { ...dayData.journal, photos } });
+        this.renderJournalPhotos();
+        this.showToast('일기 사진이 삭제되었습니다.');
+      });
+
+      card.addEventListener('click', () => {
+        const win = window.open('');
+        win.document.write(`<body style="margin:0; background:#080d1a; display:flex; align-items:center; justify-content:center; height:100vh;"><img src="${photo}" style="max-width:95vw; max-height:95vh; border-radius:8px; box-shadow:0 0 20px rgba(0,0,0,0.8);"></body>`);
+      });
+
+      this.journalPhotoGallery.appendChild(card);
+    });
+  }
+
+  // ==========================================
+  // 9-2. Journal Action Guide Extractor
   // ==========================================
   async extractActionGuideFromJournal() {
     const text = this.journalContent.value;
@@ -2445,7 +2627,11 @@ class DailyFlowApp {
     this.journalTitle.value = journal.title || '';
     this.journalContent.value = journal.content || '';
     if (this.isPreviewMode) this.togglePreview();
+    if (this.isSplitView) {
+      this.journalPreview.innerHTML = this.parseMarkdown(this.journalContent.value);
+    }
     this.renderTags();
+    this.renderJournalPhotos();
     this.updateJournalStats();
     this.autoSaveIndicator.innerHTML = '<i class="fa-solid fa-check"></i> 저장됨';
 

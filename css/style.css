@@ -778,6 +778,82 @@ body {
   resize: none; outline: none; overflow-y: auto;
 }
 .journal-preview-pane { width: 100%; height: 100%; padding: 16px; overflow-y: auto; font-family: var(--font-serif); line-height: 1.8; font-size: 1rem; }
+
+/* Split View Mode */
+.editor-body.split-mode {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border-color);
+}
+.editor-body.split-mode .journal-textarea {
+  background: var(--bg-card);
+  border-right: 1px solid var(--border-color);
+}
+.editor-body.split-mode .journal-preview-pane {
+  display: block !important;
+  background: var(--bg-secondary);
+}
+
+/* Journal Photos Bar */
+.journal-photos-bar {
+  padding: 8px 14px;
+  background: var(--bg-secondary);
+  border-top: 1px dashed var(--border-color);
+}
+.journal-photos-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.journal-photo-gallery {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+.journal-photo-card {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.journal-photo-card:hover {
+  transform: scale(1.06);
+  border-color: var(--accent-secondary);
+}
+.journal-photo-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.journal-photo-delete-btn {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  border: none;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  font-size: 0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.journal-photo-delete-btn:hover { background: var(--accent-danger); }
+
 .editor-footer { padding: 6px 16px; border-top: 1px solid var(--border-color); font-size: 0.75rem; color: var(--text-muted); display: flex; align-items: center; justify-content: space-between; }
 .divider-dot { margin: 0 5px; }
 
