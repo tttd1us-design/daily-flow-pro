@@ -676,6 +676,35 @@ class DailyFlowApp {
     this.sleepPlusBtn = document.getElementById('sleepPlusBtn');
     this.quickMemoInput = document.getElementById('quickMemoInput');
 
+    // EES (Executive Execution Score) Elements
+    this.eesScoreCard = document.getElementById('eesScoreCard');
+    this.eesScoreVal = document.getElementById('eesScoreVal');
+    this.eesGradeBadge = document.getElementById('eesGradeBadge');
+    this.eesScoreBar = document.getElementById('eesScoreBar');
+
+    // Evening Budget Elements
+    this.eveningCapacityInput = document.getElementById('eveningCapacityInput');
+    this.eveningRemainingBadge = document.getElementById('eveningRemainingBadge');
+    this.eveningBudgetFill = document.getElementById('eveningBudgetFill');
+    this.eveningTaskDuration = document.getElementById('eveningTaskDuration');
+
+    // Visual Tree Map Elements
+    this.toggleHierarchyViewModeBtn = document.getElementById('toggleHierarchyViewModeBtn');
+    this.visualTreeContainer = document.getElementById('visualTreeContainer');
+    this.hierarchyCardsViewContainer = document.getElementById('hierarchyCardsViewContainer');
+    this.visualTreeCanvas = document.getElementById('visualTreeCanvas');
+    this.isVisualTreeMode = false;
+
+    // Weekly Retro Elements
+    this.generateWeeklyReportBtn = document.getElementById('generateWeeklyReportBtn');
+    this.weeklyTotalHoursVal = document.getElementById('weeklyTotalHoursVal');
+    this.weeklyTodoRateVal = document.getElementById('weeklyTodoRateVal');
+    this.weeklyTodoCountVal = document.getElementById('weeklyTodoCountVal');
+    this.weeklyGoalRateVal = document.getElementById('weeklyGoalRateVal');
+    this.weeklyHabitDaysVal = document.getElementById('weeklyHabitDaysVal');
+    this.weeklyReportContent = document.getElementById('weeklyReportContent');
+    this.copyWeeklyReportBtn = document.getElementById('copyWeeklyReportBtn');
+
     // Evening OS Elements
     this.eveningGoalInput = document.getElementById('eveningGoalInput');
     this.saveEveningGoalBtn = document.getElementById('saveEveningGoalBtn');
@@ -1098,6 +1127,52 @@ class DailyFlowApp {
     this.updateThemeIcon(storage.data.settings.theme || 'dark');
 
     // ==========================================
+    // 🌳 Visual Tree Mode Toggle
+    // ==========================================
+    if (this.toggleHierarchyViewModeBtn) {
+      this.toggleHierarchyViewModeBtn.addEventListener('click', () => {
+        this.isVisualTreeMode = !this.isVisualTreeMode;
+        if (this.isVisualTreeMode) {
+          this.visualTreeContainer.style.display = 'flex';
+          this.hierarchyCardsViewContainer.style.display = 'none';
+          this.toggleHierarchyViewModeBtn.innerHTML = '<i class="fa-solid fa-table-cells-large text-cyan"></i> <span>📋 4단 카드 뷰</span>';
+          this.renderVisualTree();
+        } else {
+          this.visualTreeContainer.style.display = 'none';
+          this.hierarchyCardsViewContainer.style.display = 'block';
+          this.toggleHierarchyViewModeBtn.innerHTML = '<i class="fa-solid fa-diagram-project text-cyan"></i> <span>🌳 비주얼 트리 맵 뷰</span>';
+          this.renderGoalHierarchy();
+        }
+      });
+    }
+
+    // ==========================================
+    // 📊 Weekly Sprint Retro Events
+    // ==========================================
+    if (this.generateWeeklyReportBtn) {
+      this.generateWeeklyReportBtn.addEventListener('click', async () => {
+        await this.generateWeeklyRetroReport();
+      });
+    }
+
+    if (this.copyWeeklyReportBtn) {
+      this.copyWeeklyReportBtn.addEventListener('click', () => {
+        const text = this.weeklyReportContent.innerText;
+        navigator.clipboard.writeText(text);
+        this.showToast('주간 결산 리포트가 클립보드에 복사되었습니다! 📋');
+      });
+    }
+
+    // ==========================================
+    // ⏱️ Evening Budget Capacity Events
+    // ==========================================
+    if (this.eveningCapacityInput) {
+      this.eveningCapacityInput.addEventListener('change', () => {
+        this.renderEveningOS();
+      });
+    }
+
+    // ==========================================
     // 🌙 Evening OS Events (퇴근 후 야간 실행)
     // ==========================================
     if (this.saveEveningGoalBtn) {
@@ -1146,11 +1221,12 @@ class DailyFlowApp {
       this.eveningTodayForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const text = this.eveningTodayInput.value.trim();
+        const duration = parseFloat(this.eveningTaskDuration ? this.eveningTaskDuration.value : 1.0) || 1.0;
         if (!text) return;
         const dayData = storage.getDayData(this.currentDate);
         const er = dayData.eveningRoutine || { todayTasks: [], tomorrowTasks: [] };
         er.todayTasks = er.todayTasks || [];
-        er.todayTasks.push({ id: 'et_' + Date.now(), text, completed: false });
+        er.todayTasks.push({ id: 'et_' + Date.now(), text, duration, completed: false });
         storage.updateDayData(this.currentDate, { eveningRoutine: er });
         this.eveningTodayInput.value = '';
         this.renderEveningOS();
@@ -2191,6 +2267,7 @@ class DailyFlowApp {
   renderAllTabCalendars() {
     this.renderTabCalendar('dashboard');
     this.renderTabCalendar('evening');
+    this.renderTabCalendar('weekly');
     this.renderTabCalendar('ai');
     this.renderTabCalendar('study');
     this.renderTabCalendar('goals');
@@ -2251,6 +2328,12 @@ class DailyFlowApp {
         if (er.goal || (er.todayTasks && er.todayTasks.length > 0)) {
           hasBadge = true;
           badgeColor = '#facc15';
+        }
+      } else if (target === 'weekly') {
+        const todos = dayData.todos || [];
+        if (todos.length > 0) {
+          hasBadge = true;
+          badgeColor = '#0078d4';
         }
       } else if (target === 'study') {
         if (dayData.study && (dayData.study.topic || dayData.study.actualHours > 0 || (dayData.study.photos && dayData.study.photos.length > 0))) {
@@ -2328,6 +2411,14 @@ class DailyFlowApp {
           <span class="tab-cal-row-date">${dayNum}일</span>
           <span class="tab-cal-row-title">${this.escapeHtml(eGoal.substring(0, 16))}</span>
           <span class="tab-cal-row-tag category-wealth">🌙 ${er.actualHours || 1.5}h</span>
+        `;
+      } else if (target === 'weekly') {
+        const todos = day.todos || [];
+        const done = todos.filter(t => t.completed).length;
+        rowHtml = `
+          <span class="tab-cal-row-date">${dayNum}일</span>
+          <span class="tab-cal-row-title">${todos.length > 0 ? `${done}/${todos.length} 완료` : '기록'}</span>
+          <span class="tab-cal-row-tag category-career">📊 주간데이터</span>
         `;
       } else if (target === 'study') {
         if (!day.study || (!day.study.topic && day.study.actualHours === 0)) return;
@@ -2774,8 +2865,13 @@ class DailyFlowApp {
       this.renderTabCalendar('evening');
     }
     if (tabName === 'goal-hierarchy') {
-      this.renderGoalHierarchy();
+      if (this.isVisualTreeMode) this.renderVisualTree();
+      else this.renderGoalHierarchy();
       this.renderTabCalendar('goals');
+    }
+    if (tabName === 'weekly-retro') {
+      this.renderWeeklyRetroMetrics();
+      this.renderTabCalendar('weekly');
     }
     if (tabName === 'ai-coach') this.renderTabCalendar('ai');
     if (tabName === 'study') {
@@ -2845,6 +2941,7 @@ class DailyFlowApp {
     // Evening OS Load
     this.renderEveningOS();
     this.renderGoalHierarchy();
+    this.calculateEES();
 
     // Journal
     const journal = dayData.journal || {};
@@ -2864,9 +2961,272 @@ class DailyFlowApp {
   }
 
   // ==========================================
-  // 🌙 Evening OS Render (퇴근 후 야간 실행 & To-Do)
+  // ⚡ 1% 라이프 실행 지수 (Executive Execution Score)
+  // ==========================================
+  calculateEES() {
+    const dayData = storage.getDayData(this.currentDate);
+    const todos = dayData.todos || [];
+    const doneTodos = todos.filter(t => t.completed).length;
+    const todoScore = todos.length > 0 ? (doneTodos / todos.length) * 40 : 25; // 40점 만점
+
+    const studyHours = (dayData.study && dayData.study.actualHours) ? dayData.study.actualHours : 0;
+    const eveningHours = (dayData.eveningRoutine && dayData.eveningRoutine.actualHours) ? dayData.eveningRoutine.actualHours : 0;
+    const totalDeepHours = studyHours + eveningHours;
+    const deepWorkScore = Math.min(30, (totalDeepHours / 3.0) * 30); // 30점 만점 (3시간 기준)
+
+    const habits = storage.getHabits();
+    const doneHabits = habits.filter(h => dayData.habits && dayData.habits[h.id]).length;
+    const habitScore = habits.length > 0 ? (doneHabits / habits.length) * 20 : 15; // 20점 만점
+
+    const water = dayData.water || 0;
+    const sleep = dayData.sleep || 7.0;
+    const healthScore = Math.min(10, ((water / 8) * 5) + (sleep >= 6.5 ? 5 : 2)); // 10점 만점
+
+    const totalEES = Math.round(todoScore + deepWorkScore + habitScore + healthScore);
+
+    let grade = 'GRADE S';
+    let gradeColor = '#107c41';
+    if (totalEES < 60) { grade = 'GRADE C'; gradeColor = '#d83b01'; }
+    else if (totalEES < 75) { grade = 'GRADE B'; gradeColor = '#ffaa44'; }
+    else if (totalEES < 90) { grade = 'GRADE A'; gradeColor = '#0078d4'; }
+
+    if (this.eesScoreVal) this.eesScoreVal.innerHTML = `${totalEES}<span class="ees-unit">점</span>`;
+    if (this.eesScoreBar) this.eesScoreBar.style.width = `${totalEES}%`;
+    if (this.eesGradeBadge) {
+      this.eesGradeBadge.textContent = grade;
+      this.eesGradeBadge.style.background = gradeColor;
+    }
+  }
+
+  // ==========================================
+  // 🌙 Evening OS Render (시간 예산제 & 용량 게이지 연동)
   // ==========================================
   renderEveningOS() {
+    const dayData = storage.getDayData(this.currentDate);
+    const er = dayData.eveningRoutine || { goal: '', todayTasks: [], tomorrowTasks: [], actualHours: 1.5, focusRate: 100, notes: '' };
+
+    if (this.eveningGoalInput) this.eveningGoalInput.value = er.goal || '';
+    if (this.eveningActualHours) this.eveningActualHours.value = er.actualHours || 1.5;
+    if (this.eveningFocusRate) this.eveningFocusRate.value = er.focusRate || 100;
+    if (this.eveningReviewNotes) this.eveningReviewNotes.value = er.notes || '';
+
+    // 저녁 시간 예산 계산
+    const capacity = parseFloat(this.eveningCapacityInput ? this.eveningCapacityInput.value : 3.0) || 3.0;
+    const todayTasks = er.todayTasks || [];
+    let allocated = 0;
+    todayTasks.forEach(t => {
+      allocated += parseFloat(t.duration || 1.0);
+    });
+    const remaining = capacity - allocated;
+    const fillPercent = Math.min(100, Math.round((allocated / capacity) * 100));
+
+    if (this.eveningBudgetFill) this.eveningBudgetFill.style.width = `${fillPercent}%`;
+    if (this.eveningRemainingBadge) {
+      if (remaining < 0) {
+        this.eveningRemainingBadge.textContent = `⚠️ 초과: ${Math.abs(remaining).toFixed(1)}h (과부하 위험)`;
+        this.eveningRemainingBadge.style.background = 'rgba(216, 59, 1, 0.25)';
+        this.eveningRemainingBadge.style.color = '#f87171';
+      } else {
+        this.eveningRemainingBadge.textContent = `잔여: ${remaining.toFixed(1)}h 가능`;
+        this.eveningRemainingBadge.style.background = 'rgba(0, 183, 195, 0.2)';
+        this.eveningRemainingBadge.style.color = '#22d3ee';
+      }
+    }
+
+    // Render Today Evening Tasks
+    if (this.eveningTodayList) {
+      this.eveningTodayList.innerHTML = '';
+      const done = todayTasks.filter(t => t.completed).length;
+      if (this.eveningTodayBadge) {
+        this.eveningTodayBadge.textContent = `${done} / ${todayTasks.length} 완료 (${allocated.toFixed(1)}h/${capacity}h)`;
+      }
+
+      if (todayTasks.length === 0) {
+        this.eveningTodayList.innerHTML = `<li style="color:var(--text-muted); padding:16px; text-align:center; font-size:0.82rem;">오늘 저녁 할 일이 없습니다. [AI 저녁 루틴 설계] 또는 직접 추가해보세요!</li>`;
+      } else {
+        todayTasks.forEach(task => {
+          const li = document.createElement('li');
+          li.className = `todo-item ${task.completed ? 'completed' : ''}`;
+          li.innerHTML = `
+            <div class="todo-left">
+              <input type="checkbox" class="todo-checkbox" ${task.completed ? 'checked' : ''}>
+              <span class="category-tag category-wealth">⏱️ ${task.duration || 1.0}h</span>
+              <span class="todo-text">${this.escapeHtml(task.text)}</span>
+            </div>
+            <button class="todo-delete-btn" title="삭제"><i class="fa-solid fa-trash"></i></button>
+          `;
+          li.querySelector('.todo-checkbox').addEventListener('change', (e) => {
+            task.completed = e.target.checked;
+            storage.updateDayData(this.currentDate, { eveningRoutine: er });
+            this.renderEveningOS();
+            this.renderTabCalendar('evening');
+            this.calculateEES();
+          });
+          li.querySelector('.todo-delete-btn').addEventListener('click', () => {
+            er.todayTasks = er.todayTasks.filter(t => t.id !== task.id);
+            storage.updateDayData(this.currentDate, { eveningRoutine: er });
+            this.renderEveningOS();
+            this.renderTabCalendar('evening');
+            this.calculateEES();
+          });
+          this.eveningTodayList.appendChild(li);
+        });
+      }
+    }
+
+    // Render Tomorrow Evening Tasks
+    if (this.eveningTomorrowList) {
+      this.eveningTomorrowList.innerHTML = '';
+      const tomorrowTasks = er.tomorrowTasks || [];
+
+      if (tomorrowTasks.length === 0) {
+        this.eveningTomorrowList.innerHTML = `<li style="color:var(--text-muted); padding:16px; text-align:center; font-size:0.82rem;">내일 저녁 계획이 비어 있습니다. 잠들기 전 1순위 행동을 미리 적어두세요!</li>`;
+      } else {
+        tomorrowTasks.forEach(task => {
+          const li = document.createElement('li');
+          li.className = 'todo-item';
+          li.innerHTML = `
+            <div class="todo-left">
+              <span class="category-tag category-study">내일</span>
+              <span class="todo-text">${this.escapeHtml(task.text)}</span>
+            </div>
+            <button class="todo-delete-btn" title="삭제"><i class="fa-solid fa-trash"></i></button>
+          `;
+          li.querySelector('.todo-delete-btn').addEventListener('click', () => {
+            er.tomorrowTasks = er.tomorrowTasks.filter(t => t.id !== task.id);
+            storage.updateDayData(this.currentDate, { eveningRoutine: er });
+            this.renderEveningOS();
+          });
+          this.eveningTomorrowList.appendChild(li);
+        });
+      }
+    }
+  }
+
+  // ==========================================
+  // 🌳 비주얼 인터랙티브 트리 맵 렌더러 (Visual Tree)
+  // ==========================================
+  renderVisualTree() {
+    if (!this.visualTreeCanvas) return;
+    this.visualTreeCanvas.innerHTML = '';
+
+    const goals = storage.getGoals();
+    const yearly = goals.filter(g => g.horizon === 'yearly' || g.horizon === 'long');
+    const monthly = goals.filter(g => g.horizon === 'monthly' || g.horizon === 'mid');
+    const weekly = goals.filter(g => g.horizon === 'weekly' || g.horizon === 'short');
+    const daily = goals.filter(g => g.horizon === 'daily');
+
+    const tiers = [
+      { key: 'YEARLY', label: '🚀 년간 비전', list: yearly, badgeClass: 'badge-yearly' },
+      { key: 'MONTHLY', label: '🎯 월간 마일스톤', list: monthly, badgeClass: 'badge-monthly' },
+      { key: 'WEEKLY', label: '⚡ 주간 스프린트', list: weekly, badgeClass: 'badge-weekly' },
+      { key: 'DAILY', label: '☀️ 일일 1% 액션', list: daily, badgeClass: 'badge-daily' }
+    ];
+
+    tiers.forEach(tier => {
+      const row = document.createElement('div');
+      row.className = 'tree-tier-row';
+      row.innerHTML = `
+        <div class="tree-tier-label ${tier.badgeClass}">${tier.label}</div>
+        <div class="tree-nodes-list" id="treeNodes_${tier.key}"></div>
+      `;
+      const nodesContainer = row.querySelector(`#treeNodes_${tier.key}`);
+      
+      if (tier.list.length === 0) {
+        nodesContainer.innerHTML = `<span style="color:var(--text-muted); font-size:0.75rem; padding:6px;">목표가 등록되지 않았습니다.</span>`;
+      } else {
+        tier.list.forEach(goal => {
+          const node = document.createElement('div');
+          node.className = 'tree-node-item';
+          const isDone = (goal.progress || 0) >= 100;
+          node.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="category-tag category-${goal.pillar || 'career'}">${goal.pillar || '커리어'}</span>
+              <span style="font-size:0.68rem; font-weight:700; color:var(--text-secondary);">${goal.progress || 0}%</span>
+            </div>
+            <div class="tree-node-title" style="${isDone ? 'text-decoration:line-through; opacity:0.6;' : ''}">${this.escapeHtml(goal.title)}</div>
+            <div class="tree-node-kr"><i class="fa-solid fa-key"></i> ${this.escapeHtml(goal.keyResult || '지표 달성')}</div>
+          `;
+          nodesContainer.appendChild(node);
+        });
+      }
+      this.visualTreeCanvas.appendChild(row);
+    });
+  }
+
+  // ==========================================
+  // 📊 주간 7일 자동 결산 리포트 엔진 (Weekly Retro)
+  // ==========================================
+  renderWeeklyRetroMetrics() {
+    let totalDeepHours = 0;
+    let totalTodos = 0;
+    let doneTodos = 0;
+    let habitSuccessDays = 0;
+
+    const todayObj = new Date(this.currentDate);
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(todayObj);
+      d.setDate(todayObj.getDate() - i);
+      const ds = this.formatDateKey(d);
+      const dayData = storage.getDayData(ds);
+
+      const studyH = (dayData.study && dayData.study.actualHours) ? dayData.study.actualHours : 0;
+      const eveningH = (dayData.eveningRoutine && dayData.eveningRoutine.actualHours) ? dayData.eveningRoutine.actualHours : 0;
+      totalDeepHours += (studyH + eveningH);
+
+      const todos = dayData.todos || [];
+      totalTodos += todos.length;
+      doneTodos += todos.filter(t => t.completed).length;
+
+      const habits = storage.getHabits();
+      if (habits.length > 0 && dayData.habits) {
+        const hDone = habits.filter(h => dayData.habits[h.id]).length;
+        if (hDone >= Math.ceil(habits.length * 0.7)) habitSuccessDays++;
+      }
+    }
+
+    const todoRate = totalTodos > 0 ? Math.round((doneTodos / totalTodos) * 100) : 0;
+    const goals = storage.getGoals().filter(g => g.horizon === 'weekly' || g.horizon === 'short');
+    let weeklyGoalProgress = 0;
+    if (goals.length > 0) {
+      const sum = goals.reduce((acc, g) => acc + (g.progress || 0), 0);
+      weeklyGoalProgress = Math.round(sum / goals.length);
+    }
+
+    if (this.weeklyTotalHoursVal) this.weeklyTotalHoursVal.textContent = `${totalDeepHours.toFixed(1)}시간`;
+    if (this.weeklyTodoRateVal) this.weeklyTodoRateVal.textContent = `${todoRate}%`;
+    if (this.weeklyTodoCountVal) this.weeklyTodoCountVal.textContent = `${doneTodos}/${totalTodos} 완료`;
+    if (this.weeklyGoalRateVal) this.weeklyGoalRateVal.textContent = `${weeklyGoalProgress}%`;
+    if (this.weeklyHabitDaysVal) this.weeklyHabitDaysVal.textContent = `${habitSuccessDays}일`;
+  }
+
+  async generateWeeklyRetroReport() {
+    this.renderWeeklyRetroMetrics();
+    if (!this.weeklyReportContent) return;
+
+    this.generateWeeklyReportBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 지난 7일 데이터 정밀 분석 중...';
+
+    const hours = this.weeklyTotalHoursVal.textContent;
+    const todoRate = this.weeklyTodoRateVal.textContent;
+    const goalRate = this.weeklyGoalRateVal.textContent;
+    const habitDays = this.weeklyHabitDaysVal.textContent;
+
+    const prompt = `지난 7일간의 실행 데이터 요약:
+- 주간 총 딥워크 몰입 시간: ${hours}
+- 주간 To-Do 완료율: ${todoRate}
+- 주간 핵심 스프린트 목표 진척률: ${goalRate}
+- 복리 습관 성공 일수: ${habitDays} / 7일
+
+위 데이터를 바탕으로 최고 경영진(Executive) 수준의 주간 성적표 브리핑을 작성해줘:
+1. 🏆 주간 총평 및 핵심 성과 (Keep)
+2. ⚠️ 발견된 실행 누수 및 실패 패턴 (Problem)
+3. 🚀 다음 주 7일간 폭발적 성장을 위한 3대 실행 지침 (Try & Next Sprint)`;
+
+    const res = await geminiClient.generateText(prompt);
+    this.generateWeeklyReportBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> 이번 주 자동 결산 성적표 발행';
+    this.weeklyReportContent.innerHTML = this.parseMarkdown(res);
+    this.showToast('Gemini가 주간 경영 결산 성적표를 발행했습니다! 📊');
+  }
     const dayData = storage.getDayData(this.currentDate);
     const er = dayData.eveningRoutine || { goal: '', todayTasks: [], tomorrowTasks: [], actualHours: 1.5, focusRate: 100, notes: '' };
 
