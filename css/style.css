@@ -1219,26 +1219,145 @@ body {
 @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 /* Responsive */
-@media (max-width: 1280px) {
-  :root { --cal-sidebar-width: 260px; }
+/* ==========================================================================
+   📱 iPhone, iPad & Mobile / Tablet Dedicated Styles
+   ========================================================================== */
+.mobile-only-btn { display: none; }
+.mobile-menu-btn { display: none; }
+.sidebar-backdrop {
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(4px);
+  z-index: 998; opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
+}
+.sidebar-backdrop.active { opacity: 1; pointer-events: auto; }
+
+/* iOS Mobile Bottom Navigation */
+.mobile-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  background: rgba(19, 27, 46, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border-color);
+  padding: 6px 10px calc(6px + env(safe-area-inset-bottom));
+  z-index: 990;
+  justify-content: space-around;
+  align-items: center;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+}
+.mbottom-item {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  min-width: 48px;
+  -webkit-tap-highlight-color: transparent;
+}
+.mbottom-item i { font-size: 1.1rem; }
+.mbottom-item:active { transform: scale(0.92); }
+.mbottom-item.active {
+  color: #60a5fa;
+  font-weight: 800;
+}
+.mbottom-item.active i {
+  color: var(--accent-primary);
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   📱 Breakpoints (iPad & iPhone Optimization)
+   ========================================================================== */
+
+/* 📱 iPad / Tablet Viewport (769px ~ 1024px) */
+@media (max-width: 1024px) {
+  :root { --sidebar-width: 220px; --cal-sidebar-width: 100%; }
+  
+  .tab-with-calendar-layout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .tab-calendar-sidebar {
+    order: 2;
+    margin-top: 10px;
+  }
+  
+  .journal-wrapper {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  .journal-right-sidebar { order: 3; }
+  .journal-editor-container { min-height: 480px; }
+
+  .calendar-page-grid { grid-template-columns: 1fr; }
+  .analytics-grid { grid-template-columns: repeat(2, 1fr); }
+  .memo-cards-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* 📱 iPhone / Mobile Viewport (max-width: 768px) */
+@media (max-width: 768px) {
+  body {
+    padding-bottom: calc(56px + env(safe-area-inset-bottom));
+  }
+
+  .mobile-menu-btn { display: flex; }
+  .mobile-only-btn { display: flex; }
+  .mobile-bottom-nav { display: flex; }
+
+  /* 사이드바 ➡️ 슬라이드 오버레이 드로어로 전환 */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    width: 270px;
+    height: 100vh;
+    z-index: 999;
+    box-shadow: var(--shadow-lg);
+    transition: left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .sidebar.drawer-open {
+    left: 0;
+  }
+
+  .main-content {
+    padding: 8px 10px;
+    height: auto;
+    overflow-y: visible;
+  }
+
+  .outlook-ribbon-header {
+    padding: 6px 10px;
+    gap: 6px;
+  }
+  .selected-date-text { font-size: 0.95rem; }
+  .quote-banner { display: none; }
+  .btn-zen-mode span { display: none; }
+
   .dashboard-grid { grid-template-columns: 1fr; }
   .span-2 { grid-column: span 1; }
   .evening-todo-grid { grid-template-columns: 1fr; }
   .hierarchy-cards-grid { grid-template-columns: 1fr; }
-}
-
-@media (max-width: 1024px) {
-  .tab-with-calendar-layout { grid-template-columns: 1fr; }
-  .journal-wrapper { grid-template-columns: 1fr; height: auto; }
-  .journal-right-sidebar { order: -1; }
-  .calendar-page-grid { grid-template-columns: 1fr; }
-  .analytics-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (max-width: 768px) {
-  .app-container { flex-direction: column; }
-  .sidebar { width: 100%; height: auto; position: static; }
-  .main-content { padding: 10px; }
+  .principles-grid { grid-template-columns: 1fr; }
+  .condition-grid { grid-template-columns: repeat(2, 1fr); }
   .analytics-grid { grid-template-columns: 1fr; }
-  .condition-grid { grid-template-columns: 1fr; }
+  .memo-cards-grid { grid-template-columns: 1fr; }
+
+  .study-view-grid { grid-template-columns: 1fr; }
+  .journal-editor-container { min-height: 420px; }
+  .journal-textarea { font-size: 0.95rem; padding: 12px; }
+
+  .zen-timer-display { font-size: 3.2rem; }
+  .zen-focus-title { font-size: 1.3rem; }
 }

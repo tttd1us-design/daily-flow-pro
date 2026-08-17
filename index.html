@@ -2,9 +2,15 @@
 <html lang="ko" data-theme="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daily Flow Pro - 1% Life OS (Outlook Fluent Executive Edition)</title>
-  <meta name="description" content="Microsoft Outlook 감성의 고효율 1% Life OS. 과학적 계층 목표 트리, 저녁 시간 예산제, 주간 자동 결산 리포트, 1% 실행 지수 탑재">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Daily Flow Pro - 1% Life OS (PC, iPad, iPhone Universal Edition)</title>
+  <meta name="description" content="PC, iPad, iPhone 완벽 반응형 1% Life OS. 과학적 계층 목표 트리, 저녁 시간 예산제, 주간 자동 결산 리포트, 1% 실행 지수 탑재">
+  
+  <!-- iOS / Apple Web App Settings -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DailyFlow">
+  <meta name="theme-color" content="#0b111e">
   
   <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,7 +23,11 @@
 </head>
 <body>
   <div class="app-container" id="appContainer">
-    <!-- 좌측 아웃룩 스타일 사이드 레일 (Outlook App Rail) -->
+    
+    <!-- 모바일 / 아이패드 사이드바 오버레이 백드롭 -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <!-- 좌측 사이드바 (PC 상시 노출 / iPad·iPhone 슬라이드 드로어) -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="logo">
@@ -27,6 +37,10 @@
             <span class="logo-badge"><i class="fa-solid fa-crown text-yellow"></i> 1% Life OS</span>
           </div>
         </div>
+        <!-- 모바일 드로어 닫기 버튼 -->
+        <button id="closeSidebarDrawerBtn" class="icon-btn mobile-only-btn" title="메뉴 닫기">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
       </div>
 
       <!-- 상단: 1% 실행력 지수 (Execution Score Widget) -->
@@ -142,6 +156,11 @@
       <!-- 상단 Microsoft Outlook 스타일 리본 툴바 (Top Ribbon Bar) -->
       <header class="outlook-ribbon-header">
         <div class="ribbon-left">
+          <!-- 모바일 / 아이패드 햄버거 메뉴 토글 버튼 -->
+          <button id="mobileMenuToggleBtn" class="nav-arrow-btn mobile-menu-btn" title="전체 메뉴 열기">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+
           <div class="date-navigator">
             <button id="prevDayBtn" class="nav-arrow-btn" title="어제 (Ctrl+Left)"><i class="fa-solid fa-chevron-left"></i></button>
             <div class="selected-date-wrapper">
@@ -156,7 +175,7 @@
 
         <div class="ribbon-right">
           <button id="zenModeHeaderBtn" class="btn btn-zen-mode">
-            <i class="fa-solid fa-bolt text-yellow"></i> <span>딥 포커스 몰입 젠 모드</span>
+            <i class="fa-solid fa-bolt text-yellow"></i> <span>딥 포커스 젠 모드</span>
           </button>
           <div class="quote-banner" id="quoteBanner">
             <span class="quote-text">"완벽한 계획보다 1%의 즉각적 실행이 인생을 바꾼다."</span>
@@ -1433,6 +1452,34 @@
           </div>
         </div>
       </section>
+
+      <!-- 📱 iPhone / iPad 전용 iOS 스타일 하단 탭 바 (Mobile Bottom Navigation) -->
+      <nav class="mobile-bottom-nav" id="mobileBottomNav">
+        <button class="mbottom-item active" data-tab="dashboard">
+          <i class="fa-solid fa-table-columns"></i>
+          <span>대시보드</span>
+        </button>
+        <button class="mbottom-item" data-tab="quick-memo">
+          <i class="fa-solid fa-lightbulb"></i>
+          <span>메모장</span>
+        </button>
+        <button class="mbottom-item" data-tab="evening-os">
+          <i class="fa-solid fa-moon"></i>
+          <span>퇴근야간</span>
+        </button>
+        <button class="mbottom-item" data-tab="goal-hierarchy">
+          <i class="fa-solid fa-sitemap"></i>
+          <span>목표트리</span>
+        </button>
+        <button class="mbottom-item" data-tab="journal">
+          <i class="fa-solid fa-book-open"></i>
+          <span>일기회고</span>
+        </button>
+        <button class="mbottom-item" id="mobileMoreMenuBtn">
+          <i class="fa-solid fa-ellipsis"></i>
+          <span>전체메뉴</span>
+        </button>
+      </nav>
     </main>
 
     <!-- ⚡ 딥 포커스 몰입 젠 모드 -->

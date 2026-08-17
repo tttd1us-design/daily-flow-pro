@@ -1181,6 +1181,51 @@ class DailyFlowApp {
     this.updateThemeIcon(storage.data.settings.theme || 'dark');
 
     // ==========================================
+    // 📱 iPhone / iPad Mobile Drawer & Bottom Tab Bar Events
+    // ==========================================
+    const sidebar = document.getElementById('sidebar');
+    const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+    const mobileMenuToggleBtn = document.getElementById('mobileMenuToggleBtn');
+    const closeSidebarDrawerBtn = document.getElementById('closeSidebarDrawerBtn');
+    const mobileMoreMenuBtn = document.getElementById('mobileMoreMenuBtn');
+    const mobileBottomNav = document.getElementById('mobileBottomNav');
+
+    const openDrawer = () => {
+      if (sidebar) sidebar.classList.add('drawer-open');
+      if (sidebarBackdrop) sidebarBackdrop.classList.add('active');
+    };
+
+    const closeDrawer = () => {
+      if (sidebar) sidebar.classList.remove('drawer-open');
+      if (sidebarBackdrop) sidebarBackdrop.classList.remove('active');
+    };
+
+    if (mobileMenuToggleBtn) mobileMenuToggleBtn.addEventListener('click', openDrawer);
+    if (mobileMoreMenuBtn) mobileMoreMenuBtn.addEventListener('click', openDrawer);
+    if (closeSidebarDrawerBtn) closeSidebarDrawerBtn.addEventListener('click', closeDrawer);
+    if (sidebarBackdrop) sidebarBackdrop.addEventListener('click', closeDrawer);
+
+    // 모바일 하단 탭 바 연동
+    if (mobileBottomNav) {
+      mobileBottomNav.querySelectorAll('.mbottom-item[data-tab]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tab = btn.dataset.tab;
+          this.switchTab(tab);
+          closeDrawer();
+        });
+      });
+    }
+
+    // 사이드바 메뉴 클릭 시 모바일이면 자동 닫힘
+    this.navItems.forEach(item => {
+      item.addEventListener('click', () => {
+        if (window.innerWidth <= 768) {
+          closeDrawer();
+        }
+      });
+    });
+
+    // ==========================================
     // 💡 Idea Quick Memo Events (사이드바 & 탭)
     // ==========================================
     if (this.sidebarQuickMemoForm) {
@@ -3110,6 +3155,14 @@ class DailyFlowApp {
     this.activeTab = tabName;
     this.navItems.forEach(item => item.classList.toggle('active', item.dataset.tab === tabName));
     this.tabPanes.forEach(pane => pane.classList.toggle('active', pane.id === `pane-${tabName}`));
+
+    // 모바일 하단 탭 바 동기화
+    const mNav = document.getElementById('mobileBottomNav');
+    if (mNav) {
+      mNav.querySelectorAll('.mbottom-item[data-tab]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tabName);
+      });
+    }
 
     if (tabName === 'dashboard') this.renderTabCalendar('dashboard');
     if (tabName === 'quick-memo') {
