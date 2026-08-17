@@ -2,10 +2,11 @@
  * Daily Flow Pro - 1% Life OS (Commercial Grade Engine)
  * Features:
  * 1. Unlimited IndexedDB Async Storage Engine
- * 2. Deep Focus Zen Mode (Full-screen immersion)
- * 3. Smart Uncompleted Task Rollover System (Zero-leak execution)
- * 4. Gemini 1% Elite Fact-Coaching Engine (Persona-based)
- * 5. Knowledge Wiki & Daily Study Hub with Multi-image attachment
+ * 2. All-Tab Sidebar Calendar Integration (Dashboard, AI Coach, Study, Goals, Journal, Principles)
+ * 3. Deep Focus Zen Mode (Full-screen immersion)
+ * 4. Smart Uncompleted Task Rollover System (Zero-leak execution)
+ * 5. Gemini 1% Elite Fact-Coaching Engine (Persona-based)
+ * 6. Knowledge Wiki & Daily Study Hub with Multi-image attachment
  */
 
 // =========================================================================
@@ -93,7 +94,6 @@ class IndexedDBStorageManager {
           days: savedData.days || {}
         };
       } else {
-        // Fallback to LocalStorage if available
         const lsData = localStorage.getItem(LS_FALLBACK_KEY);
         if (lsData) {
           const parsed = JSON.parse(lsData);
@@ -151,14 +151,11 @@ class IndexedDBStorageManager {
   }
 
   async saveData() {
-    // Save to IndexedDB (Unlimited)
     if (this.db) {
       await this.setInDB('root_state', this.data);
     }
-    // Safe LocalStorage Backup (without huge images to avoid quota exception)
     try {
       const shallowCopy = JSON.parse(JSON.stringify(this.data));
-      // Truncate heavy photo strings in LS backup only
       for (const day of Object.values(shallowCopy.days)) {
         if (day.study && day.study.photos) {
           day.study.photos = day.study.photos.map(p => p.length > 500 ? '[IMAGE_IN_IDB]' : p);
@@ -166,7 +163,7 @@ class IndexedDBStorageManager {
       }
       localStorage.setItem(LS_FALLBACK_KEY, JSON.stringify(shallowCopy));
     } catch (e) {
-      console.warn('LS sync skipped (safe fallback):', e);
+      console.warn('LS sync skipped:', e);
     }
   }
 
@@ -180,7 +177,8 @@ class IndexedDBStorageManager {
         timeBlocks: [],
         study: { topic: '', til: '', goalHours: 2.0, actualHours: 0, notes: '', photos: [] },
         condition: { water: 0, energy: 50, sleep: 7.0, memo: '' },
-        journal: { title: '', content: '', tags: [], photos: [], updatedAt: null }
+        journal: { title: '', content: '', tags: [], photos: [], updatedAt: null },
+        aiChatHistory: []
       };
       this.saveData();
     }
@@ -539,12 +537,21 @@ class DailyFlowApp {
     this.goalPillarFilter = 'all';
     this.studySearchQuery = '';
 
-    // Mini Calendar
+    // Calendar state for each tab
     const now = new Date();
-    this.jCalYear = now.getFullYear();
-    this.jCalMonth = now.getMonth();
-    this.calYear = now.getFullYear();
-    this.calMonth = now.getMonth();
+    const curYear = now.getFullYear();
+    const curMonth = now.getMonth();
+
+    this.tabCalState = {
+      dashboard: { year: curYear, month: curMonth },
+      ai: { year: curYear, month: curMonth },
+      study: { year: curYear, month: curMonth },
+      goals: { year: curYear, month: curMonth },
+      journal: { year: curYear, month: curMonth },
+      principles: { year: curYear, month: curMonth },
+      main: { year: curYear, month: curMonth }
+    };
+
     this.archiveFilterMood = 'all';
     this.archiveSearchQuery = '';
   }
@@ -568,7 +575,6 @@ class DailyFlowApp {
   }
 
   initElements() {
-    // Containers
     this.appContainer = document.getElementById('appContainer');
     this.mainContent = document.getElementById('mainContent');
 
@@ -718,14 +724,6 @@ class DailyFlowApp {
     this.journalTagInput = document.getElementById('journalTagInput');
     this.addTagBtn = document.getElementById('addTagBtn');
     this.extractActionGuideBtn = document.getElementById('extractActionGuideBtn');
-
-    // Mini Calendar
-    this.jCalTitle = document.getElementById('jCalTitle');
-    this.jCalPrev = document.getElementById('jCalPrev');
-    this.jCalNext = document.getElementById('jCalNext');
-    this.jCalToday = document.getElementById('jCalToday');
-    this.jCalGrid = document.getElementById('jCalGrid');
-    this.jCalMonthList = document.getElementById('jCalMonthList');
 
     // Wizard Modal
     this.openWizardBtn = document.getElementById('openWizardBtn');
@@ -889,6 +887,31 @@ class DailyFlowApp {
     }
 
     // ==========================================
+    // ⭐ 전 탭 우측 캘린더 네비게이션 버튼 이벤트 바인딩 ⭐
+    // ==========================================
+    document.querySelectorAll('[data-cal-action]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const action = btn.dataset.calAction;
+        const target = btn.dataset.target || 'dashboard';
+        const st = this.tabCalState[target] || this.tabCalState.dashboard;
+
+        if (action === 'prev') {
+          st.month--;
+          if (st.month < 0) { st.month = 11; st.year--; }
+        } else if (action === 'next') {
+          st.month++;
+          if (st.month > 11) { st.month = 0; st.year++; }
+        } else if (action === 'today') {
+          const now = new Date();
+          st.year = now.getFullYear();
+          st.month = now.getMonth();
+          this.setDate(now.toISOString().split('T')[0]);
+        }
+        this.renderTabCalendar(target);
+      });
+    });
+
+    // ==========================================
     // Dashboard Trouble Chat
     // ==========================================
     if (this.dashChatForm) {
@@ -971,6 +994,7 @@ class DailyFlowApp {
           storage.updateDayData(this.currentDate, { study: { ...dayData.study, photos } });
           this.renderStudyPhotos();
           this.renderStudyArchive();
+          this.renderAllTabCalendars();
           this.showToast('학습 이미지가 IndexedDB에 안전하게 저장되었습니다! 📷');
         };
         reader.readAsDataURL(file);
@@ -1088,6 +1112,7 @@ class DailyFlowApp {
         closeGoalModal();
 
         this.renderGoals();
+        this.renderTabCalendar('goals');
         this.renderAnalytics();
         this.showToast('새로운 인생 목표가 등록되었습니다! 🎯');
       });
@@ -1108,6 +1133,7 @@ class DailyFlowApp {
     this.saveFocusBtn.addEventListener('click', () => {
       const focus = this.focusInput.value.trim();
       storage.updateDayData(this.currentDate, { focus });
+      this.renderAllTabCalendars();
       this.showToast('오늘의 북극성 미션이 확정되었습니다! 🎯');
     });
     this.focusInput.addEventListener('keydown', (e) => {
@@ -1140,6 +1166,7 @@ class DailyFlowApp {
       this.studyMainTopicInput.value = topic;
       this.studyTilSummaryInput.value = til;
       this.renderStudyArchive();
+      this.renderTabCalendar('study');
       this.renderAnalytics();
       this.showToast('공부 주제와 배움이 저장되었습니다! 📚');
     });
@@ -1169,8 +1196,7 @@ class DailyFlowApp {
         const mood = btn.dataset.mood;
         storage.updateDayData(this.currentDate, { mood });
         this.highlightMood(mood);
-        this.renderCalendar();
-        this.renderJournalRightCalendar();
+        this.renderAllTabCalendars();
         this.renderAnalytics();
         this.showToast('오늘의 마인드셋이 기록되었습니다.');
       });
@@ -1187,6 +1213,7 @@ class DailyFlowApp {
       storage.updateDayData(this.currentDate, { todos: dayData.todos });
       this.todoInput.value = '';
       this.renderTodos();
+      this.renderTabCalendar('dashboard');
       this.renderAnalytics();
     });
 
@@ -1205,6 +1232,7 @@ class DailyFlowApp {
       this.todayStudyTopic.value = topic;
       this.todayStudyTIL.value = til;
       this.renderStudyArchive();
+      this.renderTabCalendar('study');
       this.renderAnalytics();
       this.showToast('학습 메모와 지식이 안전하게 저장되었습니다! 💾');
     });
@@ -1309,6 +1337,7 @@ class DailyFlowApp {
         this.pContent.value = '';
         closeP();
         this.renderPrinciples();
+        this.renderTabCalendar('principles');
         this.showToast('나만의 인생 원칙이 등록되었습니다! 💎');
       });
     }
@@ -1325,6 +1354,7 @@ class DailyFlowApp {
         const content = lines.slice(1).join(' ').replace(/[\*\#]/g, '').trim();
         storage.addPrinciple('mindset', title, content);
         this.renderPrinciples();
+        this.renderTabCalendar('principles');
         this.showToast('Gemini 추천 인생 원칙이 추가되었습니다! 💎');
       });
     }
@@ -1421,31 +1451,7 @@ class DailyFlowApp {
       if (e.key === 'Enter') { e.preventDefault(); addTag(); }
     });
 
-    // Mini Calendar
-    if (this.jCalPrev) {
-      this.jCalPrev.addEventListener('click', () => {
-        this.jCalMonth--;
-        if (this.jCalMonth < 0) { this.jCalMonth = 11; this.jCalYear--; }
-        this.renderJournalRightCalendar();
-      });
-    }
-    if (this.jCalNext) {
-      this.jCalNext.addEventListener('click', () => {
-        this.jCalMonth++;
-        if (this.jCalMonth > 11) { this.jCalMonth = 0; this.jCalYear++; }
-        this.renderJournalRightCalendar();
-      });
-    }
-    if (this.jCalToday) {
-      this.jCalToday.addEventListener('click', () => {
-        const now = new Date();
-        this.jCalYear = now.getFullYear();
-        this.jCalMonth = now.getMonth();
-        this.setDate(now.toISOString().split('T')[0]);
-      });
-    }
-
-    // Calendar Tab
+    // Calendar Tab Navigation
     this.calPrevMonth.addEventListener('click', () => {
       this.calMonth--;
       if (this.calMonth < 0) { this.calMonth = 11; this.calYear--; }
@@ -1505,6 +1511,7 @@ class DailyFlowApp {
         this.showToast('인생 원칙이 principles.json으로 다운로드되었습니다! 💎');
       });
     }
+
     this.triggerImportBtn.addEventListener('click', () => this.importJsonInput.click());
     this.importJsonInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
@@ -1516,7 +1523,7 @@ class DailyFlowApp {
           this.loadDate(this.currentDate);
           this.renderGoals();
           this.renderCalendar();
-          this.renderJournalRightCalendar();
+          this.renderAllTabCalendars();
           this.renderStudyPhotos();
           this.renderStudyArchive();
           this.renderPrinciples();
@@ -1530,6 +1537,7 @@ class DailyFlowApp {
       reader.readAsText(file);
       this.importJsonInput.value = '';
     });
+
     this.resetDataBtn.addEventListener('click', async () => {
       if (confirm('정말로 모든 데이터를 초기화하시겠습니까? (되돌릴 수 없습니다)')) {
         await storage.resetAllData();
@@ -1537,7 +1545,7 @@ class DailyFlowApp {
         this.loadDate(this.currentDate);
         this.renderGoals();
         this.renderCalendar();
-        this.renderJournalRightCalendar();
+        this.renderAllTabCalendars();
         this.renderStudyPhotos();
         this.renderStudyArchive();
         this.renderPrinciples();
@@ -1549,14 +1557,13 @@ class DailyFlowApp {
   }
 
   // =========================================================================
-  // 4. Task Rollover Logic (미완료 과업 1초 자동 이월)
+  // 4. Task Rollover Logic
   // =========================================================================
   checkUncompletedTasksRollover() {
     const today = this.currentDate;
     const allDays = storage.data.days || {};
     const uncompleted = [];
 
-    // Check previous dates
     const dateKeys = Object.keys(allDays).sort().reverse();
     for (const dStr of dateKeys) {
       if (dStr < today) {
@@ -1566,7 +1573,7 @@ class DailyFlowApp {
             uncompleted.push({ ...t, originDate: dStr });
           }
         });
-        if (uncompleted.length > 0) break; // Check most recent past day
+        if (uncompleted.length > 0) break;
       }
     }
 
@@ -1594,7 +1601,6 @@ class DailyFlowApp {
           completed: false
         });
       }
-      // Mark as rolled over in origin
       const originDay = storage.data.days[t.originDate];
       if (originDay && originDay.todos) {
         const orig = originDay.todos.find(ot => ot.id === t.id);
@@ -1605,13 +1611,14 @@ class DailyFlowApp {
     storage.updateDayData(this.currentDate, { todos: currentTodos });
     this.rolloverBanner.style.display = 'none';
     this.renderTodos();
+    this.renderTabCalendar('dashboard');
     this.renderAnalytics();
     this.showToast(`✨ ${this.uncompletedToRollover.length}개의 미완료 과업이 오늘로 이월되었습니다!`);
     this.uncompletedToRollover = [];
   }
 
   // =========================================================================
-  // 5. Dashboard Trouble Chat Handler (Gemini 1% Persona Integration)
+  // 5. Dashboard Trouble Chat Handler
   // =========================================================================
   async handleDashboardTroubleChat(userTroubleMsg) {
     this.appendDashChatMessage('user', userTroubleMsg);
@@ -1685,6 +1692,7 @@ class DailyFlowApp {
     this.renderGoals();
     this.renderPrinciples();
     this.renderStudyArchive();
+    this.renderAllTabCalendars();
     this.renderAnalytics();
 
     if (syncResults.length > 0) {
@@ -1789,6 +1797,7 @@ class DailyFlowApp {
     this.renderGoals();
     this.renderPrinciples();
     this.renderStudyArchive();
+    this.renderAllTabCalendars();
     this.renderAnalytics();
 
     if (syncResults.length > 0) {
@@ -1905,8 +1914,180 @@ class DailyFlowApp {
     }
   }
 
+  // =========================================================================
+  // 7. ⭐⭐⭐ 전 탭 우측 캘린더 일괄 렌더링 엔진 (All-Tab Calendar Engine) ⭐⭐⭐
+  // =========================================================================
+  renderAllTabCalendars() {
+    this.renderTabCalendar('dashboard');
+    this.renderTabCalendar('ai');
+    this.renderTabCalendar('study');
+    this.renderTabCalendar('goals');
+    this.renderJournalRightCalendar();
+    this.renderTabCalendar('principles');
+  }
+
+  renderTabCalendar(target) {
+    const titleEl = document.getElementById(`${target}CalTitle`);
+    const gridEl = document.getElementById(`${target}CalGrid`);
+    const listEl = document.getElementById(`${target}CalMonthList`);
+    if (!titleEl || !gridEl) return;
+
+    const st = this.tabCalState[target] || { year: new Date().getFullYear(), month: new Date().getMonth() };
+    titleEl.textContent = `${st.year}년 ${st.month + 1}월`;
+    gridEl.innerHTML = '';
+
+    const first = new Date(st.year, st.month, 1);
+    const last = new Date(st.year, st.month + 1, 0);
+    const startDay = first.getDay();
+    const totalDays = last.getDate();
+
+    const prevLast = new Date(st.year, st.month, 0).getDate();
+    for (let i = startDay - 1; i >= 0; i--) {
+      const cell = document.createElement('div');
+      cell.className = 'tab-cal-day-cell other-month';
+      cell.innerHTML = `<span>${prevLast - i}</span>`;
+      gridEl.appendChild(cell);
+    }
+
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    for (let d = 1; d <= totalDays; d++) {
+      const mStr = String(st.month + 1).padStart(2, '0');
+      const dStr = String(d).padStart(2, '0');
+      const fullDate = `${st.year}-${mStr}-${dStr}`;
+
+      const cell = document.createElement('div');
+      cell.className = 'tab-cal-day-cell';
+      if (fullDate === todayStr) cell.classList.add('today');
+      if (fullDate === this.currentDate) cell.classList.add('selected');
+
+      const dayData = storage.data.days[fullDate] || {};
+
+      // Tab-specific badge indicator dot
+      let hasBadge = false;
+      let badgeColor = '#6366f1';
+
+      if (target === 'dashboard') {
+        const todos = dayData.todos || [];
+        if (todos.length > 0) {
+          hasBadge = true;
+          const done = todos.filter(t => t.completed).length;
+          badgeColor = (done === todos.length && todos.length > 0) ? '#10b981' : '#f59e0b';
+        }
+      } else if (target === 'study') {
+        if (dayData.study && (dayData.study.topic || dayData.study.actualHours > 0 || (dayData.study.photos && dayData.study.photos.length > 0))) {
+          hasBadge = true;
+          badgeColor = '#facc15';
+        }
+      } else if (target === 'ai') {
+        if (dayData.todos && dayData.todos.some(t => t.text.includes('[커리어]') || t.text.includes('[이월]'))) {
+          hasBadge = true;
+          badgeColor = '#22d3ee';
+        }
+      } else if (target === 'goals') {
+        const goals = storage.getGoals();
+        if (goals.some(g => g.deadline === fullDate)) {
+          hasBadge = true;
+          badgeColor = '#ec4899';
+        }
+      } else if (target === 'principles') {
+        if (dayData.journal && dayData.journal.content && dayData.journal.content.includes('원칙')) {
+          hasBadge = true;
+          badgeColor = '#fbbf24';
+        }
+      }
+
+      cell.innerHTML = `
+        <span>${d}</span>
+        ${hasBadge ? `<span class="tab-cal-badge-dot" style="background:${badgeColor};"></span>` : ''}
+      `;
+
+      cell.addEventListener('click', () => {
+        this.setDate(fullDate);
+      });
+
+      gridEl.appendChild(cell);
+    }
+
+    // Render Bottom Month Timeline List
+    if (listEl) {
+      this.renderTabMonthList(target, listEl, st.year, st.month);
+    }
+  }
+
+  renderTabMonthList(target, listEl, year, month) {
+    listEl.innerHTML = '';
+    const ym = `${year}-${String(month + 1).padStart(2, '0')}`;
+    const allDays = storage.data.days || {};
+    const dateKeys = Object.keys(allDays).filter(k => k.startsWith(ym)).sort().reverse();
+
+    if (dateKeys.length === 0) {
+      listEl.innerHTML = `<div style="text-align:center; color: var(--text-muted); padding: 14px; font-size: 0.75rem;">이달의 기록이 아직 없습니다.</div>`;
+      return;
+    }
+
+    let renderedCount = 0;
+
+    dateKeys.forEach(dStr => {
+      const day = allDays[dStr];
+      const dayNum = dStr.split('-')[2];
+      let rowHtml = '';
+
+      if (target === 'dashboard') {
+        const todos = day.todos || [];
+        const done = todos.filter(t => t.completed).length;
+        const focus = day.focus ? day.focus.substring(0, 16) + '...' : (todos.length > 0 ? `${done}/${todos.length} 완료` : '기록 없음');
+        rowHtml = `
+          <span class="tab-cal-row-date">${dayNum}일</span>
+          <span class="tab-cal-row-title">${this.escapeHtml(focus)}</span>
+          <span class="tab-cal-row-tag category-career">${done}/${todos.length}</span>
+        `;
+      } else if (target === 'study') {
+        if (!day.study || (!day.study.topic && day.study.actualHours === 0)) return;
+        rowHtml = `
+          <span class="tab-cal-row-date">${dayNum}일</span>
+          <span class="tab-cal-row-title">${this.escapeHtml(day.study.topic || '학습 메모')}</span>
+          <span class="tab-cal-row-tag category-study">${day.study.actualHours}h</span>
+        `;
+      } else if (target === 'ai') {
+        rowHtml = `
+          <span class="tab-cal-row-date">${dayNum}일</span>
+          <span class="tab-cal-row-title">${day.focus ? this.escapeHtml(day.focus.substring(0, 15)) : '코칭 연동 기록'}</span>
+          <span class="tab-cal-row-tag" style="background:rgba(6,182,212,0.2); color:#22d3ee;">AI</span>
+        `;
+      } else if (target === 'goals') {
+        const goals = storage.getGoals().filter(g => g.deadline === dStr);
+        if (goals.length === 0) return;
+        rowHtml = `
+          <span class="tab-cal-row-date">${dayNum}일</span>
+          <span class="tab-cal-row-title">${this.escapeHtml(goals[0].title)}</span>
+          <span class="tab-cal-row-tag" style="background:rgba(236,72,153,0.2); color:#f472b6;">D-Day</span>
+        `;
+      } else if (target === 'principles') {
+        rowHtml = `
+          <span class="tab-cal-row-date">${dayNum}일</span>
+          <span class="tab-cal-row-title">${day.journal?.title ? this.escapeHtml(day.journal.title) : '원칙 회고'}</span>
+          <span class="tab-cal-row-tag category-wealth">💎</span>
+        `;
+      }
+
+      if (rowHtml) {
+        const row = document.createElement('div');
+        row.className = `tab-cal-list-row ${dStr === this.currentDate ? 'active' : ''}`;
+        row.innerHTML = rowHtml;
+        row.addEventListener('click', () => this.setDate(dStr));
+        listEl.appendChild(row);
+        renderedCount++;
+      }
+    });
+
+    if (renderedCount === 0) {
+      listEl.innerHTML = `<div style="text-align:center; color: var(--text-muted); padding: 14px; font-size: 0.75rem;">해당 항목의 기록이 없습니다.</div>`;
+    }
+  }
+
   // ==========================================
-  // 7. Goals & Roadmap Logic
+  // 8. Goals Logic
   // ==========================================
   renderGoals() {
     if (!this.goalsGrid) return;
@@ -1996,6 +2177,7 @@ class DailyFlowApp {
         const newP = parseInt(e.target.value);
         storage.updateGoal(goal.id, { progress: newP });
         this.renderGoals();
+        this.renderTabCalendar('goals');
         this.renderAnalytics();
       });
 
@@ -2011,6 +2193,7 @@ class DailyFlowApp {
         if (confirm(`'${goal.title}' 목표를 삭제하시겠습니까?`)) {
           storage.deleteGoal(goal.id);
           this.renderGoals();
+          this.renderTabCalendar('goals');
           this.renderAnalytics();
           this.showToast('목표가 삭제되었습니다.');
         }
@@ -2035,12 +2218,13 @@ class DailyFlowApp {
     });
     storage.updateDayData(this.currentDate, { todos: existing });
     this.renderTodos();
+    this.renderTabCalendar('dashboard');
     this.renderAnalytics();
     this.showToast(`🎯 오늘의 실행 To-Do에 등록되었습니다!`);
   }
 
   // ==========================================
-  // 8. Journal Action Guide Extractor
+  // 9. Journal Action Guide Extractor
   // ==========================================
   async extractActionGuideFromJournal() {
     const text = this.journalContent.value;
@@ -2092,13 +2276,14 @@ class DailyFlowApp {
     this.renderTodos();
     this.renderStudyArchive();
     this.renderPrinciples();
+    this.renderAllTabCalendars();
     this.renderAnalytics();
 
     this.showToast(`✨ Gemini AI가 ${addedCount}개의 핵심 실행 가이드를 대시보드에 등록했습니다!`);
   }
 
   // ==========================================
-  // 9. Timer & Zen Timer Logic
+  // 10. Timer & Zen Timer Logic
   // ==========================================
   startTimer() {
     this.timerRunning = true;
@@ -2118,6 +2303,7 @@ class DailyFlowApp {
         const newActual = (dayData.study.actualHours || 0) + 0.5;
         storage.updateDayData(this.currentDate, { study: { ...dayData.study, actualHours: newActual } });
         this.studyActualHours.value = newActual;
+        this.renderAllTabCalendars();
         this.renderAnalytics();
 
         this.showToast('🔔 25분 딥워크 완료! 0.5시간 공부 시간이 자동 누적되었습니다.');
@@ -2151,7 +2337,7 @@ class DailyFlowApp {
   }
 
   // ==========================================
-  // 10. Speech Recognition
+  // 11. Speech Recognition
   // ==========================================
   startRecording() {
     try {
@@ -2177,20 +2363,29 @@ class DailyFlowApp {
   }
 
   // ==========================================
-  // 11. Navigation & Date Loading
+  // 12. Navigation & Date Loading
   // ==========================================
   switchTab(tabName) {
     this.activeTab = tabName;
     this.navItems.forEach(item => item.classList.toggle('active', item.dataset.tab === tabName));
     this.tabPanes.forEach(pane => pane.classList.toggle('active', pane.id === `pane-${tabName}`));
 
-    if (tabName === 'goals') this.renderGoals();
+    if (tabName === 'dashboard') this.renderTabCalendar('dashboard');
+    if (tabName === 'ai-coach') this.renderTabCalendar('ai');
     if (tabName === 'study') {
       this.renderStudyPhotos();
       this.renderStudyArchive();
+      this.renderTabCalendar('study');
+    }
+    if (tabName === 'goals') {
+      this.renderGoals();
+      this.renderTabCalendar('goals');
     }
     if (tabName === 'journal') this.renderJournalRightCalendar();
-    if (tabName === 'principles') this.renderPrinciples();
+    if (tabName === 'principles') {
+      this.renderPrinciples();
+      this.renderTabCalendar('principles');
+    }
     if (tabName === 'calendar') this.renderCalendar();
     if (tabName === 'analytics') this.renderAnalytics();
   }
@@ -2198,8 +2393,10 @@ class DailyFlowApp {
   setDate(dateStr) {
     this.currentDate = dateStr;
     const [y, m] = dateStr.split('-').map(Number);
-    this.jCalYear = y;
-    this.jCalMonth = m - 1;
+    for (const key of Object.keys(this.tabCalState)) {
+      this.tabCalState[key].year = y;
+      this.tabCalState[key].month = m - 1;
+    }
     this.calYear = y;
     this.calMonth = m - 1;
     this.loadDate(dateStr);
@@ -2252,7 +2449,7 @@ class DailyFlowApp {
     this.updateJournalStats();
     this.autoSaveIndicator.innerHTML = '<i class="fa-solid fa-check"></i> 저장됨';
 
-    this.renderJournalRightCalendar();
+    this.renderAllTabCalendars();
     this.renderPrinciples();
     this.renderGoals();
   }
@@ -2264,7 +2461,7 @@ class DailyFlowApp {
   }
 
   // ==========================================
-  // 12. Dashboard & Zen To-Do Rendering
+  // 13. Dashboard & Zen To-Do Rendering
   // ==========================================
   renderTodos() {
     const dayData = storage.getDayData(this.currentDate);
@@ -2300,6 +2497,7 @@ class DailyFlowApp {
         todo.completed = e.target.checked;
         storage.updateDayData(this.currentDate, { todos });
         this.renderTodos();
+        this.renderTabCalendar('dashboard');
         this.renderAnalytics();
       });
 
@@ -2307,6 +2505,7 @@ class DailyFlowApp {
         const updated = todos.filter(t => t.id !== todo.id);
         storage.updateDayData(this.currentDate, { todos: updated });
         this.renderTodos();
+        this.renderTabCalendar('dashboard');
         this.renderAnalytics();
       });
 
@@ -2331,7 +2530,7 @@ class DailyFlowApp {
       const li = document.createElement('li');
       li.className = `zen-todo-item ${todo.completed ? 'completed' : ''}`;
       li.innerHTML = `
-        <input type="checkbox" ${todo.completed ? 'checked' : ''} style="width: 18px; height: 18px; accent-color: var(--accent-primary);">
+        <input type="checkbox" ${todo.completed ? 'checked' : ''} style="width: 16px; height: 16px; accent-color: var(--accent-primary);">
         <span>${this.escapeHtml(todo.text)}</span>
       `;
       li.querySelector('input').addEventListener('change', (e) => {
@@ -2490,7 +2689,7 @@ class DailyFlowApp {
   }
 
   // ==========================================
-  // 13. Knowledge Wiki & Study Photos
+  // 14. Knowledge Wiki & Study Photos
   // ==========================================
   renderStudyPhotos() {
     if (!this.studyPhotoGallery) return;
@@ -2517,6 +2716,7 @@ class DailyFlowApp {
         storage.updateDayData(this.currentDate, { study: { ...dayData.study, photos } });
         this.renderStudyPhotos();
         this.renderStudyArchive();
+        this.renderTabCalendar('study');
         this.showToast('학습 이미지가 삭제되었습니다.');
       });
 
@@ -2586,7 +2786,7 @@ class DailyFlowApp {
   }
 
   // ==========================================
-  // 14. Principles Rendering
+  // 15. Principles Rendering
   // ==========================================
   renderPrinciples() {
     const list = storage.getPrinciples();
@@ -2616,6 +2816,7 @@ class DailyFlowApp {
         if (confirm('이 원칙을 삭제하시겠습니까?')) {
           storage.deletePrinciple(p.id);
           this.renderPrinciples();
+          this.renderTabCalendar('principles');
         }
       });
 
@@ -2624,7 +2825,7 @@ class DailyFlowApp {
   }
 
   // ==========================================
-  // 15. Journal Methods
+  // 16. Journal Methods
   // ==========================================
   saveJournal(showToastMsg = false) {
     const title = this.journalTitle.value.trim();
@@ -2642,7 +2843,7 @@ class DailyFlowApp {
 
     this.autoSaveIndicator.innerHTML = '<i class="fa-solid fa-check"></i> 저장됨';
     this.renderCalendar();
-    this.renderJournalRightCalendar();
+    this.renderAllTabCalendars();
     this.renderAnalytics();
 
     if (showToastMsg) {
@@ -2838,92 +3039,86 @@ class DailyFlowApp {
   }
 
   // ==========================================
-  // 16. Journal Mini Calendar & Archive
+  // 17. Journal Right Sidebar Calendar
   // ==========================================
   renderJournalRightCalendar() {
-    if (!this.jCalTitle || !this.jCalGrid) return;
-    this.jCalTitle.textContent = `${this.jCalYear}년 ${this.jCalMonth + 1}월`;
-    this.jCalGrid.innerHTML = '';
+    const titleEl = document.getElementById('jCalTitle');
+    const gridEl = document.getElementById('jCalGrid');
+    const listEl = document.getElementById('jCalMonthList');
+    if (!titleEl || !gridEl) return;
 
-    const first = new Date(this.jCalYear, this.jCalMonth, 1);
-    const last = new Date(this.jCalYear, this.jCalMonth + 1, 0);
+    const st = this.tabCalState.journal;
+    titleEl.textContent = `${st.year}년 ${st.month + 1}월`;
+    gridEl.innerHTML = '';
+
+    const first = new Date(st.year, st.month, 1);
+    const last = new Date(st.year, st.month + 1, 0);
     const startDay = first.getDay();
     const totalDays = last.getDate();
 
-    const prevLast = new Date(this.jCalYear, this.jCalMonth, 0).getDate();
+    const prevLast = new Date(st.year, st.month, 0).getDate();
     for (let i = startDay - 1; i >= 0; i--) {
       const cell = document.createElement('div');
-      cell.className = 'jcal-day-cell other-month';
+      cell.className = 'tab-cal-day-cell other-month';
       cell.innerHTML = `<span>${prevLast - i}</span>`;
-      this.jCalGrid.appendChild(cell);
+      gridEl.appendChild(cell);
     }
 
     const todayStr = new Date().toISOString().split('T')[0];
 
     for (let d = 1; d <= totalDays; d++) {
-      const mStr = String(this.jCalMonth + 1).padStart(2, '0');
+      const mStr = String(st.month + 1).padStart(2, '0');
       const dStr = String(d).padStart(2, '0');
-      const fullDate = `${this.jCalYear}-${mStr}-${dStr}`;
+      const fullDate = `${st.year}-${mStr}-${dStr}`;
 
       const cell = document.createElement('div');
-      cell.className = 'jcal-day-cell';
+      cell.className = 'tab-cal-day-cell';
       if (fullDate === todayStr) cell.classList.add('today');
       if (fullDate === this.currentDate) cell.classList.add('selected');
 
-      const dayData = storage.getDayData(fullDate);
-      const hasJournal = dayData.journal && (dayData.journal.title || dayData.journal.content);
+      const dayData = storage.data.days[fullDate];
+      const hasJournal = dayData && dayData.journal && (dayData.journal.title || dayData.journal.content);
 
       cell.innerHTML = `
         <span>${d}</span>
-        ${hasJournal ? '<span class="jcal-dot"></span>' : ''}
+        ${hasJournal ? '<span class="tab-cal-badge-dot" style="background:#818cf8;"></span>' : ''}
       `;
 
       cell.addEventListener('click', () => {
         this.setDate(fullDate);
       });
 
-      this.jCalGrid.appendChild(cell);
+      gridEl.appendChild(cell);
     }
 
-    this.renderJournalMonthList();
-  }
+    if (listEl) {
+      listEl.innerHTML = '';
+      const targetYM = `${st.year}-${String(st.month + 1).padStart(2, '0')}`;
+      const allJournals = storage.getAllJournals();
+      const monthJournals = allJournals.filter(j => j.date.startsWith(targetYM));
 
-  renderJournalMonthList() {
-    if (!this.jCalMonthList) return;
-    this.jCalMonthList.innerHTML = '';
-
-    const targetYM = `${this.jCalYear}-${String(this.jCalMonth + 1).padStart(2, '0')}`;
-    const allJournals = storage.getAllJournals();
-    const monthJournals = allJournals.filter(j => j.date.startsWith(targetYM));
-
-    if (monthJournals.length === 0) {
-      this.jCalMonthList.innerHTML = `<div style="text-align:center; color: var(--text-muted); padding: 16px; font-size: 0.75rem;">이달에 작성된 일기가 아직 없습니다.</div>`;
-      return;
+      if (monthJournals.length === 0) {
+        listEl.innerHTML = `<div style="text-align:center; color: var(--text-muted); padding: 14px; font-size: 0.75rem;">이달에 작성된 일기가 없습니다.</div>`;
+      } else {
+        const moodEmojis = { great: '😆', good: '😊', neutral: '😐', tired: '🥱', stressed: '😣' };
+        monthJournals.forEach(j => {
+          const item = document.createElement('div');
+          item.className = `tab-cal-list-row ${j.date === this.currentDate ? 'active' : ''}`;
+          const dayNum = j.date.split('-')[2];
+          item.innerHTML = `
+            <span class="tab-cal-row-date">${dayNum}일</span>
+            <span class="tab-cal-row-title" title="${this.escapeHtml(j.title)}">${this.escapeHtml(j.title || '제목 없음')}</span>
+            <span>${moodEmojis[j.mood] || '📝'}</span>
+          `;
+          item.addEventListener('click', () => this.setDate(j.date));
+          listEl.appendChild(item);
+        });
+      }
     }
-
-    const moodEmojis = { great: '😆', good: '😊', neutral: '😐', tired: '🥱', stressed: '😣' };
-
-    monthJournals.forEach(j => {
-      const item = document.createElement('div');
-      item.className = `jcal-list-item ${j.date === this.currentDate ? 'active' : ''}`;
-      const dayNum = j.date.split('-')[2];
-
-      item.innerHTML = `
-        <span class="jcal-item-date">${dayNum}일</span>
-        <span class="jcal-item-title" title="${this.escapeHtml(j.title)}">${this.escapeHtml(j.title || '제목 없음')}</span>
-        <span>${moodEmojis[j.mood] || '📝'}</span>
-      `;
-
-      item.addEventListener('click', () => {
-        this.setDate(j.date);
-      });
-
-      this.jCalMonthList.appendChild(item);
-    });
   }
 
   // ==========================================
-  // 17. Calendar Tab & Analytics
+  // 18. Calendar Tab & Analytics
   // ==========================================
   renderCalendar() {
     this.calendarMonthTitle.textContent = `${this.calYear}년 ${this.calMonth + 1}월`;
@@ -3029,7 +3224,6 @@ class DailyFlowApp {
     const today = new Date().toISOString().split('T')[0];
     const currentYM = this.currentDate.substring(0, 7);
 
-    // Streak
     let streak = 0;
     let curr = new Date(today);
     const todayJ = allDays[today]?.journal;
@@ -3049,7 +3243,6 @@ class DailyFlowApp {
     this.streakDays.textContent = `${streak}일`;
     this.streakSub.textContent = streak > 0 ? '꾸준함이 비범함을 만듭니다' : '오늘 첫 일기를 작성해보세요 ✨';
 
-    // Goals Progress
     const goals = storage.getGoals();
     let totalP = 0;
     goals.forEach(g => { totalP += (g.progress || 0); });
@@ -3057,7 +3250,6 @@ class DailyFlowApp {
     this.totalGoalRateVal.textContent = `${avgGoalRate}%`;
     this.totalGoalCountVal.textContent = `총 ${goals.length}개 목표 관리 중`;
 
-    // Study Hours
     let totalStudyHours = 0;
     let totalStudyCount = 0;
     for (const [dateStr, day] of Object.entries(allDays)) {
@@ -3069,7 +3261,6 @@ class DailyFlowApp {
     this.totalStudyHoursVal.textContent = `${totalStudyHours}시간`;
     this.totalStudyCountVal.textContent = `총 ${totalStudyCount}개 주제 학습`;
 
-    // To-Do Rate (7 days)
     let totalT = 0, compT = 0;
     for (let i = 0; i < 7; i++) {
       const d = new Date(today);
@@ -3087,7 +3278,6 @@ class DailyFlowApp {
     this.todoRateVal.textContent = `${rate}%`;
     this.todoRateSub.textContent = `최근 7일 (${compT}/${totalT} 완료)`;
 
-    // Mood Bars
     const moodCounts = { great: 0, good: 0, neutral: 0, tired: 0, stressed: 0 };
     let totalMood = 0;
     for (const [dateStr, day] of Object.entries(allDays)) {
@@ -3117,7 +3307,6 @@ class DailyFlowApp {
       this.moodAnalyticsBars.appendChild(row);
     });
 
-    // Habit Bars
     const habits = storage.getHabits();
     let monthDaysCount = 0;
     const habitSuccess = {};
@@ -3148,7 +3337,7 @@ class DailyFlowApp {
   }
 
   // ==========================================
-  // 18. Clock & Helpers
+  // 19. Clock & Helpers
   // ==========================================
   startClock() {
     const tick = () => {
