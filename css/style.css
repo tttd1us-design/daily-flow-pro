@@ -154,6 +154,58 @@ body {
 .ees-bar-wrapper { flex: 1; height: 6px; background: var(--bg-tertiary); border-radius: var(--radius-full); overflow: hidden; }
 .ees-bar-fill { height: 100%; background: linear-gradient(90deg, #0078d4, #00b7c3, #107c41); transition: width 0.4s ease; }
 
+/* 💡 사이드바 1초 번뜩이는 생각 캡처 박스 */
+.sidebar-quick-memo-box {
+  background: linear-gradient(135deg, rgba(250, 204, 21, 0.12), rgba(0, 120, 212, 0.08));
+  border: 1px solid rgba(250, 204, 21, 0.3);
+  border-radius: var(--radius-md);
+  padding: 8px 10px;
+  margin-bottom: 8px;
+}
+.sidebar-memo-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--accent-gold);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.sidebar-memo-form {
+  display: flex;
+  gap: 4px;
+}
+.sidebar-memo-form input {
+  flex: 1;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 5px 8px;
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  outline: none;
+}
+.sidebar-memo-form input:focus {
+  border-color: var(--accent-primary);
+}
+.sidebar-memo-btn {
+  background: var(--accent-primary);
+  border: none;
+  color: #fff;
+  border-radius: var(--radius-sm);
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: all var(--transition-fast);
+}
+.sidebar-memo-btn:hover {
+  background: var(--accent-primary-hover);
+}
+
 /* Date Badge */
 .current-date-badge {
   background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: var(--radius-md);
@@ -513,6 +565,127 @@ body {
   width: 100%; background: var(--bg-tertiary); border: 1px solid var(--border-color);
   border-radius: var(--radius-sm); padding: 5px 8px; color: var(--text-primary); outline: none;
   font-size: 0.8rem; font-family: var(--font-sans); resize: vertical;
+}
+
+/* ==========================================================================
+   💡 아이디어 퀵 메모장 (Instant Idea Capture & Inbox)
+   ========================================================================== */
+.memo-category-pills {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.mcat-btn {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.mcat-btn:hover { color: var(--text-primary); border-color: var(--accent-primary); }
+.mcat-btn.active {
+  background: var(--accent-primary);
+  color: #fff;
+  border-color: var(--accent-primary);
+}
+
+.memo-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+}
+
+.memo-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+@media (max-width: 1280px) {
+  .memo-cards-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+  .memo-cards-grid { grid-template-columns: 1fr; }
+}
+
+.memo-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+}
+.memo-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-primary);
+  box-shadow: var(--shadow-md);
+}
+.memo-card.pinned {
+  border-color: rgba(250, 204, 21, 0.4);
+  background: linear-gradient(135deg, rgba(250, 204, 21, 0.08), var(--bg-card));
+}
+.memo-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.memo-card-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.35;
+}
+.memo-card-content {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 140px;
+  overflow-y: auto;
+}
+.memo-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--border-color);
+  padding-top: 8px;
+  margin-top: auto;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+.memo-actions-group {
+  display: flex;
+  gap: 4px;
+}
+.memo-action-btn {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.68rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  transition: all var(--transition-fast);
+}
+.memo-action-btn:hover {
+  background: var(--accent-primary);
+  color: #fff;
 }
 
 /* ==========================================================================

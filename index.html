@@ -56,6 +56,10 @@
           <i class="fa-solid fa-table-columns text-indigo"></i>
           <span>실행 커맨드 센터</span>
         </button>
+        <button class="nav-item" data-tab="quick-memo">
+          <i class="fa-solid fa-lightbulb text-yellow"></i>
+          <span>아이디어 퀵 메모장</span>
+        </button>
         <button class="nav-item" data-tab="evening-os">
           <i class="fa-solid fa-moon text-yellow"></i>
           <span>퇴근 후 야간 실행 OS</span>
@@ -93,6 +97,15 @@
           <span>실행률 분석 리포트</span>
         </button>
       </nav>
+
+      <!-- 💡 사이드바 1초 번뜩이는 생각 즉시 캡처 바 -->
+      <div class="sidebar-quick-memo-box">
+        <div class="sidebar-memo-label"><i class="fa-solid fa-bolt text-yellow"></i> 1초 아이디어 캡처</div>
+        <form id="sidebarQuickMemoForm" class="sidebar-memo-form">
+          <input type="text" id="sidebarQuickMemoInput" placeholder="떠오른 생각 입력 후 Enter..." required>
+          <button type="submit" class="sidebar-memo-btn" title="아이디어 저장"><i class="fa-solid fa-plus"></i></button>
+        </form>
+      </div>
 
       <!-- 뽀모도로 몰입 타이머 -->
       <div class="timer-widget">
@@ -406,7 +419,103 @@
       </section>
 
       <!-- ======================================================== -->
-      <!-- 2. 직장인 퇴근 후 야간 실행 OS (시간 예산제 & 용량 게이지) -->
+      <!-- 2. 아이디어 퀵 메모장 (Instant Idea Capture & Inbox)      -->
+      <!-- ======================================================== -->
+      <section class="tab-pane" id="pane-quick-memo">
+        <div class="tab-with-calendar-layout">
+          <div class="tab-main-column">
+            
+            <div class="goals-header-bar">
+              <div class="goals-header-info">
+                <h2><i class="fa-solid fa-lightbulb text-yellow"></i> 아이디어 퀵 메모장 (Idea Inbox)</h2>
+                <p>순간 떠오른 번뜩이는 아이디어와 생각을 1초 만에 캡처하고, 실행 To-Do로 즉시 전환합니다.</p>
+              </div>
+              <div style="display:flex; gap:6px;">
+                <button id="aiIdeaBrainstormBtn" class="btn btn-gemini btn-sm">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> Gemini 아이디어 브레인스토밍
+                </button>
+              </div>
+            </div>
+
+            <!-- 신규 메모 인라인 퀵 입력 카드 -->
+            <div class="card memo-editor-card">
+              <div class="card-header">
+                <h3><i class="fa-solid fa-pen-to-square text-cyan"></i> 새로운 아이디어 / 영감 즉시 캡처</h3>
+                <div class="memo-category-pills" id="memoCategoryPills">
+                  <button type="button" class="mcat-btn active" data-cat="idea">💡 영감/아이디어</button>
+                  <button type="button" class="mcat-btn" data-cat="work">💼 업무/비즈니스</button>
+                  <button type="button" class="mcat-btn" data-cat="study">📚 지식/학습</button>
+                  <button type="button" class="mcat-btn" data-cat="wealth">💰 재테크/투자</button>
+                  <button type="button" class="mcat-btn" data-cat="misc">🛒 일상/기타</button>
+                </div>
+              </div>
+              <div class="card-body">
+                <form id="memoAddForm">
+                  <input type="text" id="memoTitleInput" placeholder="아이디어 핵심 요약 (예: 퇴근 후 자동화 파이프라인 개발 아이디어)..." class="input-focus-hero font-bold" style="margin-bottom:8px;" required>
+                  <textarea id="memoContentInput" rows="3" class="journal-textarea" placeholder="구체적인 생각, 메모, 링크, 떠오른 인사이트를 자유롭게 적어보세요..." style="min-height: 80px;"></textarea>
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                      <label style="font-size:0.75rem; color:var(--text-secondary); display:flex; align-items:center; gap:4px; cursor:pointer;">
+                        <input type="checkbox" id="memoPinCheck" style="accent-color:var(--accent-gold);">
+                        <span>📌 상단 핀 고정</span>
+                      </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus"></i> 아이디어 메모 저장</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- 메모 검색 & 카테고리 필터 바 -->
+            <div class="memo-filter-bar">
+              <div class="study-search-box" style="flex:1; margin-bottom:0;">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="memoSearchInput" placeholder="메모 제목, 내용, 키워드 검색...">
+              </div>
+              <div class="filter-pills" id="memoFilterList">
+                <button class="filter-pill active" data-filter="all">전체보기</button>
+                <button class="filter-pill" data-filter="idea">💡 영감</button>
+                <button class="filter-pill" data-filter="work">💼 업무</button>
+                <button class="filter-pill" data-filter="study">📚 지식</button>
+                <button class="filter-pill" data-filter="wealth">💰 재테크</button>
+                <button class="filter-pill" data-filter="misc">🛒 일상</button>
+              </div>
+            </div>
+
+            <!-- 아이디어 메모 포스트잇 그리드 리스트 -->
+            <div class="memo-cards-grid" id="memoCardsGrid"></div>
+
+          </div>
+
+          <!-- 우측 아이디어 캘린더 사이드바 -->
+          <div class="tab-calendar-sidebar">
+            <div class="tab-cal-widget card">
+              <div class="tab-cal-header">
+                <button class="nav-mini-btn" data-cal-action="prev" data-target="memo"><i class="fa-solid fa-chevron-left"></i></button>
+                <h4 class="tab-cal-title" id="memoCalTitle">2026년 8월</h4>
+                <button class="nav-mini-btn" data-cal-action="next" data-target="memo"><i class="fa-solid fa-chevron-right"></i></button>
+                <button class="btn btn-secondary btn-sm" data-cal-action="today" data-target="memo" style="padding: 2px 8px; font-size: 0.75rem;">오늘</button>
+              </div>
+              <div class="tab-cal-weekdays">
+                <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+              </div>
+              <div class="tab-cal-days-grid" id="memoCalGrid"></div>
+            </div>
+
+            <div class="card" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+              <div class="card-header" style="padding: 10px 14px;">
+                <h4 style="font-size: 0.82rem; font-weight: 700; margin: 0; display:flex; align-items:center; gap:6px;">
+                  <i class="fa-solid fa-lightbulb text-yellow"></i> 이달의 아이디어 피드
+                </h4>
+              </div>
+              <div class="tab-cal-item-list" id="memoCalMonthList"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- 3. 직장인 퇴근 후 야간 실행 OS (시간 예산제 & 용량 게이지) -->
       <!-- ======================================================== -->
       <section class="tab-pane" id="pane-evening-os">
         <div class="tab-with-calendar-layout">

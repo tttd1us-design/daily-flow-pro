@@ -1,0 +1,29 @@
+[
+  {
+    "id": "memo_init_1",
+    "title": "퇴근 후 데이터 분석 자동화 파이프라인 구축 아이디어",
+    "content": "매일 수동으로 정리하는 지표와 로그 데이터를 파이썬 판다스 스크립트로 자동화하여 시간을 80% 절약하는 프로젝트.",
+    "category": "work",
+    "pinned": true,
+    "date": "2026-08-18",
+    "createdAt": "2026-08-18T00:00:00.000Z"
+  },
+  {
+    "id": "memo_init_2",
+    "title": "미국 배당 귀족주 ETF 월간 적립식 투자 전략",
+    "content": "월급날 자동이체로 SCHD, VOO 분할 매수 규칙 수립 및 리밸런싱 메모.",
+    "category": "wealth",
+    "pinned": false,
+    "date": "2026-08-18",
+    "createdAt": "2026-08-18T00:00:00.000Z"
+  },
+  {
+    "id": "memo_init_3",
+    "title": "책 '결국 해내는 사람들의 원칙' 핵심 문장",
+    "content": "완벽함을 기다리지 말고, 1%의 미완성 상태에서 즉시 세상에 던져라.",
+    "category": "idea",
+    "pinned": true,
+    "date": "2026-08-18",
+    "createdAt": "2026-08-18T00:00:00.000Z"
+  }
+]

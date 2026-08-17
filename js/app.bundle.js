@@ -251,6 +251,45 @@ class IndexedDBStorageManager {
     this.saveData();
   }
 
+  // ==========================================
+  // 💡 Memos CRUD (아이디어 퀵 메모)
+  // ==========================================
+  getMemos() {
+    if (!this.data.memos) this.data.memos = [];
+    return this.data.memos;
+  }
+
+  addMemo(memo) {
+    if (!this.data.memos) this.data.memos = [];
+    const newM = {
+      id: 'memo_' + Date.now(),
+      title: memo.title || '새로운 아이디어',
+      content: memo.content || '',
+      category: memo.category || 'idea',
+      pinned: memo.pinned || false,
+      date: memo.date || new Date().toISOString().split('T')[0],
+      createdAt: new Date().toISOString()
+    };
+    this.data.memos.unshift(newM);
+    this.saveData();
+    return newM;
+  }
+
+  updateMemo(id, partialMemo) {
+    if (!this.data.memos) this.data.memos = [];
+    const idx = this.data.memos.findIndex(m => m.id === id);
+    if (idx !== -1) {
+      this.data.memos[idx] = { ...this.data.memos[idx], ...partialMemo };
+      this.saveData();
+    }
+  }
+
+  deleteMemo(id) {
+    if (!this.data.memos) this.data.memos = [];
+    this.data.memos = this.data.memos.filter(m => m.id !== id);
+    this.saveData();
+  }
+
   getAllJournals() {
     const list = [];
     for (const [dateStr, day] of Object.entries(this.data.days)) {
@@ -681,6 +720,21 @@ class DailyFlowApp {
     this.eesScoreVal = document.getElementById('eesScoreVal');
     this.eesGradeBadge = document.getElementById('eesGradeBadge');
     this.eesScoreBar = document.getElementById('eesScoreBar');
+
+    // Memo Elements
+    this.sidebarQuickMemoForm = document.getElementById('sidebarQuickMemoForm');
+    this.sidebarQuickMemoInput = document.getElementById('sidebarQuickMemoInput');
+    this.memoAddForm = document.getElementById('memoAddForm');
+    this.memoTitleInput = document.getElementById('memoTitleInput');
+    this.memoContentInput = document.getElementById('memoContentInput');
+    this.memoPinCheck = document.getElementById('memoPinCheck');
+    this.memoCategoryPills = document.getElementById('memoCategoryPills');
+    this.memoSearchInput = document.getElementById('memoSearchInput');
+    this.memoFilterList = document.getElementById('memoFilterList');
+    this.memoCardsGrid = document.getElementById('memoCardsGrid');
+    this.aiIdeaBrainstormBtn = document.getElementById('aiIdeaBrainstormBtn');
+    this.selectedMemoCategory = 'idea';
+    this.activeMemoFilter = 'all';
 
     // Evening Budget Elements
     this.eveningCapacityInput = document.getElementById('eveningCapacityInput');
@@ -1125,6 +1179,104 @@ class DailyFlowApp {
       this.showToast(`${next === 'dark' ? '다크' : '라이트'} 모드로 전환되었습니다.`);
     });
     this.updateThemeIcon(storage.data.settings.theme || 'dark');
+
+    // ==========================================
+    // 💡 Idea Quick Memo Events (사이드바 & 탭)
+    // ==========================================
+    if (this.sidebarQuickMemoForm) {
+      this.sidebarQuickMemoForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const text = this.sidebarQuickMemoInput.value.trim();
+        if (!text) return;
+        storage.addMemo({
+          title: text,
+          content: '사이드바에서 1초 퀵 캡처된 아이디어입니다.',
+          category: 'idea',
+          pinned: false,
+          date: this.currentDate
+        });
+        this.sidebarQuickMemoInput.value = '';
+        this.renderMemos();
+        this.renderTabCalendar('memo');
+        this.showToast('⚡ 아이디어가 1초 만에 캡처되어 메모장에 저장되었습니다! 💡');
+      });
+    }
+
+    if (this.memoCategoryPills) {
+      this.memoCategoryPills.querySelectorAll('.mcat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          this.memoCategoryPills.querySelectorAll('.mcat-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          this.selectedMemoCategory = btn.dataset.cat;
+        });
+      });
+    }
+
+    if (this.memoAddForm) {
+      this.memoAddForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const title = this.memoTitleInput.value.trim();
+        const content = this.memoContentInput.value.trim();
+        const pinned = this.memoPinCheck ? this.memoPinCheck.checked : false;
+        if (!title) return;
+
+        storage.addMemo({
+          title,
+          content,
+          category: this.selectedMemoCategory || 'idea',
+          pinned,
+          date: this.currentDate
+        });
+
+        this.memoTitleInput.value = '';
+        this.memoContentInput.value = '';
+        if (this.memoPinCheck) this.memoPinCheck.checked = false;
+        this.renderMemos();
+        this.renderTabCalendar('memo');
+        this.showToast('아이디어 메모가 성공적으로 등록되었습니다! 📝');
+      });
+    }
+
+    if (this.memoFilterList) {
+      this.memoFilterList.querySelectorAll('.filter-pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+          this.memoFilterList.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          this.activeMemoFilter = btn.dataset.filter;
+          this.renderMemos();
+        });
+      });
+    }
+
+    if (this.memoSearchInput) {
+      this.memoSearchInput.addEventListener('input', () => this.renderMemos());
+    }
+
+    if (this.aiIdeaBrainstormBtn) {
+      this.aiIdeaBrainstormBtn.addEventListener('click', async () => {
+        this.aiIdeaBrainstormBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 브레인스토밍 중...';
+        const dayData = storage.getDayData(this.currentDate);
+        const focus = dayData.focus || '커리어 성장 및 생산성 극대화';
+
+        const prompt = `나의 현재 핵심 관심사: [${focus}]
+위 주제를 바탕으로 직장인이 당장 실험해볼 수 있는 신선하고 강력한 1% 아이디어 3가지를 도출해줘 (아이디어 제목과 2줄 실행 힌트).`;
+
+        const res = await geminiClient.generateText(prompt);
+        this.aiIdeaBrainstormBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Gemini 아이디어 브레인스토밍';
+
+        storage.addMemo({
+          title: '🤖 [AI 추천] ' + focus + ' 혁신 아이디어',
+          content: res,
+          category: 'idea',
+          pinned: true,
+          date: this.currentDate
+        });
+
+        this.renderMemos();
+        this.renderTabCalendar('memo');
+        this.showToast('Gemini가 새로운 아이디어를 메모장에 꽂아드렸습니다! 💡');
+      });
+    }
 
     // ==========================================
     // 🌳 Visual Tree Mode Toggle
@@ -2321,6 +2473,7 @@ class DailyFlowApp {
   // =========================================================================
   renderAllTabCalendars() {
     this.renderTabCalendar('dashboard');
+    this.renderTabCalendar('memo');
     this.renderTabCalendar('evening');
     this.renderTabCalendar('weekly');
     this.renderTabCalendar('ai');
@@ -2377,6 +2530,12 @@ class DailyFlowApp {
           hasBadge = true;
           const done = todos.filter(t => t.completed).length;
           badgeColor = (done === todos.length && todos.length > 0) ? '#10b981' : '#f59e0b';
+        }
+      } else if (target === 'memo') {
+        const memos = storage.getMemos().filter(m => m.date === fullDate);
+        if (memos.length > 0) {
+          hasBadge = true;
+          badgeColor = '#facc15';
         }
       } else if (target === 'evening') {
         const er = dayData.eveningRoutine || {};
@@ -2457,6 +2616,14 @@ class DailyFlowApp {
           <span class="tab-cal-row-date">${dayNum}일</span>
           <span class="tab-cal-row-title">${this.escapeHtml(focus)}</span>
           <span class="tab-cal-row-tag category-career">${done}/${todos.length}</span>
+        `;
+      } else if (target === 'memo') {
+        const dayMemos = storage.getMemos().filter(m => m.date === dateKey);
+        if (dayMemos.length === 0) return;
+        rowHtml = `
+          <span class="tab-cal-row-date">${dayNum}일</span>
+          <span class="tab-cal-row-title">${this.escapeHtml(dayMemos[0].title.substring(0, 16))}</span>
+          <span class="tab-cal-row-tag category-wealth">💡 ${dayMemos.length}개</span>
         `;
       } else if (target === 'evening') {
         const er = day.eveningRoutine || {};
@@ -2915,6 +3082,10 @@ class DailyFlowApp {
     this.tabPanes.forEach(pane => pane.classList.toggle('active', pane.id === `pane-${tabName}`));
 
     if (tabName === 'dashboard') this.renderTabCalendar('dashboard');
+    if (tabName === 'quick-memo') {
+      this.renderMemos();
+      this.renderTabCalendar('memo');
+    }
     if (tabName === 'evening-os') {
       this.renderEveningOS();
       this.renderTabCalendar('evening');
@@ -2959,6 +3130,119 @@ class DailyFlowApp {
     const d = new Date(this.currentDate);
     d.setDate(d.getDate() + delta);
     this.setDate(d.toISOString().split('T')[0]);
+  }
+
+  // ==========================================
+  // 💡 Idea Quick Memos Render (아이디어 퀵 메모장)
+  // ==========================================
+  renderMemos() {
+    if (!this.memoCardsGrid) return;
+    const memos = storage.getMemos();
+    this.memoCardsGrid.innerHTML = '';
+
+    const query = this.memoSearchInput ? this.memoSearchInput.value.toLowerCase().trim() : '';
+
+    const filtered = memos.filter(m => {
+      if (this.activeMemoFilter !== 'all' && m.category !== this.activeMemoFilter) return false;
+      if (query && !m.title.toLowerCase().includes(query) && !m.content.toLowerCase().includes(query)) return false;
+      return true;
+    });
+
+    // 핀 고정 우선 정렬
+    filtered.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+
+    if (filtered.length === 0) {
+      this.memoCardsGrid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 40px;">
+        <i class="fa-solid fa-lightbulb" style="font-size: 2rem; margin-bottom: 8px; opacity: 0.5;"></i>
+        <p>등록된 아이디어 메모가 없습니다. 상단 입력창이나 사이드바에서 1초 만에 생각을 기록해보세요!</p>
+      </div>`;
+      return;
+    }
+
+    const catMap = {
+      idea: { label: '💡 영감', cls: 'category-career' },
+      work: { label: '💼 업무', cls: 'category-career' },
+      study: { label: '📚 지식', cls: 'category-study' },
+      wealth: { label: '💰 재테크', cls: 'category-wealth' },
+      misc: { label: '🛒 일상', cls: 'category-routine' }
+    };
+
+    filtered.forEach(memo => {
+      const card = document.createElement('div');
+      card.className = `memo-card ${memo.pinned ? 'pinned' : ''}`;
+      const cat = catMap[memo.category] || { label: '메모', cls: 'category-career' };
+
+      card.innerHTML = `
+        <div class="memo-card-header">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span class="category-tag ${cat.cls}">${cat.label}</span>
+            ${memo.pinned ? '<span style="color:var(--accent-gold); font-size:0.75rem;"><i class="fa-solid fa-thumbtack"></i> 핀고정</span>' : ''}
+          </div>
+          <button class="todo-delete-btn delete-memo-btn" title="메모 삭제"><i class="fa-solid fa-trash"></i></button>
+        </div>
+
+        <div class="memo-card-title">${this.escapeHtml(memo.title)}</div>
+        <div class="memo-card-content">${this.escapeHtml(memo.content || '내용 없음')}</div>
+
+        <div class="memo-card-footer">
+          <span><i class="fa-regular fa-clock"></i> ${memo.date || '오늘'}</span>
+          <div class="memo-actions-group">
+            <button class="memo-action-btn pin-memo-btn" title="${memo.pinned ? '핀 해제' : '상단 핀 고정'}">
+              <i class="fa-solid fa-thumbtack"></i>
+            </button>
+            <button class="memo-action-btn ai-expand-memo-btn" title="Gemini AI로 아이디어 구체화 기획서 발전">
+              <i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> AI 기획
+            </button>
+            <button class="memo-action-btn push-memo-todo-btn" title="오늘의 실행 To-Do로 즉시 전환">
+              <i class="fa-solid fa-bolt text-yellow"></i> To-Do 전환
+            </button>
+          </div>
+        </div>
+      `;
+
+      // Pin toggle
+      card.querySelector('.pin-memo-btn').addEventListener('click', () => {
+        storage.updateMemo(memo.id, { pinned: !memo.pinned });
+        this.renderMemos();
+        this.showToast(memo.pinned ? '핀 고정이 해제되었습니다.' : '상단에 핀 고정되었습니다! 📌');
+      });
+
+      // Push to Todo
+      card.querySelector('.push-memo-todo-btn').addEventListener('click', () => {
+        this.pushActionToTodayTodo(`[아이디어 실행] ${memo.title}`, memo.category || 'career');
+        this.showToast('아이디어가 오늘의 To-Do로 즉시 전환되었습니다! ⚡');
+      });
+
+      // AI Expand
+      card.querySelector('.ai-expand-memo-btn').addEventListener('click', async () => {
+        const btn = card.querySelector('.ai-expand-memo-btn');
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 기획 중...';
+
+        const prompt = `아이디어 메모: [${memo.title}]
+내용: [${memo.content}]
+
+위 아이디어를 실전에 바로 적용할 수 있도록 3단계 구체적 실행 기획서(1. 핵심 가치, 2. 프로토타입/실험 1단계, 3. 당장 착수할 구체적 행동 2개)로 확장 발전시켜줘.`;
+
+        const res = await geminiClient.generateText(prompt);
+        btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> AI 기획';
+
+        storage.updateMemo(memo.id, { content: `${memo.content}\n\n---\n### 🤖 Gemini AI 심화 기획\n${res}` });
+        this.renderMemos();
+        this.showToast('Gemini가 아이디어를 실행 기획서로 발전시켰습니다! 🚀');
+      });
+
+      // Delete
+      card.querySelector('.delete-memo-btn').addEventListener('click', () => {
+        if (confirm(`'${memo.title}' 메모를 삭제하시겠습니까?`)) {
+          storage.deleteMemo(memo.id);
+          this.renderMemos();
+          this.renderTabCalendar('memo');
+          this.showToast('메모가 삭제되었습니다.');
+        }
+      });
+
+      this.memoCardsGrid.appendChild(card);
+    });
   }
 
   loadDate(dateStr) {
