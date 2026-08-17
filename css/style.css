@@ -568,6 +568,96 @@ body {
 }
 
 /* ==========================================================================
+   🚀 5개년 10조 초고속 기하급수 로드맵 (5-Year Exponential Timeline)
+   ========================================================================== */
+.five-year-timeline-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+@media (max-width: 1440px) {
+  .five-year-timeline-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 992px) {
+  .five-year-timeline-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .five-year-timeline-grid { grid-template-columns: 1fr; }
+}
+
+.five-year-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(250, 204, 21, 0.25);
+  border-radius: var(--radius-md);
+  padding: 12px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all var(--transition-fast);
+}
+.five-year-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-gold);
+  box-shadow: 0 4px 16px rgba(250, 204, 21, 0.15);
+}
+.five-year-card.highlight-trillion {
+  background: linear-gradient(135deg, rgba(250, 204, 21, 0.2), var(--bg-card));
+  border-color: var(--accent-gold);
+  border-width: 2px;
+  box-shadow: 0 0 16px rgba(250, 204, 21, 0.2);
+}
+
+.five-year-badge {
+  font-size: 0.68rem;
+  font-weight: 900;
+  padding: 2px 7px;
+  border-radius: 4px;
+  width: fit-content;
+  letter-spacing: 0.5px;
+}
+.badge-year1 { background: rgba(0, 120, 212, 0.2); color: #60a5fa; border: 1px solid rgba(0, 120, 212, 0.4); }
+.badge-year2 { background: rgba(0, 183, 195, 0.2); color: #00b7c3; border: 1px solid rgba(0, 183, 195, 0.4); }
+.badge-year3 { background: rgba(121, 40, 202, 0.2); color: #c084fc; border: 1px solid rgba(121, 40, 202, 0.4); }
+.badge-year4 { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+.badge-year5 { background: rgba(250, 204, 21, 0.25); color: #facc15; border: 1px solid #facc15; }
+
+.five-year-target {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+.five-year-theme {
+  font-size: 0.72rem;
+  color: var(--accent-gold);
+  font-weight: 600;
+  font-style: italic;
+  margin-bottom: 2px;
+}
+.five-year-tasks {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 10px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+}
+.five-year-tasks li {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  position: relative;
+  padding-left: 10px;
+}
+.five-year-tasks li::before {
+  content: '▪';
+  position: absolute;
+  left: 0;
+  color: var(--accent-gold);
+}
+
+/* ==========================================================================
    🏛️ 10조자산가되기 (5-Column Scientific OS & Quests)
    ========================================================================== */
 .trillion-subnav-bar {

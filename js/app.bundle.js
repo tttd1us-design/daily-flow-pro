@@ -1285,6 +1285,41 @@ class DailyFlowApp {
     const trillionAiBox = document.getElementById('trillionAiResponseBox');
     const pushAllTrillionTodosBtn = document.getElementById('pushAllTrillionTodosBtn');
     const trillionSubnavBar = document.getElementById('trillionSubnavBar');
+    const ai5YearSimulateBtn = document.getElementById('ai5YearSimulateBtn');
+    const fiveYearResultBox = document.getElementById('fiveYearSimulateResultBox');
+
+    // 제미나이 5개년 10조 시뮬레이터
+    if (ai5YearSimulateBtn) {
+      ai5YearSimulateBtn.addEventListener('click', async () => {
+        if (!fiveYearResultBox) return;
+        fiveYearResultBox.innerHTML = '<div style="text-align:center; padding:16px;"><i class="fa-solid fa-spinner fa-spin text-amber" style="font-size:1.5rem;"></i><p style="margin-top:6px; color:var(--text-secondary); font-weight:700;">제미나이가 5개년 10조 초고속 기하급수 시뮬레이션을 연산 중입니다...</p></div>';
+
+        const mastery = storage.getTrillionMastery();
+        const vision = mastery.vision || '글로벌 AI/소프트웨어 인프라 및 자산 구축';
+        const dayData = storage.getDayData(this.currentDate);
+        const focus = dayData.focus || '자립형 비즈니스 파이프라인 구축';
+
+        const prompt = `[제미나이 5개년 10조 초고속 기하급수 성장 시뮬레이션]
+사용자 비전: "${vision}"
+현재 핵심 과업: "${focus}"
+
+당신은 글로벌 10조 자산가/유니콘 육성 최고전략고문 AI입니다.
+사용자가 앞으로 5년 안에 10조 자산가에 도달하기 위한 연차별 핵심 성공 경로(Critical Path)와 기하급수적 성장 공식을 브리핑해 주세요:
+
+1. 🚀 **Year 1 (100억 PMF):** 1차원 노동 100% 제거 & 자립형 프로토타입 핵심 성공 기준
+2. 📈 **Year 2 (1,000억 스케일업):** 글로벌 시장 침투 및 네트워크 효과 폭발 전략
+3. 🏰 **Year 3 (1조 데카콘 진입):** 대체 불가능한 독점 해자(Moat) 완성 & 자본 유치
+4. 💰 **Year 4 (5조 자본화):** 글로벌 IPO/M&A 및 유동성의 글로벌 복리 자산 배분
+5. 👑 **Year 5 (10조 완성):** 10조 글로벌 복리 포트폴리오 완성 & 영구 현금흐름 운영
+6. ⚠️ **가장 경계해야 할 단 1가지 치명적 병목(Bottleneck) 및 해결책:**
+
+단호하고 명쾌하며 실행 가능한 전략으로 작성해줘.`;
+
+        const res = await geminiClient.generateText(prompt);
+        fiveYearResultBox.innerHTML = this.parseMarkdown(res);
+        this.showToast('제미나이 5개년 10조 시뮬레이션 진단이 완료되었습니다! 🚀');
+      });
+    }
 
     // 10조 서브탭 전환
     if (trillionSubnavBar) {
