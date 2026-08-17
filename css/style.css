@@ -568,6 +568,72 @@ body {
 }
 
 /* ==========================================================================
+   🏛️ 10조 자산가 로드맵 & 마인드셋 OS (Billionaire Framework)
+   ========================================================================== */
+.trillion-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+@media (max-width: 900px) {
+  .trillion-grid { grid-template-columns: 1fr; }
+}
+
+.trillion-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(250, 204, 21, 0.25);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  transition: all var(--transition-fast);
+}
+.trillion-card:hover {
+  border-color: var(--accent-gold);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(250, 204, 21, 0.12);
+}
+
+.trillion-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 14px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.trillion-list li {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  position: relative;
+  padding-left: 14px;
+}
+.trillion-list li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--accent-gold);
+  font-weight: 800;
+}
+.trillion-list li strong {
+  color: var(--text-primary);
+}
+
+.trillion-ai-box {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  min-height: 120px;
+  max-height: 400px;
+  overflow-y: auto;
+  font-size: 0.88rem;
+  line-height: 1.8;
+  color: var(--text-primary);
+}
+
+/* ==========================================================================
    💡 아이디어 퀵 메모장 (Instant Idea Capture & Inbox)
    ========================================================================== */
 .memo-category-pills {

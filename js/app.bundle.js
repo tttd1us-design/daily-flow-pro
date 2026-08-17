@@ -1226,6 +1226,67 @@ class DailyFlowApp {
     });
 
     // ==========================================
+    // 🏛️ 10조 자산가 로드맵 & 마인드셋 OS Events
+    // ==========================================
+    const aiTrillionCoachBtn = document.getElementById('aiTrillionCoachBtn');
+    const trillionAiBox = document.getElementById('trillionAiResponseBox');
+
+    const requestTrillionCoaching = async (topicType = 'general') => {
+      if (!trillionAiBox) return;
+      trillionAiBox.innerHTML = '<div style="text-align:center; padding:20px;"><i class="fa-solid fa-spinner fa-spin text-amber" style="font-size:1.5rem;"></i><p style="margin-top:8px; color:var(--text-secondary);">Gemini 10조 자산가 AI 전략 고문이 분석 중입니다...</p></div>';
+
+      const dayData = storage.getDayData(this.currentDate);
+      const focus = dayData.focus || '비즈니스 자동화 및 자산 증식';
+
+      let promptText = '';
+      if (topicType === 'leverage') {
+        promptText = `[10조 자산가 관점 레버리지 진단]
+나의 오늘 핵심 과업: "${focus}"
+질문: 이 과업에서 나의 1차원적 시간 노동을 덜어내고, 자본/시스템/코드/미디어 4대 레버리지를 극대화하여 100배의 결과물을 낼 수 있는 3단계 레버리지 전략을 제시해줘.`;
+      } else if (topicType === 'pipeline') {
+        promptText = `[독자적 비즈니스 파이프라인 3단계 설계]
+직장인/개인이 월급을 넘어 10조 자산가로 향하는 첫 번째 독자적 현금흐름 파이프라인 구축 3단계(1단계 프로토타입 검증, 2단계 수익화 시스템, 3단계 스케일업 및 자본화)를 현실적이고 날카롭게 설계해줘.`;
+      } else if (topicType === 'allocation') {
+        promptText = `[자본 배분 & 복리 재투자 원칙]
+10조 자산가(워런 버핏, 레이 달리오 등)가 지키는 최고의 자본 배분(Capital Allocation) 및 복리 법칙 4가지를 알려주고, 오늘 하루 벌어들인 자원(시간, 돈, 에너지)을 어떻게 재투자해야 하는지 구체적인 행동 가이드를 제시해줘.`;
+      } else if (topicType === 'mindset') {
+        promptText = `[초격차 10조 마인드셋 & 멘탈 코칭]
+실패의 두려움과 단기적인 유혹을 극복하고, 10년 뒤 초거대 자산을 완성하기 위해 오늘 내가 가져야 할 흔들리지 않는 극단적 장기적 사고(Extreme Long-term Horizon)와 멘탈 원칙을 강력하게 코칭해줘.`;
+      } else {
+        promptText = `[10조 자산가 일일 종합 전략 브리핑]
+오늘 날짜: ${this.currentDate}
+오늘 나의 목표: "${focus}"
+10조 자산가 최고전략고문으로서, 오늘 하루 내가 실천해야 할:
+1. 💡 오늘의 핵심 레버리지 결정 (1문장)
+2. 💎 초격차 딥워크 4시간 행동 지침
+3. 🚀 복리 비즈니스 시스템 구축 행동 1가지
+를 명확하고 단호하게 지침을 내려줘.`;
+      }
+
+      const res = await geminiClient.generateText(promptText);
+      trillionAiBox.innerHTML = this.parseMarkdown(res);
+      this.showToast('Gemini 10조 자산가 전략 지침이 도착했습니다! 🏛️');
+    };
+
+    if (aiTrillionCoachBtn) {
+      aiTrillionCoachBtn.addEventListener('click', () => requestTrillionCoaching('general'));
+    }
+
+    document.querySelectorAll('.trillion-prompt-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        requestTrillionCoaching(btn.dataset.type);
+      });
+    });
+
+    document.querySelectorAll('.trillion-action-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const action = btn.dataset.action;
+        this.pushActionToTodayTodo(action, 'career');
+        this.showToast('10조 자산가 실행 행동이 오늘의 To-Do로 등록되었습니다! ⚡');
+      });
+    });
+
+    // ==========================================
     // 💡 Idea Quick Memo Events (사이드바 & 탭)
     // ==========================================
     if (this.sidebarQuickMemoForm) {
@@ -2548,6 +2609,7 @@ class DailyFlowApp {
   // =========================================================================
   renderAllTabCalendars() {
     this.renderTabCalendar('dashboard');
+    this.renderTabCalendar('trillion');
     this.renderTabCalendar('memo');
     this.renderTabCalendar('evening');
     this.renderTabCalendar('weekly');
@@ -2605,6 +2667,12 @@ class DailyFlowApp {
           hasBadge = true;
           const done = todos.filter(t => t.completed).length;
           badgeColor = (done === todos.length && todos.length > 0) ? '#10b981' : '#f59e0b';
+        }
+      } else if (target === 'trillion') {
+        const todos = (dayData.todos || []).filter(t => t.text.includes('[레버리지') || t.text.includes('[초격차') || t.text.includes('[자립') || t.text.includes('[역량'));
+        if (todos.length > 0) {
+          hasBadge = true;
+          badgeColor = '#f59e0b';
         }
       } else if (target === 'memo') {
         const memos = storage.getMemos().filter(m => m.date === fullDate);
@@ -2691,6 +2759,15 @@ class DailyFlowApp {
           <span class="tab-cal-row-date">${dayNum}일</span>
           <span class="tab-cal-row-title">${this.escapeHtml(focus)}</span>
           <span class="tab-cal-row-tag category-career">${done}/${todos.length}</span>
+        `;
+      } else if (target === 'trillion') {
+        const todos = (day.todos || []).filter(t => t.text.includes('[레버리지') || t.text.includes('[초격차') || t.text.includes('[자립') || t.text.includes('[역량'));
+        if (todos.length === 0) return;
+        const done = todos.filter(t => t.completed).length;
+        rowHtml = `
+          <span class="tab-cal-row-date">${dayNum}일</span>
+          <span class="tab-cal-row-title">${this.escapeHtml(todos[0].text.substring(0, 16))}</span>
+          <span class="tab-cal-row-tag category-wealth">💎 ${done}/${todos.length}</span>
         `;
       } else if (target === 'memo') {
         const dayMemos = storage.getMemos().filter(m => m.date === dateKey);
@@ -3165,6 +3242,7 @@ class DailyFlowApp {
     }
 
     if (tabName === 'dashboard') this.renderTabCalendar('dashboard');
+    if (tabName === 'ten-trillion') this.renderTabCalendar('trillion');
     if (tabName === 'quick-memo') {
       this.renderMemos();
       this.renderTabCalendar('memo');

@@ -70,6 +70,10 @@
           <i class="fa-solid fa-table-columns text-indigo"></i>
           <span>실행 커맨드 센터</span>
         </button>
+        <button class="nav-item" data-tab="ten-trillion">
+          <i class="fa-solid fa-gem text-amber"></i>
+          <span>10조 자산가 로드맵</span>
+        </button>
         <button class="nav-item" data-tab="quick-memo">
           <i class="fa-solid fa-lightbulb text-yellow"></i>
           <span>아이디어 퀵 메모장</span>
@@ -99,7 +103,7 @@
           <span>오늘의 일기 & 회고</span>
         </button>
         <button class="nav-item" data-tab="principles">
-          <i class="fa-solid fa-gem text-amber"></i>
+          <i class="fa-solid fa-feather text-cyan"></i>
           <span>인생 원칙 보관소</span>
         </button>
         <button class="nav-item" data-tab="calendar">
@@ -438,7 +442,165 @@
       </section>
 
       <!-- ======================================================== -->
-      <!-- 2. 아이디어 퀵 메모장 (Instant Idea Capture & Inbox)      -->
+      <!-- 2. 10조 자산가 로드맵 & 마인드셋 OS (Billionaire Framework) -->
+      <!-- ======================================================== -->
+      <section class="tab-pane" id="pane-ten-trillion">
+        <div class="tab-with-calendar-layout">
+          <div class="tab-main-column">
+            
+            <div class="goals-header-bar">
+              <div class="goals-header-info">
+                <h2><i class="fa-solid fa-gem text-amber"></i> 10조 자산가 로드맵 & 마인드셋 OS</h2>
+                <p>시간당 노동을 넘어 4대 레버리지(자본·시스템·코드·네트워크)와 복리의 힘으로 초격차 자산을 구축하는 과학적 실행 체계입니다.</p>
+              </div>
+              <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                <button id="aiTrillionCoachBtn" class="btn btn-gemini btn-sm">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> Gemini 10조 전략 지침 브리핑
+                </button>
+              </div>
+            </div>
+
+            <!-- 10조 자산가 4대 축 아키텍처 카드 그리드 -->
+            <div class="trillion-grid">
+              
+              <!-- 1. 🧠 마인드셋 & 레버리지 원칙 -->
+              <div class="card trillion-card">
+                <div class="card-header">
+                  <h3><i class="fa-solid fa-brain text-cyan"></i> 1. 레버리지 마인드셋</h3>
+                  <span class="badge badge-primary">Leverage</span>
+                </div>
+                <div class="card-body">
+                  <ul class="trillion-list">
+                    <li><strong>시간 ↔ 돈 교환 탈피:</strong> 내 노동 시간이 아닌 시스템과 자본이 일하게 만든다.</li>
+                    <li><strong>4대 레버리지 극대화:</strong> 자본(투자), 사람(조직), 코드/소프트웨어, 미디어(영향력).</li>
+                    <li><strong>비대칭적 기회 베팅:</strong> 하방 리스크는 제한되고 상방 잠재력은 무한한 비즈니스 집중.</li>
+                    <li><strong>극단적 장기적 사고:</strong> 단기 유행을 배제하고 10년 이상 유지될 복리 자산에 집중.</li>
+                  </ul>
+                  <button class="btn btn-outline btn-sm w-full trillion-action-btn" data-action="[레버리지 사고] 오늘 내가 직접 하지 않고 시스템화/자동화할 1가지 과업 정의하기">
+                    <i class="fa-solid fa-plus"></i> 오늘 실행 과업으로 등록
+                  </button>
+                </div>
+              </div>
+
+              <!-- 2. 💎 매일의 5대 필수 초격차 습관 -->
+              <div class="card trillion-card">
+                <div class="card-header">
+                  <h3><i class="fa-solid fa-award text-yellow"></i> 2. 매일의 초격차 습관</h3>
+                  <span class="badge badge-warning">Daily Habits</span>
+                </div>
+                <div class="card-body">
+                  <ul class="trillion-list">
+                    <li><strong>4시간 딥워크 블록:</strong> 방해 없는 아침/야간 4시간 핵심 비즈니스 구축 몰입.</li>
+                    <li><strong>매일 1시간 산업 리서치:</strong> 글로벌 시장 흐름, 기술 트렌드, 우량 자산 분석.</li>
+                    <li><strong>신체 에너지 극대화:</strong> 규칙적 운동과 질 높은 수면으로 최상의 판단력 유지.</li>
+                    <li><strong>불필요한 결정 제거:</strong> 옷, 사소한 선택을 루틴화하여 인지 자원을 보호.</li>
+                  </ul>
+                  <button class="btn btn-outline btn-sm w-full trillion-action-btn" data-action="[초격차 습관] 방해 없는 2시간 핵심 비즈니스 몰입 딥워크 완수">
+                    <i class="fa-solid fa-plus"></i> 오늘 실행 과업으로 등록
+                  </button>
+                </div>
+              </div>
+
+              <!-- 3. 🚀 필수 역량 & 학습 마스터리 -->
+              <div class="card trillion-card">
+                <div class="card-header">
+                  <h3><i class="fa-solid fa-cubes-stacked text-indigo"></i> 3. 필수 역량 & 학습</h3>
+                  <span class="badge badge-info">Mastery</span>
+                </div>
+                <div class="card-body">
+                  <ul class="trillion-list">
+                    <li><strong>자본 배분(Capital Allocation):</strong> 벌어들인 수익을 더 높은 ROI 자산으로 재투자.</li>
+                    <li><strong>비즈니스 모델링:</strong> 높은 진입장벽(Moat)과 확장성(Scalability) 설계.</li>
+                    <li><strong>스토리텔링 & 세일즈:</strong> 비전을 설득하고 최고의 인재와 자본을 끌어모으는 힘.</li>
+                    <li><strong>데이터 기반 의사결정:</strong> 감정을 배제하고 확률적 통계와 지표로 판단.</li>
+                  </ul>
+                  <button class="btn btn-outline btn-sm w-full trillion-action-btn" data-action="[역량 마스터리] 자본 배분 및 비즈니스 모델 관련 핵심 도서 1챕터 분석 및 적용">
+                    <i class="fa-solid fa-plus"></i> 오늘 실행 과업으로 등록
+                  </button>
+                </div>
+              </div>
+
+              <!-- 4. ⚡ 당장 실천할 1% 행동 지침 -->
+              <div class="card trillion-card">
+                <div class="card-header">
+                  <h3><i class="fa-solid fa-bolt text-emerald"></i> 4. 1% 즉각 실행 지침</h3>
+                  <span class="badge badge-success">Execution</span>
+                </div>
+                <div class="card-body">
+                  <ul class="trillion-list">
+                    <li><strong>1달러라도 버는 자립형 파이프라인:</strong> 월급 외 스스로 창출하는 첫 시스템 구축.</li>
+                    <li><strong>복리 자산 매수:</strong> 현금 흐름의 일정 비율을 매월 기계적으로 우량 자산에 배분.</li>
+                    <li><strong>실패의 데이터화:</strong> 실수를 자책하지 않고 시스템의 개선 원칙으로 전환.</li>
+                    <li><strong>오늘의 원씽(The One Thing):</strong> 오늘 하루 전체를 바꿀 단 1가지 핵심 행동 완수.</li>
+                  </ul>
+                  <button class="btn btn-outline btn-sm w-full trillion-action-btn" data-action="[자립 파이프라인] 월급 외 독자적 가치를 창출하는 1단계 프로토타입 실행">
+                    <i class="fa-solid fa-plus"></i> 오늘 실행 과업으로 등록
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Gemini 10조 자산가 인터랙티브 AI 브리핑 카드 -->
+            <div class="card" style="margin-top: 14px;">
+              <div class="card-header">
+                <h3><i class="fa-solid fa-robot text-cyan"></i> Gemini 10조 자산가 맞춤형 전략 컨설팅</h3>
+              </div>
+              <div class="card-body">
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
+                  <button class="btn btn-secondary btn-sm trillion-prompt-btn" data-type="leverage">
+                    <i class="fa-solid fa-scale-balanced text-cyan"></i> 🔍 나의 오늘 레버리지 지수 진단
+                  </button>
+                  <button class="btn btn-secondary btn-sm trillion-prompt-btn" data-type="pipeline">
+                    <i class="fa-solid fa-network-wired text-yellow"></i> 🏗️ 독자적 비즈니스 파이프라인 3단계 설계
+                  </button>
+                  <button class="btn btn-secondary btn-sm trillion-prompt-btn" data-type="allocation">
+                    <i class="fa-solid fa-coins text-amber"></i> 💰 자본 배분 및 복리 재투자 원칙
+                  </button>
+                  <button class="btn btn-secondary btn-sm trillion-prompt-btn" data-type="mindset">
+                    <i class="fa-solid fa-shield-halved text-emerald"></i> 🧘 흔들리지 않는 극단적 멘탈 코칭
+                  </button>
+                </div>
+
+                <div id="trillionAiResponseBox" class="trillion-ai-box">
+                  <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.7;">
+                    상단의 버튼을 클릭하거나 <strong>[Gemini 10조 전략 지침 브리핑]</strong>을 누르시면, 오늘 하루를 초격차 자산가의 관점에서 진단하고 당장 실행할 구체적 행동 지침을 제시해 드립니다. ✨
+                  </p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- 우측 10조 로드맵 캘린더 사이드바 -->
+          <div class="tab-calendar-sidebar">
+            <div class="tab-cal-widget card">
+              <div class="tab-cal-header">
+                <button class="nav-mini-btn" data-cal-action="prev" data-target="trillion"><i class="fa-solid fa-chevron-left"></i></button>
+                <h4 class="tab-cal-title" id="trillionCalTitle">2026년 8월</h4>
+                <button class="nav-mini-btn" data-cal-action="next" data-target="trillion"><i class="fa-solid fa-chevron-right"></i></button>
+                <button class="btn btn-secondary btn-sm" data-cal-action="today" data-target="trillion" style="padding: 2px 8px; font-size: 0.75rem;">오늘</button>
+              </div>
+              <div class="tab-cal-weekdays">
+                <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+              </div>
+              <div class="tab-cal-days-grid" id="trillionCalGrid"></div>
+            </div>
+
+            <div class="card" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+              <div class="card-header" style="padding: 10px 14px;">
+                <h4 style="font-size: 0.82rem; font-weight: 700; margin: 0; display:flex; align-items:center; gap:6px;">
+                  <i class="fa-solid fa-gem text-amber"></i> 10조 로드맵 실천 기록
+                </h4>
+              </div>
+              <div class="tab-cal-item-list" id="trillionCalMonthList"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- 3. 아이디어 퀵 메모장 (Instant Idea Capture & Inbox)      -->
       <!-- ======================================================== -->
       <section class="tab-pane" id="pane-quick-memo">
         <div class="tab-with-calendar-layout">
