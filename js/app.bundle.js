@@ -1848,30 +1848,58 @@ class DailyFlowApp {
       });
     });
 
+    const aiBottomUpCascadeBtn = document.getElementById('aiBottomUpCascadeBtn');
+    if (aiBottomUpCascadeBtn) {
+      aiBottomUpCascadeBtn.addEventListener('click', async () => {
+        const dayData = storage.getDayData(this.currentDate);
+        const todos = dayData.todos || [];
+        const dailyGoals = storage.getGoals().filter(g => g.horizon === 'daily');
+
+        const items = [...dailyGoals.map(g => g.title), ...todos.map(t => t.text)].slice(0, 5);
+        const contextText = items.length > 0 ? items.join(', ') : '오늘의 핵심 딥워크 및 비즈니스 실행';
+
+        aiBottomUpCascadeBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 상향 연계 연산 중...';
+
+        const prompt = `[일일 실행 기반 상향식(Bottom-Up) 목표 피라미드 자동 연계]
+오늘 나의 핵심 실행 항목: [${contextText}]
+
+위 일일 행동들을 바탕으로, 이 행동들이 궁극적으로 어떤 주간 스프린트, 월간 마일스톤, 년간 장기 비전으로 수렴해야 하는지 완벽한 상향식 계층 피라미드를 구성해줘:
+1. ☀️ DAILY: 일일 핵심 실행 과업 (현재 행동 최적화)
+2. ⚡ WEEKLY: 이번 주 완수할 주간 스프린트 목표
+3. 🎯 MONTHLY: 이번 달 도달할 월간 정량적 마일스톤
+4. 🚀 YEARLY: 1~3년 내 달성할 년간 북극성 비전`;
+
+        const res = await geminiClient.generateText(prompt);
+        aiBottomUpCascadeBtn.innerHTML = '<i class="fa-solid fa-arrow-trend-up"></i> 일일 ➔ 년간 상향 연계';
+
+        this.openGlobalAiModal('🚀 일일 실행 ➔ 년간 비전 상향 연계 피라미드 리포트', this.parseMarkdown(res));
+      });
+    }
+
     if (this.aiHierarchyBreakdownBtn) {
       this.aiHierarchyBreakdownBtn.addEventListener('click', async () => {
         const goals = storage.getGoals().filter(g => g.horizon === 'yearly' || g.horizon === 'long');
-        const visionText = goals.length > 0 ? goals.map(g => g.title).join(', ') : '전문성 강화 및 경제적 자유 1억 달성';
+        const visionText = goals.length > 0 ? goals.map(g => g.title).join(', ') : '10조 자산가 도약 및 글로벌 비즈니스 인프라 구축';
 
         this.aiHierarchyBreakdownBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 4단계 피라미드 생성 중...';
         const prompt = `나의 장기 비전: [${visionText}]
-위 장기 비전을 실현하기 위해 아래 4단계 목표 피라미드를 완벽한 OKR 형태로 작성해줘:
-1. YEARLY: 년간 핵심 목표 1개
-2. MONTHLY: 이번 달 핵심 마일스톤 프로젝트 1개
-3. WEEKLY: 이번 주 스프린트 과업 1개
-4. DAILY: 오늘 끝낼 1% 핵심 액션 1개`;
+위 장기 비전을 실현하기 위해 일일 ➔ 주간 ➔ 월간 ➔ 년간 4단계 목표 피라미드를 완벽한 OKR 형태로 작성해줘:
+1. DAILY: 오늘 끝낼 1% 핵심 액션 1개
+2. WEEKLY: 이번 주 스프린트 과업 1개
+3. MONTHLY: 이번 달 핵심 마일스톤 프로젝트 1개
+4. YEARLY: 년간 핵심 목표 1개`;
 
         const res = await geminiClient.generateText(prompt);
-        this.aiHierarchyBreakdownBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> AI 4단계 목표 피라미드 일괄 생성';
+        this.aiHierarchyBreakdownBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> 🤖 AI 4단계 목표 피라미드 분해 & 정렬';
 
-        storage.addGoal({ pillar: 'career', horizon: 'yearly', title: '데이터 기반 직무 시니어 전문가 도약 및 포트폴리오 구축', keyResult: '실전 프로젝트 3건 완성', deadline: '2027-12-31', progress: 30 });
-        storage.addGoal({ pillar: 'career', horizon: 'monthly', title: '이번 달 핵심 데이터 파이프라인 분석 리포트 완성', keyResult: 'SQL 쿼리 10개 검증', deadline: '2026-08-31', progress: 50 });
-        storage.addGoal({ pillar: 'study', horizon: 'weekly', title: '이번 주 Window Function & 비즈니스 지표 5개 실습', keyResult: '주간 10시간 공부 확보', deadline: '2026-08-23', progress: 60 });
-        storage.addGoal({ pillar: 'career', horizon: 'daily', title: '오늘 최우선 업무 1개 45분 딥워크 끝내기', keyResult: '100% 완료', deadline: this.currentDate, progress: 0 });
+        storage.addGoal({ pillar: 'career', horizon: 'daily', title: '오늘 최우선 비즈니스 자동화 1개 딥워크 끝내기', keyResult: '100% 완료', deadline: this.currentDate, progress: 0 });
+        storage.addGoal({ pillar: 'study', horizon: 'weekly', title: '이번 주 10조 자산가 의사결정 모델 분석 및 실무 적용', keyResult: '주간 10시간 연구 확보', deadline: '2026-08-23', progress: 50 });
+        storage.addGoal({ pillar: 'career', horizon: 'monthly', title: '이번 달 글로벌 AI SaaS 파이프라인 분석 리포트 완성', keyResult: '초기 유료 전환 검증', deadline: '2026-08-31', progress: 40 });
+        storage.addGoal({ pillar: 'wealth', horizon: 'yearly', title: '자립형 비즈니스 파이프라인 구축 및 100억 PMF 달성', keyResult: '독점적 해자 확보', deadline: '2027-12-31', progress: 20 });
 
         this.renderGoalHierarchy();
         this.renderTabCalendar('goals');
-        this.showToast('Gemini가 4단계 계층 목표 피라미드를 일괄 구축했습니다! 🚀');
+        this.showToast('Gemini가 일일 ➔ 년간 4단계 계층 목표 피라미드를 구축했습니다! 🚀');
       });
     }
     const closeGoalModal = () => this.goalModal.classList.remove('active');
@@ -4058,23 +4086,23 @@ class DailyFlowApp {
   }
 
   // ==========================================
-  // 🌳 비주얼 인터랙티브 트리 맵 렌더러 (Visual Tree)
+  // 🌳 비주얼 인터랙티브 트리 맵 렌더러 (Visual Tree - Daily to Yearly)
   // ==========================================
   renderVisualTree() {
     if (!this.visualTreeCanvas) return;
     this.visualTreeCanvas.innerHTML = '';
 
     const goals = storage.getGoals();
-    const yearly = goals.filter(g => g.horizon === 'yearly' || g.horizon === 'long');
-    const monthly = goals.filter(g => g.horizon === 'monthly' || g.horizon === 'mid');
-    const weekly = goals.filter(g => g.horizon === 'weekly' || g.horizon === 'short');
     const daily = goals.filter(g => g.horizon === 'daily');
+    const weekly = goals.filter(g => g.horizon === 'weekly' || g.horizon === 'short');
+    const monthly = goals.filter(g => g.horizon === 'monthly' || g.horizon === 'mid');
+    const yearly = goals.filter(g => g.horizon === 'yearly' || g.horizon === 'long');
 
     const tiers = [
-      { key: 'YEARLY', label: '🚀 년간 비전', list: yearly, badgeClass: 'badge-yearly' },
-      { key: 'MONTHLY', label: '🎯 월간 마일스톤', list: monthly, badgeClass: 'badge-monthly' },
-      { key: 'WEEKLY', label: '⚡ 주간 스프린트', list: weekly, badgeClass: 'badge-weekly' },
-      { key: 'DAILY', label: '☀️ 일일 1% 액션', list: daily, badgeClass: 'badge-daily' }
+      { key: 'DAILY', label: '☀️ 1. 일일 핵심 실행 (Daily)', list: daily, badgeClass: 'badge-daily' },
+      { key: 'WEEKLY', label: '⚡ 2. 주간 스프린트 (Weekly)', list: weekly, badgeClass: 'badge-weekly' },
+      { key: 'MONTHLY', label: '🎯 3. 월간 마일스톤 (Monthly)', list: monthly, badgeClass: 'badge-monthly' },
+      { key: 'YEARLY', label: '🚀 4. 년간 장기 비전 (Yearly)', list: yearly, badgeClass: 'badge-yearly' }
     ];
 
     tiers.forEach(tier => {
@@ -4087,7 +4115,7 @@ class DailyFlowApp {
       const nodesContainer = row.querySelector(`#treeNodes_${tier.key}`);
       
       if (tier.list.length === 0) {
-        nodesContainer.innerHTML = `<span style="color:var(--text-muted); font-size:0.75rem; padding:6px;">목표가 등록되지 않았습니다.</span>`;
+        nodesContainer.innerHTML = `<span style="color:var(--text-muted); font-size:0.75rem; padding:6px;">등록된 목표가 없습니다.</span>`;
       } else {
         tier.list.forEach(goal => {
           const node = document.createElement('div');
@@ -4183,29 +4211,29 @@ class DailyFlowApp {
   }
 
   // ==========================================
-  // 📅 Goal Hierarchy Render (일/주/월/년 목표 피라미드)
+  // 📅 Goal Hierarchy Render (일일 ➔ 주간 ➔ 월간 ➔ 년간 순서)
   // ==========================================
   renderGoalHierarchy() {
     const goals = storage.getGoals();
-    const yearly = goals.filter(g => g.horizon === 'yearly' || g.horizon === 'long');
-    const monthly = goals.filter(g => g.horizon === 'monthly' || g.horizon === 'mid');
-    const weekly = goals.filter(g => g.horizon === 'weekly' || g.horizon === 'short');
     const daily = goals.filter(g => g.horizon === 'daily');
+    const weekly = goals.filter(g => g.horizon === 'weekly' || g.horizon === 'short');
+    const monthly = goals.filter(g => g.horizon === 'monthly' || g.horizon === 'mid');
+    const yearly = goals.filter(g => g.horizon === 'yearly' || g.horizon === 'long');
 
-    const yBadge = document.getElementById('yearlyCountBadge');
-    const mBadge = document.getElementById('monthlyCountBadge');
-    const wBadge = document.getElementById('weeklyCountBadge');
     const dBadge = document.getElementById('dailyCountBadge');
+    const wBadge = document.getElementById('weeklyCountBadge');
+    const mBadge = document.getElementById('monthlyCountBadge');
+    const yBadge = document.getElementById('yearlyCountBadge');
 
-    if (yBadge) yBadge.textContent = `${yearly.length}개 비전 관리`;
-    if (mBadge) mBadge.textContent = `${monthly.length}개 마일스톤`;
+    if (dBadge) dBadge.textContent = `${daily.length}개 핵심 실행`;
     if (wBadge) wBadge.textContent = `${weekly.length}개 스프린트`;
-    if (dBadge) dBadge.textContent = `${daily.length}개 핵심 액션`;
+    if (mBadge) mBadge.textContent = `${monthly.length}개 마일스톤`;
+    if (yBadge) yBadge.textContent = `${yearly.length}개 년간 비전`;
 
-    this.renderHierarchyGrid(this.yearlyGoalsGrid, yearly, 'yearly');
-    this.renderHierarchyGrid(this.monthlyGoalsGrid, monthly, 'monthly');
-    this.renderHierarchyGrid(this.weeklyGoalsGrid, weekly, 'weekly');
     this.renderHierarchyGrid(this.dailyGoalsGrid, daily, 'daily');
+    this.renderHierarchyGrid(this.weeklyGoalsGrid, weekly, 'weekly');
+    this.renderHierarchyGrid(this.monthlyGoalsGrid, monthly, 'monthly');
+    this.renderHierarchyGrid(this.yearlyGoalsGrid, yearly, 'yearly');
     this.filterHierarchyView();
   }
 
@@ -4219,17 +4247,17 @@ class DailyFlowApp {
     }
 
     const nextLevelMap = {
-      yearly: { label: '🎯 월간 마일스톤으로 파생', nextLevel: 'monthly' },
-      monthly: { label: '⚡ 주간 스프린트로 파생', nextLevel: 'weekly' },
-      weekly: { label: '☀️ 일일 액션으로 파생', nextLevel: 'daily' },
-      daily: { label: '🔥 오늘 To-Do로 즉시 연동', nextLevel: 'todo' }
+      daily: { label: '⚡ 주간 스프린트로 상향 연계', nextLevel: 'weekly' },
+      weekly: { label: '🎯 월간 마일스톤으로 상향 연계', nextLevel: 'monthly' },
+      monthly: { label: '🚀 년간 장기 비전으로 상향 연계', nextLevel: 'yearly' },
+      yearly: { label: '👑 10조 자산가 로드맵으로 연동', nextLevel: 'trillion' }
     };
 
     list.forEach(goal => {
       const card = document.createElement('div');
       card.className = 'goal-card';
       const isDone = (goal.progress || 0) >= 100;
-      const cascadeInfo = nextLevelMap[level];
+      const cascadeInfo = nextLevelMap[level] || { label: '연계', nextLevel: 'daily' };
 
       card.innerHTML = `
         <div class="goal-card-top">
@@ -4263,7 +4291,7 @@ class DailyFlowApp {
 
         <div class="hgoal-cascade-bar">
           <button class="hgoal-cascade-btn" data-action="cascade">
-            <i class="fa-solid fa-arrow-down-long"></i> ${cascadeInfo.label}
+            <i class="fa-solid fa-arrow-up-long"></i> ${cascadeInfo.label}
           </button>
         </div>
       `;
@@ -4298,32 +4326,28 @@ class DailyFlowApp {
         this.renderAnalytics();
       });
 
-      // Push to Today's Todo
-      card.querySelector('.goal-push-todo-btn').addEventListener('click', () => {
-        this.pushActionToTodayTodo(`[${level.toUpperCase()} 연계] ${goal.title}`, goal.pillar || 'career');
+      // Cascade button
+      card.querySelector('.hgoal-cascade-btn').addEventListener('click', () => {
+        if (cascadeInfo.nextLevel === 'trillion') {
+          this.switchTab('ten-trillion');
+          this.showToast('10조 자산가 로드맵으로 연결되었습니다! 👑');
+        } else {
+          const newTitle = `[연계] ${goal.title}`;
+          storage.addGoal({
+            title: newTitle,
+            pillar: goal.pillar || 'career',
+            horizon: cascadeInfo.nextLevel,
+            keyResult: `상위 목표 연계: ${goal.title}`,
+            actions: [`실행 단계 1: ${goal.title} 완수`]
+          });
+          this.renderGoalHierarchy();
+          this.showToast(`상위 단계(${cascadeInfo.nextLevel})로 성공적으로 연계되었습니다! 🚀`);
+        }
       });
 
-      // Cascading Breakdown to Lower Tier
-      card.querySelector('.hgoal-cascade-btn').addEventListener('click', () => {
-        if (cascadeInfo.nextLevel === 'todo') {
-          this.pushActionToTodayTodo(`[일일 핵심] ${goal.title}`, goal.pillar || 'career');
-        } else {
-          const subTitle = prompt(`[${cascadeInfo.nextLevel.toUpperCase()}] 하위 목표/과업 명칭을 입력하세요:`, `${goal.title} 세부 실행`);
-          if (subTitle && subTitle.trim()) {
-            storage.addGoal({
-              pillar: goal.pillar || 'career',
-              horizon: cascadeInfo.nextLevel,
-              title: subTitle.trim(),
-              keyResult: `${subTitle.trim()} 100% 완수`,
-              deadline: cascadeInfo.nextLevel === 'daily' ? this.currentDate : (cascadeInfo.nextLevel === 'weekly' ? '2026-08-23' : '2026-08-31'),
-              progress: 0
-            });
-            this.renderGoalHierarchy();
-            this.renderTabCalendar('goals');
-            this.renderAnalytics();
-            this.showToast(`✨ [${cascadeInfo.nextLevel.toUpperCase()}] 하위 목표가 자동 파생되었습니다!`);
-          }
-        }
+      // Push to Todo
+      card.querySelector('.goal-push-todo-btn').addEventListener('click', () => {
+        this.pushActionToTodayTodo(`[${level.toUpperCase()} 목표실행] ${goal.title}`, goal.pillar || 'career');
       });
 
       // Delete

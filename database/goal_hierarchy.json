@@ -1,64 +1,26 @@
 {
-  "yearly": [
+  "system": "일일 ➔ 주간 ➔ 월간 ➔ 년간 4단계 계층형 목표 로드맵",
+  "version": "2.0-DailyFirstOrder",
+  "tiers": [
     {
-      "id": "yh1",
-      "pillar": "career",
-      "horizon": "yearly",
-      "title": "데이터 분석 직무 핵심 전문성 확보 및 시니어 레벨 도약",
-      "keyResult": "실무 프로젝트 포트폴리오 3편 완성 & 핵심 자격증 취득",
-      "deadline": "2027-12-31",
-      "progress": 40
+      "tier": "daily",
+      "name": "1. 일일 핵심 실행 (Daily Action)",
+      "description": "오늘 당장 끝내서 주간 스프린트를 견인할 1% 핵심 액션"
     },
     {
-      "id": "yh2",
-      "pillar": "wealth",
-      "horizon": "yearly",
-      "title": "경제적 자유를 위한 투자 파이프라인 및 시드 1억 달성",
-      "keyResult": "월 저축률 60% 유지 & 배당/지수 ETF 포트폴리오 구축",
-      "deadline": "2026-12-31",
-      "progress": 65
-    }
-  ],
-  "monthly": [
-    {
-      "id": "mh1",
-      "pillar": "career",
-      "horizon": "monthly",
-      "title": "데이터 파이프라인 심화 과정 완강 및 1차 분석 리포트 완성",
-      "keyResult": "SQL 고급 쿼리 10개 실습 및 깃허브 코드 업로드",
-      "deadline": "2026-08-31",
-      "progress": 70
+      "tier": "weekly",
+      "name": "2. 주간 스프린트 (Weekly Sprint)",
+      "description": "이번 주 5일 동안 완수할 핵심 마일스톤 스프린트"
     },
     {
-      "id": "mh2",
-      "pillar": "health",
-      "horizon": "monthly",
-      "title": "퇴근 후 헬스/러닝 주 4회 완주 및 체지방률 1% 감량",
-      "keyResult": "월간 누적 운동 16회 달성",
-      "deadline": "2026-08-31",
-      "progress": 75
-    }
-  ],
-  "weekly": [
+      "tier": "monthly",
+      "name": "3. 월간 마일스톤 (Monthly Milestone)",
+      "description": "이번 달 정량적 핵심 결과 지표(Key Results)"
+    },
     {
-      "id": "wh1",
-      "pillar": "study",
-      "horizon": "weekly",
-      "title": "이번 주 Window Function & 비즈니스 지표 실무 적용 5편",
-      "keyResult": "주간 10시간 공부 시간 확보",
-      "deadline": "2026-08-23",
-      "progress": 60
-    }
-  ],
-  "daily": [
-    {
-      "id": "dh1",
-      "pillar": "career",
-      "horizon": "daily",
-      "title": "오늘 퇴근 후 데이터 분석 2강 집중 수강 및 실습",
-      "keyResult": "100% 완료",
-      "deadline": "2026-08-18",
-      "progress": 0
+      "tier": "yearly",
+      "name": "4. 년간 장기 비전 (Yearly Vision)",
+      "description": "올해 및 3년 내 달성할 10조 북극성 장기 비전"
     }
   ]
 }

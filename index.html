@@ -1216,16 +1216,19 @@
             <div class="goals-header-bar">
               <div class="goals-header-info">
                 <h2><i class="fa-solid fa-sitemap text-cyan"></i> 일일 / 주간 / 월간 / 년간 계층형 목표 로드맵</h2>
-                <p>장기 비전(년간) ➡️ 월간 마일스톤 ➡️ 주간 스프린트 ➡️ 일일 실행으로 연결되는 완벽한 목표 피라미드</p>
+                <p><strong>일일 핵심 실행 ➔ 주간 스프린트 ➔ 월간 마일스톤 ➔ 년간 장기 비전</strong>으로 실시간 수렴 및 연쇄 정렬(Cascade & Roll-up)되는 완벽한 목표 피라미드</p>
               </div>
-              <div style="display:flex; gap:6px;">
+              <div style="display:flex; gap:6px; flex-wrap:wrap;">
                 <button id="toggleHierarchyViewModeBtn" class="btn btn-secondary btn-sm" title="트리 맵 / 카드 뷰 전환">
                   <i class="fa-solid fa-diagram-project text-cyan"></i> <span>🌳 비주얼 트리 맵 뷰</span>
                 </button>
-                <button id="aiHierarchyBreakdownBtn" class="btn btn-gemini btn-sm">
-                  <i class="fa-solid fa-wand-magic-sparkles"></i> AI 4단계 목표 피라미드 일괄 생성
+                <button id="aiBottomUpCascadeBtn" class="btn btn-primary btn-sm" title="오늘의 일일 실행을 주간/월간/년간으로 자동 상향 연계">
+                  <i class="fa-solid fa-arrow-trend-up"></i> 일일 ➔ 년간 상향 연계
                 </button>
-                <button id="openNewGoalModalBtn" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> 상세 목표 수립</button>
+                <button id="aiHierarchyBreakdownBtn" class="btn btn-gemini btn-sm">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> 🤖 AI 4단계 목표 피라미드 분해 & 정렬
+                </button>
+                <button id="openNewGoalModalBtn" class="btn btn-secondary btn-sm"><i class="fa-solid fa-plus"></i> 상세 목표 수립</button>
               </div>
             </div>
 
@@ -1240,56 +1243,79 @@
 
             <!-- 카드 뷰 모드 컨테이너 -->
             <div id="hierarchyCardsViewContainer">
-              <!-- 4단 계층 탭 셀렉터 -->
+              <!-- 4단 계층 탭 셀렉터 (일일 ➔ 주간 ➔ 월간 ➔ 년간) -->
               <div class="hierarchy-tabs-bar" id="hierarchyTabsBar">
                 <button class="hierarchy-tab-btn active" data-hlevel="all">🌟 전체 4단 피라미드 보기</button>
-                <button class="hierarchy-tab-btn" data-hlevel="yearly">🚀 년간 장기 비전 (Yearly)</button>
-                <button class="hierarchy-tab-btn" data-hlevel="monthly">🎯 월간 마일스톤 (Monthly)</button>
-                <button class="hierarchy-tab-btn" data-hlevel="weekly">⚡ 주간 스프린트 (Weekly)</button>
-                <button class="hierarchy-tab-btn" data-hlevel="daily">☀️ 일일 핵심 실행 (Daily)</button>
+                <button class="hierarchy-tab-btn" data-hlevel="daily"><i class="fa-solid fa-sun text-yellow"></i> 1. 일일 핵심 실행 (Daily)</button>
+                <button class="hierarchy-tab-btn" data-hlevel="weekly"><i class="fa-solid fa-bolt text-amber"></i> 2. 주간 스프린트 (Weekly)</button>
+                <button class="hierarchy-tab-btn" data-hlevel="monthly"><i class="fa-solid fa-bullseye text-emerald"></i> 3. 월간 마일스톤 (Monthly)</button>
+                <button class="hierarchy-tab-btn" data-hlevel="yearly"><i class="fa-solid fa-rocket text-indigo"></i> 4. 년간 장기 비전 (Yearly)</button>
               </div>
 
-              <!-- 4단 계층 보드 그리드 -->
+              <!-- 4단 계층 보드 그리드 (일일 ➔ 주간 ➔ 월간 ➔ 년간 순서) -->
               <div class="hierarchy-board-container" id="hierarchyBoardContainer">
                 
-                <!-- 1) 년간 목표 섹션 (Yearly) -->
-                <div class="hierarchy-section" data-section="yearly">
+                <!-- 1) 일일 핵심 실행 섹션 (Daily) -->
+                <div class="hierarchy-section" data-section="daily">
                   <div class="hierarchy-section-header">
                     <div class="hierarchy-section-title">
-                      <span class="hierarchy-badge badge-yearly">1. YEARLY VISION</span>
-                      <h3>🚀 년간 장기 비전 & 핵심 목표 (1~3년)</h3>
+                      <span class="hierarchy-badge badge-daily">1. DAILY ACTION</span>
+                      <h3>☀️ 오늘 반드시 끝낼 핵심 실행 (Daily Action)</h3>
                     </div>
-                    <span class="hierarchy-count-badge" id="yearlyCountBadge">0개 관리 중</span>
+                    <span class="hierarchy-count-badge" id="dailyCountBadge">0개 관리 중</span>
                   </div>
-                  <form class="hierarchy-inline-form" data-level="yearly">
+                  <form class="hierarchy-inline-form" data-level="daily">
                     <select class="select-sm hierarchy-pillar-select">
-                      <option value="career">💼 커리어</option>
-                      <option value="wealth">💰 재테크</option>
-                      <option value="study">📚 역량</option>
-                      <option value="health">💪 건강</option>
+                      <option value="career">💼 커리어/사업</option>
+                      <option value="wealth">💰 자산/투자</option>
+                      <option value="study">📚 역량/학습</option>
+                      <option value="health">💪 건강/루틴</option>
                       <option value="mindset">🧘 마인드셋</option>
                     </select>
-                    <input type="text" placeholder="새로운 년간 장기 비전 입력 후 Enter..." required>
+                    <input type="text" placeholder="오늘 당장 실행할 1% 핵심 행동 입력 후 Enter..." required>
                     <button type="submit" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> 1초 등록</button>
                   </form>
-                  <div class="hierarchy-cards-grid" id="yearlyGoalsGrid"></div>
+                  <div class="hierarchy-cards-grid" id="dailyGoalsGrid"></div>
                 </div>
 
-                <!-- 2) 월간 목표 섹션 (Monthly) -->
+                <!-- 2) 주간 목표 섹션 (Weekly) -->
+                <div class="hierarchy-section" data-section="weekly">
+                  <div class="hierarchy-section-header">
+                    <div class="hierarchy-section-title">
+                      <span class="hierarchy-badge badge-weekly">2. WEEKLY SPRINT</span>
+                      <h3>⚡ 이번 주 핵심 스프린트 과업 (Weekly Sprint)</h3>
+                    </div>
+                    <span class="hierarchy-count-badge" id="weeklyCountBadge">0개 관리 중</span>
+                  </div>
+                  <form class="hierarchy-inline-form" data-level="weekly">
+                    <select class="select-sm hierarchy-pillar-select">
+                      <option value="career">💼 커리어/사업</option>
+                      <option value="wealth">💰 자산/투자</option>
+                      <option value="study">📚 역량/학습</option>
+                      <option value="health">💪 건강/루틴</option>
+                      <option value="mindset">🧘 마인드셋</option>
+                    </select>
+                    <input type="text" placeholder="이번 주 완수할 핵심 스프린트 과업 입력..." required>
+                    <button type="submit" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> 1초 등록</button>
+                  </form>
+                  <div class="hierarchy-cards-grid" id="weeklyGoalsGrid"></div>
+                </div>
+
+                <!-- 3) 월간 목표 섹션 (Monthly) -->
                 <div class="hierarchy-section" data-section="monthly">
                   <div class="hierarchy-section-header">
                     <div class="hierarchy-section-title">
-                      <span class="hierarchy-badge badge-monthly">2. MONTHLY MILESTONE</span>
-                      <h3>🎯 이번 달 핵심 마일스톤 프로젝트 (Monthly)</h3>
+                      <span class="hierarchy-badge badge-monthly">3. MONTHLY MILESTONE</span>
+                      <h3>🎯 이번 달 핵심 마일스톤 프로젝트 (Monthly Milestone)</h3>
                     </div>
                     <span class="hierarchy-count-badge" id="monthlyCountBadge">0개 관리 중</span>
                   </div>
                   <form class="hierarchy-inline-form" data-level="monthly">
                     <select class="select-sm hierarchy-pillar-select">
-                      <option value="career">💼 커리어</option>
-                      <option value="wealth">💰 재테크</option>
-                      <option value="study">📚 역량</option>
-                      <option value="health">💪 건강</option>
+                      <option value="career">💼 커리어/사업</option>
+                      <option value="wealth">💰 자산/투자</option>
+                      <option value="study">📚 역량/학습</option>
+                      <option value="health">💪 건강/루틴</option>
                       <option value="mindset">🧘 마인드셋</option>
                     </select>
                     <input type="text" placeholder="이번 달에 완수할 핵심 마일스톤 프로젝트 입력..." required>
@@ -1298,50 +1324,27 @@
                   <div class="hierarchy-cards-grid" id="monthlyGoalsGrid"></div>
                 </div>
 
-                <!-- 3) 주간 목표 섹션 (Weekly) -->
-                <div class="hierarchy-section" data-section="weekly">
+                <!-- 4) 년간 목표 섹션 (Yearly) -->
+                <div class="hierarchy-section" data-section="yearly">
                   <div class="hierarchy-section-header">
                     <div class="hierarchy-section-title">
-                      <span class="hierarchy-badge badge-weekly">3. WEEKLY SPRINT</span>
-                      <h3>⚡ 이번 주 핵심 스프린트 과업 (Weekly)</h3>
+                      <span class="hierarchy-badge badge-yearly">4. YEARLY VISION</span>
+                      <h3>🚀 년간 장기 비전 & 10조 북극성 목표 (Yearly Vision)</h3>
                     </div>
-                    <span class="hierarchy-count-badge" id="weeklyCountBadge">0개 관리 중</span>
+                    <span class="hierarchy-count-badge" id="yearlyCountBadge">0개 관리 중</span>
                   </div>
-                  <form class="hierarchy-inline-form" data-level="weekly">
+                  <form class="hierarchy-inline-form" data-level="yearly">
                     <select class="select-sm hierarchy-pillar-select">
-                      <option value="career">💼 커리어</option>
-                      <option value="wealth">💰 재테크</option>
-                      <option value="study">📚 역량</option>
-                      <option value="health">💪 건강</option>
+                      <option value="career">💼 커리어/사업</option>
+                      <option value="wealth">💰 자산/투자</option>
+                      <option value="study">📚 역량/학습</option>
+                      <option value="health">💪 건강/루틴</option>
                       <option value="mindset">🧘 마인드셋</option>
                     </select>
-                    <input type="text" placeholder="이번 주 5일 동안 끝낼 핵심 스프린트 입력..." required>
+                    <input type="text" placeholder="올해 및 3년 내 달성할 년간 장기 비전 입력 후 Enter..." required>
                     <button type="submit" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> 1초 등록</button>
                   </form>
-                  <div class="hierarchy-cards-grid" id="weeklyGoalsGrid"></div>
-                </div>
-
-                <!-- 4) 일일 핵심 실행 섹션 (Daily) -->
-                <div class="hierarchy-section" data-section="daily">
-                  <div class="hierarchy-section-header">
-                    <div class="hierarchy-section-title">
-                      <span class="hierarchy-badge badge-daily">4. DAILY ACTION</span>
-                      <h3>☀️ 오늘 반드시 끝낼 3대 핵심 액션 (Daily)</h3>
-                    </div>
-                    <span class="hierarchy-count-badge" id="dailyCountBadge">0개 관리 중</span>
-                  </div>
-                  <form class="hierarchy-inline-form" data-level="daily">
-                    <select class="select-sm hierarchy-pillar-select">
-                      <option value="career">💼 커리어</option>
-                      <option value="wealth">💰 재테크</option>
-                      <option value="study">📚 역량</option>
-                      <option value="health">💪 건강</option>
-                      <option value="mindset">🧘 마인드셋</option>
-                    </select>
-                    <input type="text" placeholder="오늘 끝낼 1% 핵심 행동 입력..." required>
-                    <button type="submit" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> 1초 등록</button>
-                  </form>
-                  <div class="hierarchy-cards-grid" id="dailyGoalsGrid"></div>
+                  <div class="hierarchy-cards-grid" id="yearlyGoalsGrid"></div>
                 </div>
 
               </div>
