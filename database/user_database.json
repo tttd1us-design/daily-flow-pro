@@ -1,0 +1,11 @@
+{
+  "profile": {
+    "name": "10조 자산가",
+    "theme": "dark-luxury-gold",
+    "createdAt": "2026-08-18T00:00:00.000Z"
+  },
+  "settings": {
+    "syncWithGithub": true,
+    "aiAutoBriefing": true
+  }
+}

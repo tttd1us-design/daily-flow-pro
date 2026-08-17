@@ -1278,9 +1278,21 @@ class DailyFlowApp {
       });
     });
 
-    // ==========================================
-    // 🏛️ 10조자산가되기 (5-Column Scientific OS) Events
-    // ==========================================
+    // 10조 복리 모멘텀 퀵 진단 버튼
+    const quickCompoundBriefBtn = document.getElementById('quickCompoundBriefBtn');
+    if (quickCompoundBriefBtn) {
+      quickCompoundBriefBtn.addEventListener('click', async () => {
+        const score = this.calculateCompoundMomentum();
+        const prompt = `[오늘의 10조 복리 모멘텀 지수 실시간 진단]
+오늘 복리 점수: ${score}점 (100점 만점)
+오늘 날짜: ${this.currentDate}
+
+현재 사용자의 10조 복리 모멘텀 점수를 바탕으로, 오늘 남은 시간 동안 점수를 100%로 끌어올리고 인생의 복리 격차를 벌리기 위한 3단계 즉각 행동 처방전을 내려줘.`;
+
+        const res = await geminiClient.generateText(prompt);
+        this.openGlobalAiModal('👑 10조 복리 모멘텀 실시간 처방전', this.parseMarkdown(res));
+      });
+    }
     const aiTrillionCoachBtn = document.getElementById('aiTrillionCoachBtn');
     const trillionAiBox = document.getElementById('trillionAiResponseBox');
     const pushAllTrillionTodosBtn = document.getElementById('pushAllTrillionTodosBtn');
@@ -1444,6 +1456,7 @@ class DailyFlowApp {
         badge.className = `badge ${done === 5 ? 'badge-success' : 'badge-warning'}`;
       }
       storage.updateDayData(this.currentDate, { trillionQuests: questData });
+      this.calculateCompoundMomentum();
     };
 
     ['tquest_mindset', 'tquest_habit', 'tquest_ability', 'tquest_learning', 'tquest_action'].forEach(id => {
@@ -3654,8 +3667,55 @@ class DailyFlowApp {
   }
 
   // ==========================================
-  // 💡 Idea Quick Memos Render (아이디어 퀵 메모장)
+  // 👑 10조 복리 모멘텀 지수 계산기 (Compound Momentum Index)
   // ==========================================
+  calculateCompoundMomentum() {
+    const dayData = storage.getDayData(this.currentDate);
+    const todos = dayData.todos || [];
+    const tQuests = dayData.trillionQuests || {};
+
+    // 1. 10조 5대 퀘스트 점수 (30점 만점)
+    let questDone = 0;
+    ['tquest_mindset', 'tquest_habit', 'tquest_ability', 'tquest_learning', 'tquest_action'].forEach(id => {
+      if (tQuests[id]) questDone++;
+    });
+    const questScore = (questDone / 5) * 30;
+
+    // 2. To-Do 완료율 (30점 만점)
+    let todoScore = 0;
+    if (todos.length > 0) {
+      const doneCount = todos.filter(t => t.completed).length;
+      todoScore = (doneCount / todos.length) * 30;
+    } else {
+      todoScore = 15; // 기본 점수
+    }
+
+    // 3. 딥워크 몰입 시간 (20점 만점: 2시간 기준)
+    const deepworkSec = dayData.deepworkSeconds || 0;
+    const deepworkScore = Math.min(20, (deepworkSec / 7200) * 20);
+
+    // 4. 일기 & 회고 작성 (20점 만점)
+    let retroScore = 0;
+    if (dayData.journal && dayData.journal.trim().length > 10) retroScore += 10;
+    if (dayData.eveningOS && dayData.eveningOS.trim().length > 10) retroScore += 10;
+
+    const total = Math.round(questScore + todoScore + deepworkScore + retroScore);
+
+    const badge = document.getElementById('compoundScoreBadge');
+    const bar = document.getElementById('compoundProgressBar');
+
+    if (badge) {
+      badge.textContent = `${total}% 달성`;
+      if (total >= 80) badge.className = 'badge badge-success';
+      else if (total >= 40) badge.className = 'badge badge-warning';
+      else badge.className = 'badge badge-danger';
+    }
+    if (bar) {
+      bar.style.width = `${total}%`;
+    }
+
+    return total;
+  }
   renderMemos() {
     if (!this.memoCardsGrid) return;
     const memos = storage.getMemos();
@@ -3818,6 +3878,7 @@ class DailyFlowApp {
       tBadge.textContent = `${tDone}/5 달성`;
       tBadge.className = `badge ${tDone === 5 ? 'badge-success' : 'badge-warning'}`;
     }
+    this.calculateCompoundMomentum();
 
     // Journal
     const journal = dayData.journal || {};
