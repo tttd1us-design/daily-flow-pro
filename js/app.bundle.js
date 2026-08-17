@@ -294,9 +294,30 @@ class IndexedDBStorageManager {
     const blob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    const today = new Date().toISOString().split('T')[0];
     a.href = url;
-    a.download = `daily_flow_pro_backup_${today}.json`;
+    a.download = `data_state.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  exportGoalsJson() {
+    const dataStr = JSON.stringify(this.data.goals || [], null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `goals.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  exportPrinciplesJson() {
+    const dataStr = JSON.stringify(this.data.principles || [], null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `principles.json`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -1466,8 +1487,24 @@ class DailyFlowApp {
     this.closeBackupModalBtn.addEventListener('click', () => this.backupModal.classList.remove('active'));
     this.exportJsonBtn.addEventListener('click', () => {
       storage.exportJson();
-      this.showToast('전체 데이터가 JSON 파일로 백업되었습니다! 💾');
+      this.showToast('통합 데이터가 data_state.json으로 다운로드되었습니다! 💾');
     });
+
+    const exportGoalsBtn = document.getElementById('exportGoalsJsonBtn');
+    if (exportGoalsBtn) {
+      exportGoalsBtn.addEventListener('click', () => {
+        storage.exportGoalsJson();
+        this.showToast('목표 로드맵이 goals.json으로 다운로드되었습니다! 🎯');
+      });
+    }
+
+    const exportPrinciplesBtn = document.getElementById('exportPrinciplesJsonBtn');
+    if (exportPrinciplesBtn) {
+      exportPrinciplesBtn.addEventListener('click', () => {
+        storage.exportPrinciplesJson();
+        this.showToast('인생 원칙이 principles.json으로 다운로드되었습니다! 💎');
+      });
+    }
     this.triggerImportBtn.addEventListener('click', () => this.importJsonInput.click());
     this.importJsonInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
