@@ -1226,14 +1226,14 @@ class DailyFlowApp {
     });
 
     // ==========================================
-    // 🏛️ 10조자산가되기 (Billionaire OS) Events
+    // 🏛️ 10조자산가되기 (5-Column Scientific OS) Events
     // ==========================================
     const aiTrillionCoachBtn = document.getElementById('aiTrillionCoachBtn');
     const trillionAiBox = document.getElementById('trillionAiResponseBox');
     const pushAllTrillionTodosBtn = document.getElementById('pushAllTrillionTodosBtn');
 
     const updateQuestScore = () => {
-      const checks = ['tquest_habit', 'tquest_learning', 'tquest_ability', 'tquest_action'];
+      const checks = ['tquest_mindset', 'tquest_habit', 'tquest_ability', 'tquest_learning', 'tquest_action'];
       let done = 0;
       const questData = {};
       checks.forEach(id => {
@@ -1247,13 +1247,13 @@ class DailyFlowApp {
       });
       const badge = document.getElementById('trillionQuestScoreBadge');
       if (badge) {
-        badge.textContent = `${done}/4 달성`;
-        badge.className = `badge ${done === 4 ? 'badge-success' : 'badge-warning'}`;
+        badge.textContent = `${done}/5 달성`;
+        badge.className = `badge ${done === 5 ? 'badge-success' : 'badge-warning'}`;
       }
       storage.updateDayData(this.currentDate, { trillionQuests: questData });
     };
 
-    ['tquest_habit', 'tquest_learning', 'tquest_ability', 'tquest_action'].forEach(id => {
+    ['tquest_mindset', 'tquest_habit', 'tquest_ability', 'tquest_learning', 'tquest_action'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.addEventListener('change', updateQuestScore);
     });
@@ -1261,39 +1261,57 @@ class DailyFlowApp {
     if (pushAllTrillionTodosBtn) {
       pushAllTrillionTodosBtn.addEventListener('click', () => {
         const tasks = [
-          { text: '[10조 습관] 방해 없는 2시간 핵심 딥워크 완수', category: 'career' },
-          { text: '[10조 학습] 글로벌 산업·자본 리서치 1시간 분석', category: 'study' },
-          { text: '[10조 능력] 4대 레버리지(시스템·코드) 구조 설계', category: 'career' },
-          { text: '[10조 행동] 월급 외 자립형 파이프라인 1단계 실행', category: 'wealth' }
+          { text: '[1열 마인드셋] 오늘 내가 직접 하지 않고 시스템화/자동화할 1가지 정의', category: 'career' },
+          { text: '[2열 초격차습관] 방해 없는 2시간 딥워크로 핵심 복리 비즈니스 시스템 구축', category: 'career' },
+          { text: '[3열 핵심능력] 내 비즈니스의 독보적 경쟁력(해자)과 확장성 1페이지 설계', category: 'career' },
+          { text: '[4열 매일학습] 10조급 자산가들의 의사결정 원칙 도서 1챕터 요약 및 적용', category: 'study' },
+          { text: '[5열 즉각행동] 월급 외 자립형 파이프라인 1호 프로토타입 런칭/실행', category: 'wealth' }
         ];
         tasks.forEach(t => this.pushActionToTodayTodo(t.text, t.category));
-        this.showToast('👑 10조 자산가 4대 필수 지침이 오늘의 To-Do로 일괄 등록되었습니다! ⚡');
+        this.showToast('👑 10조 자산가 5대 혁신 지침이 오늘의 To-Do로 일괄 등록되었습니다! ⚡');
       });
     }
 
     const requestTrillionCoaching = async (topicType = 'daily') => {
       if (!trillionAiBox) return;
-      trillionAiBox.innerHTML = '<div style="text-align:center; padding:20px;"><i class="fa-solid fa-spinner fa-spin text-amber" style="font-size:1.5rem;"></i><p style="margin-top:8px; color:var(--text-secondary); font-weight:700;">Gemini 10조 자산가 최고전략고문이 당신을 위한 오늘의 지침을 작성 중입니다...</p></div>';
+      trillionAiBox.innerHTML = '<div style="text-align:center; padding:24px;"><i class="fa-solid fa-spinner fa-spin text-amber" style="font-size:1.6rem;"></i><p style="margin-top:10px; color:var(--text-secondary); font-weight:700;">Gemini 10조 자산가 최고전략고문이 5열 과학적 분석을 수행 중입니다...</p></div>';
 
       const dayData = storage.getDayData(this.currentDate);
       const focus = dayData.focus || '비즈니스 자동화 및 자산 증식';
 
       let promptText = '';
       if (topicType === 'daily') {
-        promptText = `[Gemini 10조 자산가 일일 최고전략 지침서]
+        promptText = `[Gemini 10조 자산가 5열 통합 최고전략 지침서]
 오늘 날짜: ${this.currentDate}
-오늘 사용자 관심사: "${focus}"
+오늘 사용자 핵심 관심사: "${focus}"
 
-당신은 사용자가 '10조 자산가'가 될 수 있도록 돕는 최고전략고문 AI입니다.
-아래 4대 핵심 축에 대해 오늘 당장 실천할 수 있는 날카롭고 구체적인 지침을 내려주세요:
-1. 💎 **오늘의 10조 습관 지침:** (방해 없는 딥워크 및 에너지 관리 1가지)
-2. 🚀 **오늘의 10조 능력 지침:** (자본 배분, 시스템 해자 구축을 위한 실전 훈련 1가지)
-3. 📚 **오늘의 10조 학습 지침:** (오늘 반드시 파고들어야 할 메가트렌드/비즈니스 분석 1가지)
-4. ⚡ **오늘의 10조 즉각 행동 지침:** (월급 외 독자적 가치를 만드는 오늘 퇴근 후 1% 액션)
+당신은 사용자가 '10조 자산가'로 도약할 수 있도록 돕는 과학적 최고전략고문 AI입니다.
+아래 5대 핵심 영역에 대해 오늘 당장 실천할 수 있는 날카롭고 구체적인 1일 1지침을 내려주세요:
+1. 🧠 **[1열. 마인드셋 지침]:** (1차원 노동 탈피 & 4대 레버리지 전환 사고)
+2. 💎 **[2열. 초격차 습관 지침]:** (4시간 딥워크 블록 & 인지 에너지 최적화)
+3. 🚀 **[3열. 핵심 능력 지침]:** (자본 배분 Capital Allocation & 비즈니스 해자 설계 훈련)
+4. 📚 **[4열. 매일 학습 지침]:** (오늘 반드시 파고들 글로벌 메가트렌드/비즈니스 분석)
+5. ⚡ **[5열. 즉각 행동 지침]:** (월급 외 독자적 가치를 창출하는 오늘 퇴근 후 1% 실전 액션)
 
 군더더기 없이 단호하고 지혜로운 어조로 작성해줘.`;
+      } else if (topicType === 'mindset') {
+        promptText = `[10조 자산가 1열: 마인드셋 & 레버리지 심층 코칭]
+오늘 목표: "${focus}"
+질문: 10조 자산가의 극단적 장기 시계(Extreme Long-term Horizon)와 비대칭 베팅 원칙을 바탕으로, 오늘 하루 나의 생각을 어떻게 혁신해야 하는지 3가지 마인드셋 행동 지침을 제시해줘.`;
+      } else if (topicType === 'habit') {
+        promptText = `[10조 자산가 2열: 초격차 습관 최적화 코칭]
+질문: 10조 자산가들이 매일 실천하는 4시간 딥워크, 양질의 수면/신체 관리, 불필요한 결정 제거 루틴을 오늘 내 하루 스케줄에 어떻게 이식할 수 있는지 구체적인 시간표 가이드를 제시해줘.`;
+      } else if (topicType === 'ability') {
+        promptText = `[10조 자산가 3열: 핵심 능력 & 자본 배분 훈련]
+질문: 10조 자산가의 가장 중요한 2대 역량인 '자본 배분(Capital Allocation)'과 '해자(Moat) 있는 비즈니스 설계' 능력을 오늘 실전에서 훈련하기 위한 3가지 워크북 질문을 던져줘.`;
+      } else if (topicType === 'learning') {
+        promptText = `[10조 자산가 4열: 매일 1시간 심층 학습 추천]
+질문: 현재 글로벌 경제와 기술 지형도(AI, 로보틱스, 에너지 등)에서 10조 규모로 성장할 수 있는 핵심 메가트렌드 1가지를 브리핑하고, 오늘 분석해야 할 핵심 학습 주제를 추천해줘.`;
+      } else if (topicType === 'action') {
+        promptText = `[10조 자산가 5열: 오늘 당장 실행할 1% 즉각 행동]
+질문: 월급 외에 1달러를 스스로 벌어들이는 자립형 파이프라인 1호를 오늘 퇴근 후 당장 착수할 수 있는 3단계 실천 행동을 제시해줘.`;
       } else if (topicType === 'leverage') {
-        promptText = `[10조 자산가 관점 4대 레버리지 전환 지침]
+        promptText = `[10조 자산가 4대 레버리지 전환 진단]
 나의 오늘 핵심 과업: "${focus}"
 질문: 이 과업에서 나의 1차원적 시간 노동을 덜어내고, 자본/시스템/코드/미디어 4대 레버리지를 극대화하여 100배의 결과물을 낼 수 있는 3단계 레버리지 전환 전략을 제시해줘.`;
       } else if (topicType === 'pipeline') {
@@ -3484,10 +3502,10 @@ class DailyFlowApp {
     this.renderGoalHierarchy();
     this.calculateEES();
 
-    // 10조 자산가 퀘스트 체크리스트 복원
+    // 10조 자산가 5대 퀘스트 체크리스트 복원
     const tQuests = dayData.trillionQuests || {};
     let tDone = 0;
-    ['tquest_habit', 'tquest_learning', 'tquest_ability', 'tquest_action'].forEach(id => {
+    ['tquest_mindset', 'tquest_habit', 'tquest_ability', 'tquest_learning', 'tquest_action'].forEach(id => {
       const el = document.getElementById(id);
       if (el) {
         el.checked = !!tQuests[id];
@@ -3496,8 +3514,8 @@ class DailyFlowApp {
     });
     const tBadge = document.getElementById('trillionQuestScoreBadge');
     if (tBadge) {
-      tBadge.textContent = `${tDone}/4 달성`;
-      tBadge.className = `badge ${tDone === 4 ? 'badge-success' : 'badge-warning'}`;
+      tBadge.textContent = `${tDone}/5 달성`;
+      tBadge.className = `badge ${tDone === 5 ? 'badge-success' : 'badge-warning'}`;
     }
 
     // Journal
