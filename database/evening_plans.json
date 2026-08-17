@@ -1,0 +1,17 @@
+{
+  "2026-08-17": {
+    "goal": "데이터 분석 핵심 알고리즘 2시간 마스터 및 보고서 초안 완성",
+    "todayTasks": [
+      { "id": "et1", "text": "퇴근 후 데이터 분석 강의 2강 완강 및 실습 쿼리 작성", "completed": true },
+      { "id": "et2", "text": "이번 달 지출 내역 점검 및 ETF 자동 적립 확인", "completed": true },
+      { "id": "et3", "text": "취침 전 하루 회고 일기 작성 및 내일 우선순위 3개 세팅", "completed": true }
+    ],
+    "tomorrowTasks": [
+      { "id": "em1", "text": "데이터 분석 실무 보고서 2차 검토 및 깃허브 코드 푸시", "completed": false },
+      { "id": "em2", "text": "저녁 헬스장 40분 러닝 및 스트레칭", "completed": false }
+    ],
+    "actualHours": 2.0,
+    "focusRate": 100,
+    "notes": "1% 젠 모드 타이머를 켜고 45분 집중 딥워크를 진행하니 피로감 없이 집중도가 극대화되었다."
+  }
+}

@@ -42,6 +42,14 @@
           <i class="fa-solid fa-crosshairs text-indigo"></i>
           <span>실행 커맨드 센터</span>
         </button>
+        <button class="nav-item" data-tab="evening-os">
+          <i class="fa-solid fa-moon text-yellow"></i>
+          <span>퇴근 후 야간 실행 & To-Do</span>
+        </button>
+        <button class="nav-item" data-tab="goal-hierarchy">
+          <i class="fa-solid fa-sitemap text-cyan"></i>
+          <span>일/주/월/년 목표 로드맵</span>
+        </button>
         <button class="nav-item" data-tab="ai-coach">
           <i class="fa-solid fa-brain text-cyan"></i>
           <span>Gemini 1% 코칭 센터</span>
@@ -49,10 +57,6 @@
         <button class="nav-item" data-tab="study">
           <i class="fa-solid fa-cubes-stacked text-yellow"></i>
           <span>지식 위키 & 학습 아카이브</span>
-        </button>
-        <button class="nav-item" data-tab="goals">
-          <i class="fa-solid fa-bullseye text-emerald"></i>
-          <span>인생 목표 로드맵</span>
         </button>
         <button class="nav-item" data-tab="journal">
           <i class="fa-solid fa-book-open text-purple"></i>
@@ -559,31 +563,208 @@
       </section>
 
       <!-- ======================================================== -->
-      <!-- 4. 인생 목표 로드맵 (우측 캘린더 연동)                     -->
+      <!-- 2. 직장인 퇴근 후 야간 실행 & To-Do (목표 ➡️ 실행 ➡️ 피드백) -->
       <!-- ======================================================== -->
-      <section class="tab-pane" id="pane-goals">
+      <section class="tab-pane" id="pane-evening-os">
         <div class="tab-with-calendar-layout">
           <div class="tab-main-column">
-            <div class="goals-page-container">
-              <div class="goals-header-bar">
-                <div class="goals-header-info">
-                  <h2><i class="fa-solid fa-bullseye text-cyan"></i> 인생 목표 로드맵 (Life Goals & Roadmap)</h2>
-                  <p>장기 비전(1~3년) ➡️ 중기 마일스톤 ➡️ 단기 목표 ➡️ 일일 To-Do로 이어지는 계층형 실행 체계</p>
+            
+            <!-- 상단: 오늘 퇴근 후 1% 목표 설정 (Goal Setup) -->
+            <div class="card evening-hero-card">
+              <div class="card-header">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span class="pulse-indicator" style="background:#facc15; box-shadow:0 0 10px #facc15;"></span>
+                  <h3><i class="fa-solid fa-moon text-yellow"></i> 오늘 퇴근 후 1~2시간 핵심 목표 (Evening Goal Setup)</h3>
                 </div>
-                <button id="openNewGoalModalBtn" class="btn btn-primary"><i class="fa-solid fa-plus"></i> 새로운 목표 수립</button>
+                <div style="display:flex; gap:6px;">
+                  <button id="aiEveningRoutineBtn" class="btn btn-gemini btn-sm">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> AI 저녁 루틴 설계
+                  </button>
+                  <button id="saveEveningGoalBtn" class="btn btn-primary btn-sm"><i class="fa-solid fa-check"></i> 목표 확정</button>
+                </div>
               </div>
-
-              <div class="goal-pillar-filters" id="goalPillarFilters">
-                <button class="pillar-btn active" data-pillar="all">🌟 전체 보기</button>
-                <button class="pillar-btn" data-pillar="career">💼 커리어 & 업무</button>
-                <button class="pillar-btn" data-pillar="study">📚 공부 & 역량</button>
-                <button class="pillar-btn" data-pillar="wealth">💰 경제적 자유 & 투자</button>
-                <button class="pillar-btn" data-pillar="health">💪 건강 & 에너지</button>
-                <button class="pillar-btn" data-pillar="mindset">🧘 마인드셋</button>
+              <div class="card-body">
+                <input type="text" id="eveningGoalInput" placeholder="퇴근 후 지친 나를 깨우고 미래를 바꿀 저녁 집중 목표를 입력하세요... (예: 데이터 분석 강의 1강 + 깃허브 코드 푸시)" class="input-focus-hero">
               </div>
-
-              <div class="goals-grid" id="goalsGrid"></div>
             </div>
+
+            <!-- 중앙 2단: [오늘 퇴근 후 할 것] vs [내일 퇴근 후 할 것 (미리 설계)] -->
+            <div class="evening-todo-grid">
+              
+              <!-- 좌측: 오늘 퇴근 후 할 일 (Today Evening Actions) -->
+              <div class="card">
+                <div class="card-header">
+                  <h3><i class="fa-solid fa-fire-burner text-amber"></i> 오늘 퇴근 후 실행 리스트 (Today)</h3>
+                  <span class="badge" id="eveningTodayBadge">0 / 0 완료</span>
+                </div>
+                <div class="card-body">
+                  <form id="eveningTodayForm" class="todo-add-form">
+                    <input type="text" id="eveningTodayInput" placeholder="오늘 저녁 끝낼 구체적 행동..." required>
+                    <button type="submit" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i></button>
+                  </form>
+                  <ul class="todo-list" id="eveningTodayList" style="max-height: 280px;"></ul>
+                </div>
+              </div>
+
+              <!-- 우측: 내일 퇴근 후 할 것 미리 설계 (Tomorrow Pre-plan) -->
+              <div class="card">
+                <div class="card-header">
+                  <h3><i class="fa-solid fa-sun text-cyan"></i> 내일 퇴근 후 할 일 미리 설계 (Tomorrow)</h3>
+                  <button id="pushTomorrowToTodayBtn" class="btn btn-secondary btn-sm" title="내일 할 일을 오늘로 즉시 불러오기">
+                    <i class="fa-solid fa-arrow-left"></i> 오늘로 당기기
+                  </button>
+                </div>
+                <div class="card-body">
+                  <form id="eveningTomorrowForm" class="todo-add-form">
+                    <input type="text" id="eveningTomorrowInput" placeholder="내일 퇴근 후 착수할 1순위 행동..." required>
+                    <button type="submit" class="btn btn-secondary btn-sm"><i class="fa-solid fa-plus"></i></button>
+                  </form>
+                  <ul class="todo-list" id="eveningTomorrowList" style="max-height: 280px;"></ul>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- 하단: 실질적 실행 내용 & 회고 메모 (Execution Review & Check) -->
+            <div class="card">
+              <div class="card-header">
+                <h3><i class="fa-solid fa-clipboard-check text-emerald"></i> 실질적 실행 내용 & 피드백 (Execution Check)</h3>
+                <button id="saveEveningReviewBtn" class="btn btn-primary btn-sm"><i class="fa-solid fa-floppy-disk"></i> 피드백 저장</button>
+              </div>
+              <div class="card-body">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>⏱️ 실제 저녁 몰입 시간</label>
+                    <input type="number" id="eveningActualHours" min="0" max="8" step="0.5" value="1.5" class="input-sm" style="width: 100px;">
+                  </div>
+                  <div class="form-group">
+                    <label>⚡ 오늘 저녁 몰입 만족도</label>
+                    <select id="eveningFocusRate" class="select-sm">
+                      <option value="100">🔥 100% 압도적 몰입 완료</option>
+                      <option value="80">✨ 80% 양호한 실행</option>
+                      <option value="50">😐 50% 절반 성공</option>
+                      <option value="30">🥱 30% 피로로 인한 조기 휴식</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>📝 구체적 실행 내용 및 깨달음 (무엇을 완료했고 어떤 벽에 부딪혔는가?)</label>
+                  <textarea id="eveningReviewNotes" rows="4" class="journal-textarea" placeholder="오늘 퇴근 후 실제로 실행한 구체적인 내용, 진도, 코드/독서 내역, 그리고 내일 개선할 점을 솔직하게 기록하세요..."></textarea>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- 우측 퇴근 후 실행 캘린더 사이드바 -->
+          <div class="tab-calendar-sidebar">
+            <div class="tab-cal-widget card">
+              <div class="tab-cal-header">
+                <button class="nav-mini-btn" data-cal-action="prev" data-target="evening"><i class="fa-solid fa-chevron-left"></i></button>
+                <h4 class="tab-cal-title" id="eveningCalTitle">2026년 8월</h4>
+                <button class="nav-mini-btn" data-cal-action="next" data-target="evening"><i class="fa-solid fa-chevron-right"></i></button>
+                <button class="btn btn-secondary btn-sm" data-cal-action="today" data-target="evening" style="padding: 2px 8px; font-size: 0.75rem;">오늘</button>
+              </div>
+              <div class="tab-cal-weekdays">
+                <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+              </div>
+              <div class="tab-cal-days-grid" id="eveningCalGrid"></div>
+            </div>
+
+            <div class="card" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+              <div class="card-header" style="padding: 10px 14px;">
+                <h4 style="font-size: 0.82rem; font-weight: 700; margin: 0; display:flex; align-items:center; gap:6px;">
+                  <i class="fa-solid fa-moon text-yellow"></i> 이달의 야간 성장 기록
+                </h4>
+              </div>
+              <div class="tab-cal-item-list" id="eveningCalMonthList"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- 3. 일일 / 주간 / 월간 / 년간 목표 로드맵 (계층형 목표 허브) -->
+      <!-- ======================================================== -->
+      <section class="tab-pane" id="pane-goal-hierarchy">
+        <div class="tab-with-calendar-layout">
+          <div class="tab-main-column">
+            
+            <div class="goals-header-bar">
+              <div class="goals-header-info">
+                <h2><i class="fa-solid fa-sitemap text-cyan"></i> 일일 / 주간 / 월간 / 년간 계층형 목표 로드맵</h2>
+                <p>장기 비전(년간) ➡️ 월간 마일스톤 ➡️ 주간 스프린트 ➡️ 일일 실행으로 연결되는 완벽한 목표 피라미드</p>
+              </div>
+              <div style="display:flex; gap:6px;">
+                <button id="aiHierarchyBreakdownBtn" class="btn btn-gemini btn-sm">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> Gemini 계층 목표 자동 분해
+                </button>
+                <button id="openNewGoalModalBtn" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> 새 목표 수립</button>
+              </div>
+            </div>
+
+            <!-- 4단 계층 탭 셀렉터 -->
+            <div class="hierarchy-tabs-bar" id="hierarchyTabsBar">
+              <button class="hierarchy-tab-btn active" data-hlevel="all">🌟 전체 계층 피라미드</button>
+              <button class="hierarchy-tab-btn" data-hlevel="yearly">🚀 년간 장기 비전 (Yearly)</button>
+              <button class="hierarchy-tab-btn" data-hlevel="monthly">🎯 월간 마일스톤 (Monthly)</button>
+              <button class="hierarchy-tab-btn" data-hlevel="weekly">⚡ 주간 스프린트 (Weekly)</button>
+              <button class="hierarchy-tab-btn" data-hlevel="daily">☀️ 일일 핵심 실행 (Daily)</button>
+            </div>
+
+            <!-- 4단 계층 보드 그리드 -->
+            <div class="hierarchy-board-container" id="hierarchyBoardContainer">
+              
+              <!-- 1) 년간 목표 섹션 -->
+              <div class="hierarchy-section" data-section="yearly">
+                <div class="hierarchy-section-header">
+                  <div class="hierarchy-section-title">
+                    <span class="hierarchy-badge badge-yearly">YEARLY</span>
+                    <h3>🚀 년간 장기 비전 & 핵심 목표 (1~3년)</h3>
+                  </div>
+                  <button class="btn btn-secondary btn-sm add-hgoal-btn" data-level="yearly"><i class="fa-solid fa-plus"></i> 년간 목표 추가</button>
+                </div>
+                <div class="hierarchy-cards-grid" id="yearlyGoalsGrid"></div>
+              </div>
+
+              <!-- 2) 월간 목표 섹션 -->
+              <div class="hierarchy-section" data-section="monthly">
+                <div class="hierarchy-section-header">
+                  <div class="hierarchy-section-title">
+                    <span class="hierarchy-badge badge-monthly">MONTHLY</span>
+                    <h3>🎯 이번 달 핵심 마일스톤 (Monthly Projects)</h3>
+                  </div>
+                  <button class="btn btn-secondary btn-sm add-hgoal-btn" data-level="monthly"><i class="fa-solid fa-plus"></i> 월간 목표 추가</button>
+                </div>
+                <div class="hierarchy-cards-grid" id="monthlyGoalsGrid"></div>
+              </div>
+
+              <!-- 3) 주간 목표 섹션 -->
+              <div class="hierarchy-section" data-section="weekly">
+                <div class="hierarchy-section-header">
+                  <div class="hierarchy-section-title">
+                    <span class="hierarchy-badge badge-weekly">WEEKLY</span>
+                    <h3>⚡ 이번 주 핵심 스프린트 과업 (Weekly Sprints)</h3>
+                  </div>
+                  <button class="btn btn-secondary btn-sm add-hgoal-btn" data-level="weekly"><i class="fa-solid fa-plus"></i> 주간 과업 추가</button>
+                </div>
+                <div class="hierarchy-cards-grid" id="weeklyGoalsGrid"></div>
+              </div>
+
+              <!-- 4) 일일 핵심 실행 섹션 -->
+              <div class="hierarchy-section" data-section="daily">
+                <div class="hierarchy-section-header">
+                  <div class="hierarchy-section-title">
+                    <span class="hierarchy-badge badge-daily">DAILY</span>
+                    <h3>☀️ 오늘 반드시 끝낼 3대 핵심 액션 (Daily Actions)</h3>
+                  </div>
+                  <button class="btn btn-secondary btn-sm add-hgoal-btn" data-level="daily"><i class="fa-solid fa-plus"></i> 오늘 액션 추가</button>
+                </div>
+                <div class="hierarchy-cards-grid" id="dailyGoalsGrid"></div>
+              </div>
+
+            </div>
+
           </div>
 
           <!-- 우측 목표 마감 D-Day 캘린더 사이드바 -->
@@ -1003,11 +1184,12 @@
               </select>
             </div>
             <div class="form-group">
-              <label>목표 기간 (Time Horizon)</label>
+              <label>목표 계층 (Hierarchy Level)</label>
               <select id="goalHorizon" class="select-sm">
-                <option value="long">🚀 장기 비전 (1~3년)</option>
-                <option value="mid">🎯 중기 마일스톤 (올해 / 분기)</option>
-                <option value="short">⚡ 단기 목표 (이번 달)</option>
+                <option value="yearly">🚀 년간 장기 비전 (Yearly / 1~3년)</option>
+                <option value="monthly">🎯 월간 마일스톤 (Monthly / 이번 달)</option>
+                <option value="weekly">⚡ 주간 스프린트 (Weekly / 이번 주)</option>
+                <option value="daily">☀️ 일일 핵심 실행 (Daily / 오늘)</option>
               </select>
             </div>
           </div>

@@ -676,7 +676,33 @@ class DailyFlowApp {
     this.sleepPlusBtn = document.getElementById('sleepPlusBtn');
     this.quickMemoInput = document.getElementById('quickMemoInput');
 
-    // Goals Tab
+    // Evening OS Elements
+    this.eveningGoalInput = document.getElementById('eveningGoalInput');
+    this.saveEveningGoalBtn = document.getElementById('saveEveningGoalBtn');
+    this.aiEveningRoutineBtn = document.getElementById('aiEveningRoutineBtn');
+    this.eveningTodayForm = document.getElementById('eveningTodayForm');
+    this.eveningTodayInput = document.getElementById('eveningTodayInput');
+    this.eveningTodayList = document.getElementById('eveningTodayList');
+    this.eveningTodayBadge = document.getElementById('eveningTodayBadge');
+    this.eveningTomorrowForm = document.getElementById('eveningTomorrowForm');
+    this.eveningTomorrowInput = document.getElementById('eveningTomorrowInput');
+    this.eveningTomorrowList = document.getElementById('eveningTomorrowList');
+    this.pushTomorrowToTodayBtn = document.getElementById('pushTomorrowToTodayBtn');
+    this.eveningActualHours = document.getElementById('eveningActualHours');
+    this.eveningFocusRate = document.getElementById('eveningFocusRate');
+    this.eveningReviewNotes = document.getElementById('eveningReviewNotes');
+    this.saveEveningReviewBtn = document.getElementById('saveEveningReviewBtn');
+
+    // Goal Hierarchy Elements
+    this.hierarchyTabsBar = document.getElementById('hierarchyTabsBar');
+    this.yearlyGoalsGrid = document.getElementById('yearlyGoalsGrid');
+    this.monthlyGoalsGrid = document.getElementById('monthlyGoalsGrid');
+    this.weeklyGoalsGrid = document.getElementById('weeklyGoalsGrid');
+    this.dailyGoalsGrid = document.getElementById('dailyGoalsGrid');
+    this.aiHierarchyBreakdownBtn = document.getElementById('aiHierarchyBreakdownBtn');
+    this.activeHierarchyLevel = 'all';
+
+    // Legacy Goals Tab
     this.goalsGrid = document.getElementById('goalsGrid');
     this.goalPillarFilters = document.getElementById('goalPillarFilters');
     this.openNewGoalModalBtn = document.getElementById('openNewGoalModalBtn');
@@ -1071,9 +1097,158 @@ class DailyFlowApp {
     });
     this.updateThemeIcon(storage.data.settings.theme || 'dark');
 
-    // Goals Events
-    if (this.openNewGoalModalBtn) {
-      this.openNewGoalModalBtn.addEventListener('click', () => this.goalModal.classList.add('active'));
+    // ==========================================
+    // 🌙 Evening OS Events (퇴근 후 야간 실행)
+    // ==========================================
+    if (this.saveEveningGoalBtn) {
+      this.saveEveningGoalBtn.addEventListener('click', () => {
+        const goal = this.eveningGoalInput.value.trim();
+        const dayData = storage.getDayData(this.currentDate);
+        storage.updateDayData(this.currentDate, {
+          eveningRoutine: { ...(dayData.eveningRoutine || {}), goal }
+        });
+        this.renderAllTabCalendars();
+        this.showToast('오늘 퇴근 후 야간 목표가 확정되었습니다! 🌙');
+      });
+    }
+
+    if (this.aiEveningRoutineBtn) {
+      this.aiEveningRoutineBtn.addEventListener('click', async () => {
+        const dayData = storage.getDayData(this.currentDate);
+        const focus = dayData.focus || '';
+        const studyTopic = dayData.study?.topic || '';
+        this.aiEveningRoutineBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> AI 루틴 설계 중...';
+
+        const prompt = `직장인 퇴근 후 1~2시간 야간 성장 루틴 설계:
+- 오늘의 메인 목표: ${focus}
+- 공부 주제: ${studyTopic}
+
+퇴근 후 피곤한 뇌를 위해 5분 워밍업 -> 45분 집중 딥워크 -> 15분 회고/내일 준비로 이어지는 가장 현실적이고 강력한 저녁 To-Do 3가지를 설계해줘.`;
+
+        const res = await geminiClient.generateText(prompt);
+        this.aiEveningRoutineBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> AI 저녁 루틴 설계';
+
+        const lines = res.split('\n').filter(Boolean);
+        const dayRoutine = dayData.eveningRoutine || { todayTasks: [], tomorrowTasks: [] };
+        lines.forEach(l => {
+          const clean = l.replace(/^-\s*\[\s*\]\s*/, '').replace(/^\d+\.\s*/, '').replace(/[\*\#]/g, '').trim();
+          if (clean && clean.length > 3 && !dayRoutine.todayTasks.some(t => t.text === clean)) {
+            dayRoutine.todayTasks.push({ id: 'et_' + Date.now() + Math.random(), text: clean, completed: false });
+          }
+        });
+        storage.updateDayData(this.currentDate, { eveningRoutine: dayRoutine });
+        this.renderEveningOS();
+        this.showToast('Gemini가 퇴근 후 맞춤 루틴을 설계했습니다! 🌙');
+      });
+    }
+
+    if (this.eveningTodayForm) {
+      this.eveningTodayForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const text = this.eveningTodayInput.value.trim();
+        if (!text) return;
+        const dayData = storage.getDayData(this.currentDate);
+        const er = dayData.eveningRoutine || { todayTasks: [], tomorrowTasks: [] };
+        er.todayTasks = er.todayTasks || [];
+        er.todayTasks.push({ id: 'et_' + Date.now(), text, completed: false });
+        storage.updateDayData(this.currentDate, { eveningRoutine: er });
+        this.eveningTodayInput.value = '';
+        this.renderEveningOS();
+        this.renderTabCalendar('evening');
+      });
+    }
+
+    if (this.eveningTomorrowForm) {
+      this.eveningTomorrowForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const text = this.eveningTomorrowInput.value.trim();
+        if (!text) return;
+        const dayData = storage.getDayData(this.currentDate);
+        const er = dayData.eveningRoutine || { todayTasks: [], tomorrowTasks: [] };
+        er.tomorrowTasks = er.tomorrowTasks || [];
+        er.tomorrowTasks.push({ id: 'em_' + Date.now(), text, completed: false });
+        storage.updateDayData(this.currentDate, { eveningRoutine: er });
+        this.eveningTomorrowInput.value = '';
+        this.renderEveningOS();
+      });
+    }
+
+    if (this.pushTomorrowToTodayBtn) {
+      this.pushTomorrowToTodayBtn.addEventListener('click', () => {
+        const dayData = storage.getDayData(this.currentDate);
+        const er = dayData.eveningRoutine || { todayTasks: [], tomorrowTasks: [] };
+        if (!er.tomorrowTasks || er.tomorrowTasks.length === 0) {
+          this.showToast('내일로 계획된 과업이 없습니다.', 'error');
+          return;
+        }
+        er.todayTasks = er.todayTasks || [];
+        er.tomorrowTasks.forEach(t => {
+          er.todayTasks.push({ id: 'et_' + Date.now() + Math.random(), text: t.text, completed: false });
+        });
+        er.tomorrowTasks = [];
+        storage.updateDayData(this.currentDate, { eveningRoutine: er });
+        this.renderEveningOS();
+        this.showToast('내일 계획이 오늘 실행 리스트로 당겨졌습니다! ⚡');
+      });
+    }
+
+    if (this.saveEveningReviewBtn) {
+      this.saveEveningReviewBtn.addEventListener('click', () => {
+        const actualHours = parseFloat(this.eveningActualHours.value) || 0;
+        const focusRate = parseInt(this.eveningFocusRate.value) || 100;
+        const notes = this.eveningReviewNotes.value.trim();
+        const dayData = storage.getDayData(this.currentDate);
+        const er = dayData.eveningRoutine || {};
+        storage.updateDayData(this.currentDate, {
+          eveningRoutine: { ...er, actualHours, focusRate, notes }
+        });
+        this.renderTabCalendar('evening');
+        this.showToast('퇴근 후 실행 피드백이 안전하게 저장되었습니다! 💾');
+      });
+    }
+
+    // ==========================================
+    // 📅 Goal Hierarchy Events (계층형 목표 피라미드)
+    // ==========================================
+    if (this.hierarchyTabsBar) {
+      this.hierarchyTabsBar.querySelectorAll('.hierarchy-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          this.hierarchyTabsBar.querySelectorAll('.hierarchy-tab-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          this.activeHierarchyLevel = btn.dataset.hlevel;
+          this.filterHierarchyView();
+        });
+      });
+    }
+
+    document.querySelectorAll('.add-hgoal-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const lvl = btn.dataset.level || 'yearly';
+        this.goalHorizon.value = lvl;
+        this.goalModal.classList.add('active');
+      });
+    });
+
+    if (this.aiHierarchyBreakdownBtn) {
+      this.aiHierarchyBreakdownBtn.addEventListener('click', async () => {
+        const goals = storage.getGoals().filter(g => g.horizon === 'yearly' || g.horizon === 'long');
+        const visionText = goals.length > 0 ? goals.map(g => g.title).join(', ') : '전문성 강화 및 경제적 자유 1억 달성';
+
+        this.aiHierarchyBreakdownBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 계층 목표 분해 중...';
+        const prompt = `나의 장기 비전: [${visionText}]
+위 장기 비전을 (1) 이번 달 핵심 마일스톤(Monthly 1개), (2) 이번 주 스프린트 과업(Weekly 2개), (3) 오늘 실행할 1% 액션(Daily 2개)으로 계층형 분해해줘.`;
+
+        const res = await geminiClient.generateText(prompt);
+        this.aiHierarchyBreakdownBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Gemini 계층 목표 자동 분해';
+
+        storage.addGoal({ pillar: 'career', horizon: 'monthly', title: '월간 핵심 지표 80% 달성 및 포트폴리오 정리', keyResult: '보고서 및 코드 1건 완성', deadline: '2026-08-31', progress: 20 });
+        storage.addGoal({ pillar: 'study', horizon: 'weekly', title: '이번 주 핵심 알고리즘 및 쿼리 5편 마스터', keyResult: '주간 10시간 공부 확보', deadline: '2026-08-23', progress: 50 });
+        storage.addGoal({ pillar: 'career', horizon: 'daily', title: '오늘 최우선 업무 1개 45분 딥워크 끝내기', keyResult: '100% 완료', deadline: this.currentDate, progress: 0 });
+
+        this.renderGoalHierarchy();
+        this.renderTabCalendar('goals');
+        this.showToast('Gemini가 년간 비전에서 월/주/일간 계층 목표를 자동 도출했습니다! 🚀');
+      });
     }
     const closeGoalModal = () => this.goalModal.classList.remove('active');
     if (this.closeGoalModalBtn) this.closeGoalModalBtn.addEventListener('click', closeGoalModal);
@@ -1990,6 +2165,7 @@ class DailyFlowApp {
   // =========================================================================
   renderAllTabCalendars() {
     this.renderTabCalendar('dashboard');
+    this.renderTabCalendar('evening');
     this.renderTabCalendar('ai');
     this.renderTabCalendar('study');
     this.renderTabCalendar('goals');
@@ -2044,6 +2220,12 @@ class DailyFlowApp {
           hasBadge = true;
           const done = todos.filter(t => t.completed).length;
           badgeColor = (done === todos.length && todos.length > 0) ? '#10b981' : '#f59e0b';
+        }
+      } else if (target === 'evening') {
+        const er = dayData.eveningRoutine || {};
+        if (er.goal || (er.todayTasks && er.todayTasks.length > 0)) {
+          hasBadge = true;
+          badgeColor = '#facc15';
         }
       } else if (target === 'study') {
         if (dayData.study && (dayData.study.topic || dayData.study.actualHours > 0 || (dayData.study.photos && dayData.study.photos.length > 0))) {
@@ -2112,6 +2294,15 @@ class DailyFlowApp {
           <span class="tab-cal-row-date">${dayNum}일</span>
           <span class="tab-cal-row-title">${this.escapeHtml(focus)}</span>
           <span class="tab-cal-row-tag category-career">${done}/${todos.length}</span>
+        `;
+      } else if (target === 'evening') {
+        const er = day.eveningRoutine || {};
+        if (!er.goal && (!er.todayTasks || er.todayTasks.length === 0)) return;
+        const eGoal = er.goal || (er.todayTasks[0]?.text || '저녁 실행');
+        rowHtml = `
+          <span class="tab-cal-row-date">${dayNum}일</span>
+          <span class="tab-cal-row-title">${this.escapeHtml(eGoal.substring(0, 16))}</span>
+          <span class="tab-cal-row-tag category-wealth">🌙 ${er.actualHours || 1.5}h</span>
         `;
       } else if (target === 'study') {
         if (!day.study || (!day.study.topic && day.study.actualHours === 0)) return;
@@ -2553,15 +2744,19 @@ class DailyFlowApp {
     this.tabPanes.forEach(pane => pane.classList.toggle('active', pane.id === `pane-${tabName}`));
 
     if (tabName === 'dashboard') this.renderTabCalendar('dashboard');
+    if (tabName === 'evening-os') {
+      this.renderEveningOS();
+      this.renderTabCalendar('evening');
+    }
+    if (tabName === 'goal-hierarchy') {
+      this.renderGoalHierarchy();
+      this.renderTabCalendar('goals');
+    }
     if (tabName === 'ai-coach') this.renderTabCalendar('ai');
     if (tabName === 'study') {
       this.renderStudyPhotos();
       this.renderStudyArchive();
       this.renderTabCalendar('study');
-    }
-    if (tabName === 'goals') {
-      this.renderGoals();
-      this.renderTabCalendar('goals');
     }
     if (tabName === 'journal') this.renderJournalRightCalendar();
     if (tabName === 'principles') {
@@ -2622,6 +2817,10 @@ class DailyFlowApp {
     this.renderStudyPhotos();
     this.renderStudyArchive();
 
+    // Evening OS Load
+    this.renderEveningOS();
+    this.renderGoalHierarchy();
+
     // Journal
     const journal = dayData.journal || {};
     this.journalTitle.value = journal.title || '';
@@ -2637,7 +2836,173 @@ class DailyFlowApp {
 
     this.renderAllTabCalendars();
     this.renderPrinciples();
-    this.renderGoals();
+  }
+
+  // ==========================================
+  // 🌙 Evening OS Render (퇴근 후 야간 실행 & To-Do)
+  // ==========================================
+  renderEveningOS() {
+    const dayData = storage.getDayData(this.currentDate);
+    const er = dayData.eveningRoutine || { goal: '', todayTasks: [], tomorrowTasks: [], actualHours: 1.5, focusRate: 100, notes: '' };
+
+    if (this.eveningGoalInput) this.eveningGoalInput.value = er.goal || '';
+    if (this.eveningActualHours) this.eveningActualHours.value = er.actualHours || 1.5;
+    if (this.eveningFocusRate) this.eveningFocusRate.value = er.focusRate || 100;
+    if (this.eveningReviewNotes) this.eveningReviewNotes.value = er.notes || '';
+
+    // Render Today Evening Tasks
+    if (this.eveningTodayList) {
+      this.eveningTodayList.innerHTML = '';
+      const todayTasks = er.todayTasks || [];
+      const done = todayTasks.filter(t => t.completed).length;
+      if (this.eveningTodayBadge) {
+        this.eveningTodayBadge.textContent = `${done} / ${todayTasks.length} 완료`;
+      }
+
+      if (todayTasks.length === 0) {
+        this.eveningTodayList.innerHTML = `<li style="color:var(--text-muted); padding:16px; text-align:center; font-size:0.82rem;">오늘 저녁 할 일이 없습니다. [AI 저녁 루틴 설계] 또는 직접 추가해보세요!</li>`;
+      } else {
+        todayTasks.forEach(task => {
+          const li = document.createElement('li');
+          li.className = `todo-item ${task.completed ? 'completed' : ''}`;
+          li.innerHTML = `
+            <div class="todo-left">
+              <input type="checkbox" class="todo-checkbox" ${task.completed ? 'checked' : ''}>
+              <span class="todo-text">${this.escapeHtml(task.text)}</span>
+            </div>
+            <button class="todo-delete-btn" title="삭제"><i class="fa-solid fa-trash"></i></button>
+          `;
+          li.querySelector('.todo-checkbox').addEventListener('change', (e) => {
+            task.completed = e.target.checked;
+            storage.updateDayData(this.currentDate, { eveningRoutine: er });
+            this.renderEveningOS();
+            this.renderTabCalendar('evening');
+          });
+          li.querySelector('.todo-delete-btn').addEventListener('click', () => {
+            er.todayTasks = er.todayTasks.filter(t => t.id !== task.id);
+            storage.updateDayData(this.currentDate, { eveningRoutine: er });
+            this.renderEveningOS();
+            this.renderTabCalendar('evening');
+          });
+          this.eveningTodayList.appendChild(li);
+        });
+      }
+    }
+
+    // Render Tomorrow Evening Tasks
+    if (this.eveningTomorrowList) {
+      this.eveningTomorrowList.innerHTML = '';
+      const tomorrowTasks = er.tomorrowTasks || [];
+
+      if (tomorrowTasks.length === 0) {
+        this.eveningTomorrowList.innerHTML = `<li style="color:var(--text-muted); padding:16px; text-align:center; font-size:0.82rem;">내일 저녁 계획이 비어 있습니다. 잠들기 전 1순위 행동을 미리 적어두세요!</li>`;
+      } else {
+        tomorrowTasks.forEach(task => {
+          const li = document.createElement('li');
+          li.className = 'todo-item';
+          li.innerHTML = `
+            <div class="todo-left">
+              <span class="category-tag category-study">내일</span>
+              <span class="todo-text">${this.escapeHtml(task.text)}</span>
+            </div>
+            <button class="todo-delete-btn" title="삭제"><i class="fa-solid fa-trash"></i></button>
+          `;
+          li.querySelector('.todo-delete-btn').addEventListener('click', () => {
+            er.tomorrowTasks = er.tomorrowTasks.filter(t => t.id !== task.id);
+            storage.updateDayData(this.currentDate, { eveningRoutine: er });
+            this.renderEveningOS();
+          });
+          this.eveningTomorrowList.appendChild(li);
+        });
+      }
+    }
+  }
+
+  // ==========================================
+  // 📅 Goal Hierarchy Render (일/주/월/년 목표 피라미드)
+  // ==========================================
+  renderGoalHierarchy() {
+    const goals = storage.getGoals();
+    const yearly = goals.filter(g => g.horizon === 'yearly' || g.horizon === 'long');
+    const monthly = goals.filter(g => g.horizon === 'monthly' || g.horizon === 'mid');
+    const weekly = goals.filter(g => g.horizon === 'weekly' || g.horizon === 'short');
+    const daily = goals.filter(g => g.horizon === 'daily');
+
+    this.renderHierarchyGrid(this.yearlyGoalsGrid, yearly, 'yearly');
+    this.renderHierarchyGrid(this.monthlyGoalsGrid, monthly, 'monthly');
+    this.renderHierarchyGrid(this.weeklyGoalsGrid, weekly, 'weekly');
+    this.renderHierarchyGrid(this.dailyGoalsGrid, daily, 'daily');
+    this.filterHierarchyView();
+  }
+
+  renderHierarchyGrid(gridEl, list, level) {
+    if (!gridEl) return;
+    gridEl.innerHTML = '';
+
+    if (list.length === 0) {
+      gridEl.innerHTML = `<div style="grid-column: 1 / -1; color: var(--text-muted); padding: 14px; font-size: 0.78rem; text-align: center;">등록된 목표가 없습니다. 우측 [+ 추가] 버튼을 눌러보세요.</div>`;
+      return;
+    }
+
+    list.forEach(goal => {
+      const card = document.createElement('div');
+      card.className = 'goal-card';
+      card.innerHTML = `
+        <div class="goal-card-top">
+          <span class="category-tag category-${goal.pillar || 'career'}">${goal.pillar || '목표'}</span>
+          <button class="todo-delete-btn" title="삭제"><i class="fa-solid fa-trash"></i></button>
+        </div>
+        <div class="goal-card-title">${this.escapeHtml(goal.title)}</div>
+        <div class="goal-key-result"><i class="fa-solid fa-key"></i> ${this.escapeHtml(goal.keyResult || '지표 달성')}</div>
+        <div class="goal-progress-section">
+          <div class="goal-progress-header">
+            <span>진행률</span>
+            <span><strong>${goal.progress || 0}%</strong></span>
+          </div>
+          <input type="range" min="0" max="100" value="${goal.progress || 0}" class="slider hgoal-slider">
+        </div>
+        <div class="goal-card-footer">
+          <span><i class="fa-regular fa-clock"></i> ${goal.deadline || '마감일 미지정'}</span>
+          <button class="goal-push-todo-btn" title="오늘의 To-Do로 등록"><i class="fa-solid fa-plus"></i> 실행 등록</button>
+        </div>
+      `;
+
+      card.querySelector('.hgoal-slider').addEventListener('change', (e) => {
+        const p = parseInt(e.target.value);
+        storage.updateGoal(goal.id, { progress: p });
+        this.renderGoalHierarchy();
+        this.renderTabCalendar('goals');
+        this.renderAnalytics();
+      });
+
+      card.querySelector('.goal-push-todo-btn').addEventListener('click', () => {
+        this.pushActionToTodayTodo(`[${level.toUpperCase()} 목표연계] ${goal.title}`, goal.pillar || 'career');
+      });
+
+      card.querySelector('.todo-delete-btn').addEventListener('click', () => {
+        if (confirm(`'${goal.title}' 목표를 삭제하시겠습니까?`)) {
+          storage.deleteGoal(goal.id);
+          this.renderGoalHierarchy();
+          this.renderTabCalendar('goals');
+          this.renderAnalytics();
+          this.showToast('목표가 삭제되었습니다.');
+        }
+      });
+
+      gridEl.appendChild(card);
+    });
+  }
+
+  filterHierarchyView() {
+    const sections = document.querySelectorAll('.hierarchy-section');
+    sections.forEach(sec => {
+      const secLevel = sec.dataset.section;
+      if (this.activeHierarchyLevel === 'all' || this.activeHierarchyLevel === secLevel) {
+        sec.style.display = 'flex';
+      } else {
+        sec.style.display = 'none';
+      }
+    });
   }
 
   highlightMood(mood) {
