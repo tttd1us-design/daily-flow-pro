@@ -1705,11 +1705,13 @@
         <p class="modal-desc">모든 데이터와 대용량 이미지는 브라우저의 <strong>IndexedDB 데이터베이스</strong>에 안전하게 영구 보관됩니다.</p>
         <div class="backup-action-boxes">
           <div class="backup-box">
-            <h4><i class="fa-solid fa-file-export text-cyan"></i> database/ 폴더용 통합 DB 다운로드</h4>
-            <p>프로젝트의 <code>database/data_state.json</code> 파일로 바로 저장할 수 있는 최신 통합 DB를 내보냅니다.</p>
+            <h4><i class="fa-solid fa-file-export text-cyan"></i> database/ 폴더용 개별 DB 다운로드</h4>
+            <p>프로젝트의 <code>database/</code> 폴더로 바로 보관할 수 있는 최신 JSON 파일들을 내보냅니다.</p>
             <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;">
-              <button id="exportJsonBtn" class="btn btn-primary btn-sm"><i class="fa-solid fa-download"></i> data_state.json 다운로드</button>
+              <button id="exportJsonBtn" class="btn btn-primary btn-sm"><i class="fa-solid fa-download"></i> data_state.json</button>
               <button id="exportGoalsJsonBtn" class="btn btn-secondary btn-sm"><i class="fa-solid fa-bullseye text-cyan"></i> goals.json</button>
+              <button id="exportMemosJsonBtn" class="btn btn-secondary btn-sm"><i class="fa-solid fa-lightbulb text-yellow"></i> memos.json</button>
+              <button id="exportWeeklyJsonBtn" class="btn btn-secondary btn-sm"><i class="fa-solid fa-chart-pie text-emerald"></i> weekly_retros.json</button>
               <button id="exportPrinciplesJsonBtn" class="btn btn-secondary btn-sm"><i class="fa-solid fa-gem text-amber"></i> principles.json</button>
             </div>
           </div>

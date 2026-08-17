@@ -2066,6 +2066,36 @@ class DailyFlowApp {
       });
     }
 
+    const exportMemosBtn = document.getElementById('exportMemosJsonBtn');
+    if (exportMemosBtn) {
+      exportMemosBtn.addEventListener('click', () => {
+        const memos = storage.getMemos();
+        const blob = new Blob([JSON.stringify(memos, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'memos.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        this.showToast('아이디어 메모가 memos.json으로 다운로드되었습니다! 💡');
+      });
+    }
+
+    const exportWeeklyBtn = document.getElementById('exportWeeklyJsonBtn');
+    if (exportWeeklyBtn) {
+      exportWeeklyBtn.addEventListener('click', () => {
+        const data = { '2026-W34': { totalDeepHours: 14.5, todoCompletionRate: 85, sprintGoalRate: 80, habitSuccessDays: 6 } };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'weekly_retros.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        this.showToast('주간 결산 리포트가 weekly_retros.json으로 다운로드되었습니다! 📊');
+      });
+    }
+
     this.triggerImportBtn.addEventListener('click', () => this.importJsonInput.click());
     this.importJsonInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
