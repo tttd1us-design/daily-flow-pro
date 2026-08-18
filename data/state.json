@@ -1,9 +1,403 @@
 {
+  "meta": {
+    "schema": 2,
+    "tz": "Asia/Seoul",
+    "createdAt": "2026-08-18",
+    "lastBackup": null
+  },
+  "vision": {
+    "title": "지배자산 10조 / 순자산 8,000억~1.2조",
+    "controlledTarget": 10000000000000,
+    "netWorthTarget": 800000000000,
+    "startDate": "2026-08-18",
+    "horizonYears": 20,
+    "identity": "나는 부동산 의사결정 시스템을 만드는 사람이고, 설계는 그 일부다.",
+    "principles": [
+      "거절이 전략이다 (월 2건 이상 거절)",
+      "가역성을 먼저 본다 (가역은 빠르게, 불가역은 신중하게)",
+      "비대칭에만 베팅한다 (하방 제한, 상방 무한대)",
+      "먼저 준다 (자료·통찰·소개 선제공 후 요청)",
+      "복리에만 시간을 쓴다 (3년 뒤 가치 창출 여부)",
+      "기록의 무결성은 타협하지 않는다",
+      "신체가 최상위 자산이다 (수면 7시간 & 주 4회 운동)"
+    ],
+    "phases": [
+      {
+        "id": "P1",
+        "name": "증명",
+        "yr": [
+          0,
+          2
+        ],
+        "net": 3000000000,
+        "ctrl": 30000000000,
+        "question": "내 지식이 돈을 내는 제품이 되는가",
+        "guard": "용역 비중 상한, 금지 목록"
+      },
+      {
+        "id": "P2",
+        "name": "증폭",
+        "yr": [
+          2,
+          5
+        ],
+        "net": 20000000000,
+        "ctrl": 200000000000,
+        "question": "나 없이도 돌아가는 구조가 되는가",
+        "guard": "채용 전 3개월 프로젝트 동행 원칙"
+      },
+      {
+        "id": "P3",
+        "name": "자본화",
+        "yr": [
+          5,
+          10
+        ],
+        "net": 200000000000,
+        "ctrl": 1500000000000,
+        "question": "남의 돈을 책임지고 운용할 자격을 갖췄는가",
+        "guard": "인가 요건 역산 5년 준비표"
+      },
+      {
+        "id": "P4",
+        "name": "구조화",
+        "yr": [
+          10,
+          15
+        ],
+        "net": 700000000000,
+        "ctrl": 5000000000000,
+        "question": "유동성을 영구 자산으로 전환했는가",
+        "guard": "사전 확정 매각 트리거"
+      },
+      {
+        "id": "P5",
+        "name": "지배",
+        "yr": [
+          15,
+          20
+        ],
+        "net": 1200000000000,
+        "ctrl": 10000000000000,
+        "question": "내가 없어도 100년 가는가",
+        "guard": "경영진 승계 및 재단 구조"
+      }
+    ],
+    "milestones": [
+      {
+        "id": "M1",
+        "due": "2027-08-17",
+        "name": "Y1 증명 완료",
+        "gate": [
+          "books>=3",
+          "mrr>=3000000",
+          "retention>=0.4"
+        ]
+      },
+      {
+        "id": "M2",
+        "due": "2028-02-01",
+        "name": "첫 채용 3인 완료",
+        "gate": [
+          "team>=3",
+          "mrr>=20000000"
+        ]
+      },
+      {
+        "id": "M3",
+        "due": "2028-08-17",
+        "name": "Y2 증폭 완료",
+        "gate": [
+          "books>=6",
+          "mrr>=30000000",
+          "net>=3e9"
+        ]
+      },
+      {
+        "id": "M4",
+        "due": "2029-02-01",
+        "name": "SPV 1호 착공",
+        "gate": [
+          "gdv>=4e10",
+          "equity>=5e8"
+        ]
+      },
+      {
+        "id": "M5",
+        "due": "2029-08-17",
+        "name": "Y3 ARR 10억",
+        "gate": [
+          "arr>=1e9",
+          "books>=10"
+        ]
+      },
+      {
+        "id": "M6",
+        "due": "2032-08-17",
+        "name": "AMC 인가 신청",
+        "gate": [
+          "capital>=7e9",
+          "experts>=5"
+        ]
+      }
+    ],
+    "stopRules": {
+      "deal": [
+        "인허가 예상 기간 최초 대비 6개월 이상 지연 조짐 시 중단",
+        "공사비 견적 초기 대비 15% 이상 상승 시 중단",
+        "FI 모집 90일 내 목표 70% 미달 시 진행 불가",
+        "기준금리 진입 시점 대비 150bp 이상 상승 시 보류"
+      ],
+      "hiring": [
+        "과제(1주 유상) 기한 미준수 시 즉시 탈락",
+        "동행(4주) 중 질문의 질이 낮으면 채용 중단",
+        "시범(3개월) 명시적 목표 3개 중 2개 미달 시 정규 미전환"
+      ],
+      "saas": [
+        "월 이탈률 6% 초과 2개월 연속 시 신규 마케팅 전면 중단 및 제품 재점검",
+        "순매출유지율(NRR) 2분기 연속 100% 미만 시 전략적 매각 프로세스 개시"
+      ],
+      "self": [
+        "EES 4주 연속 55점 미만 시 회복일 월 8회로 자동 확대 및 목표 하향"
+      ]
+    },
+    "forbiddenListYear1": [
+      "유튜브 채널 개설 (Y2 Q1 도서 3권+유료 15명 달성 전 금지)",
+      "대학 출강 지원 (Q3 8주 유료강의 검증 전 금지)",
+      "신규 카테고리 도서 착수 (우선 5권 외 신규 기획 금지)",
+      "시행 직접 참여 (소액 LP 참여 1건 외 자체시행 금지)",
+      "자산운용사·리스사 설립 (Y3 이전 법인 설립 금지)",
+      "오프라인 사무실 임차",
+      "직원 정규 채용 (Y2 이전 1인 체제 유지)",
+      "신규 자격증 취득",
+      "무료 강연·세미나 연사",
+      "지분 없는 자문 활동"
+    ],
+    "assetBridge": [
+      {
+        "axis": "amc",
+        "y10": 500000000000,
+        "y15": 1500000000000,
+        "y20": 3000000000000,
+        "net": 85000000000
+      },
+      {
+        "axis": "devGDV",
+        "y10": 1000000000000,
+        "y15": 3000000000000,
+        "y20": 6000000000000,
+        "net": 250000000000
+      },
+      {
+        "axis": "platform",
+        "y10": 200000000000,
+        "y15": 600000000000,
+        "y20": 1000000000000,
+        "net": 160000000000
+      },
+      {
+        "axis": "realAsset",
+        "y10": 50000000000,
+        "y15": 200000000000,
+        "y20": 500000000000,
+        "net": 250000000000
+      },
+      {
+        "axis": "ip",
+        "y10": 10000000000,
+        "y15": 30000000000,
+        "y20": 50000000000,
+        "net": 30000000000
+      }
+    ],
+    "criticalGate": "AMC 인가 또는 대체경로(공동운용/전문사모/M&A) 확보 — 실패 시 현실적 상한 4~5조"
+  },
+  "engines": [
+    {
+      "id": "E1",
+      "name": "IP·저작",
+      "weight": 0.3,
+      "kpi": "chars",
+      "color": "#6366f1"
+    },
+    {
+      "id": "E2",
+      "name": "개발·시행",
+      "weight": 0.25,
+      "kpi": "gdv",
+      "color": "#f59e0b"
+    },
+    {
+      "id": "E3",
+      "name": "금융·운용",
+      "weight": 0.2,
+      "kpi": "aum",
+      "color": "#10b981"
+    },
+    {
+      "id": "E4",
+      "name": "AI 프로덕트",
+      "weight": 0.15,
+      "kpi": "mrr",
+      "color": "#06b6d4"
+    },
+    {
+      "id": "E5",
+      "name": "자본·인맥",
+      "weight": 0.1,
+      "kpi": "contacts",
+      "color": "#f43f5e"
+    }
+  ],
+  "entities": {
+    "books": [
+      {
+        "id": "bk_1",
+        "title": "건축사가 읽는 돈의 도면",
+        "cat": "B",
+        "status": "writing",
+        "targetPersona": "연 GDV 300억~1,000억 규모 시행사 대표와, 그 딜을 심사하는 PF 심사역",
+        "bpi_target": 12,
+        "royaltyYTD": 0,
+        "targetChars": 270000,
+        "chapters": [
+          {
+            "no": 1,
+            "title": "도면에는 가격표가 붙어 있다",
+            "targetChars": 18000,
+            "writtenChars": 0,
+            "status": "writing"
+          },
+          {
+            "no": 2,
+            "title": "건축사는 왜 돈을 못 버는가",
+            "targetChars": 18000,
+            "writtenChars": 0,
+            "status": "todo"
+          },
+          {
+            "no": 3,
+            "title": "땅을 처음 볼 때 봐야 할 7가지",
+            "targetChars": 18000,
+            "writtenChars": 0,
+            "status": "todo"
+          },
+          {
+            "no": 4,
+            "title": "용적률은 숫자가 아니라 돈이다",
+            "targetChars": 18000,
+            "writtenChars": 0,
+            "status": "todo"
+          },
+          {
+            "no": 5,
+            "title": "첫 수지분석 30분 컷",
+            "targetChars": 18000,
+            "writtenChars": 0,
+            "status": "todo"
+          },
+          {
+            "no": 6,
+            "title": "공사비가 흔들릴 때 지켜야 할 선",
+            "targetChars": 18000,
+            "writtenChars": 0,
+            "status": "todo"
+          },
+          {
+            "no": 7,
+            "title": "인허가는 시간이고 시간은 이자다",
+            "targetChars": 18000,
+            "writtenChars": 0,
+            "status": "todo"
+          },
+          {
+            "no": 8,
+            "title": "브릿지론이라는 외줄",
+            "targetChars": 18000,
+            "writtenChars": 0,
+            "status": "todo"
+          },
+          {
+            "no": 9,
+            "title": "본PF의 문턱을 넘는 조건",
+            "targetChars": 18000,
+            "writtenChars": 0,
+            "status": "todo"
+          },
+          {
+            "no": 10,
+            "title": "신탁, 안전장치인가 족쇄인가",
+            "targetChars": 18000,
+            "writtenChars": 0,
+            "status": "todo"
+          },
+          {
+            "no": 11,
+            "title": "분양과 임대, 출구의 갈림길",
+            "targetChars": 18000,
+            "writtenChars": 0,
+            "status": "todo"
+          },
+          {
+            "no": 12,
+            "title": "실패한 현장 6곳의 부검",
+            "targetChars": 18000,
+            "writtenChars": 0,
+            "status": "todo"
+          },
+          {
+            "no": 13,
+            "title": "설계자에서 시행자로",
+            "targetChars": 18000,
+            "writtenChars": 0,
+            "status": "todo"
+          },
+          {
+            "no": 14,
+            "title": "AI가 수지분석을 대신할 때",
+            "targetChars": 18000,
+            "writtenChars": 0,
+            "status": "todo"
+          },
+          {
+            "no": 15,
+            "title": "다음 10년, 어떤 건물이 돈이 되는가",
+            "targetChars": 18000,
+            "writtenChars": 0,
+            "status": "todo"
+          }
+        ]
+      }
+    ],
+    "deals": [],
+    "contacts": [],
+    "products": [
+      {
+        "id": "prd_1",
+        "name": "Daily Flow Pro (1% Life OS)",
+        "mrr": 0,
+        "arr": 0,
+        "ownership": 1,
+        "stage": "beta"
+      }
+    ],
+    "assets": [],
+    "ip": [],
+    "skills": [],
+    "prompts": []
+  },
   "goals": [
     {
       "title": "부동산 금융 & 디벨로퍼 시스템",
       "id": "g1",
       "progress": 40
+    }
+  ],
+  "principles": [
+    {
+      "title": "거절이 전략이다",
+      "category": "execution",
+      "id": "p1"
     }
   ],
   "memos": [
@@ -13,9 +407,67 @@
       "id": "m1"
     }
   ],
-  "meta": {
-    "tz": "Asia/Seoul",
-    "schema": 2
+  "trillionMastery": {
+    "vision": "지배자산 10조 / 순자산 8,000억~1.2조",
+    "val1": "거절이 전략이다",
+    "val2": "비대칭에만 베팅한다",
+    "val3": "기록의 무결성은 타협하지 않는다",
+    "ideas": [
+      {
+        "id": "tidea_1",
+        "title": "부동산 수지분석 AI 프롭테크 SaaS (Daily Flow Pro)",
+        "content": "수지분석 30분 컷 및 딜 파이프라인 관리 B2B 솔루션. ARR 800억 플랫폼 구축.",
+        "category": "business",
+        "createdAt": "2026-08-18T13:04:23.295Z"
+      },
+      {
+        "id": "tidea_2",
+        "title": "100권 저작 기반 1,200인 BPI 앵커 LP 네트워크",
+        "content": "책을 읽고 유입된 의사결정권자 DB를 AUM 3조 운용 자본으로 조직화.",
+        "category": "invest",
+        "createdAt": "2026-08-18T13:04:23.295Z"
+      }
+    ]
+  },
+  "targets": {
+    "year1": {
+      "books": 3,
+      "chars": 900000,
+      "contacts": 48,
+      "mrr": 3000000,
+      "billableRatio": 0.8,
+      "decisions": 700
+    },
+    "quarter": {
+      "books": 1,
+      "chars": 225000,
+      "contacts": 12,
+      "deals": 0,
+      "decisions": 180
+    },
+    "month": {
+      "books": 0,
+      "chars": 75000,
+      "contacts": 4,
+      "decisions": 60,
+      "refusals": 2,
+      "workouts": 16
+    },
+    "week": {
+      "chars": 18000,
+      "deepMin": 900,
+      "contacts": 1,
+      "decisions": 15,
+      "billableHours": 40,
+      "workouts": 4,
+      "refusals": 1
+    },
+    "day": {
+      "chars": 3600,
+      "deepMin": 90,
+      "decisions": 3,
+      "sleepMin": 420
+    }
   },
   "days": {
     "2026-08-18": {
@@ -29,7 +481,319 @@
         ],
         "content": "오늘 하루 3,600자 집필과 1% Life OS 시스템을 정비하였다."
       },
-      "mood": "great"
+      "mood": "great",
+      "ees": {
+        "date": "2026-08-18",
+        "authoring": 0,
+        "capital": 0,
+        "transition": 20,
+        "decision": 9,
+        "total": 29,
+        "grade": "D",
+        "color": "#f43f5e",
+        "raw": {
+          "chars": 0,
+          "contacts": 0,
+          "dealMoves": 0,
+          "billableH": 0,
+          "logged": 0,
+          "reviewRate": 60
+        }
+      },
+      "commands": [
+        {
+          "block": "05:30–07:00",
+          "min": 90,
+          "engineId": "E1",
+          "type": "write",
+          "entityId": "bk_1",
+          "text": "『건축사가 읽는 돈의 도면』 Ch.1 「도면에는 가격표가 붙어 있다」 3,600자",
+          "why": "기상 직후는 아무도 요구하지 않는 유일한 시간"
+        },
+        {
+          "block": "20:00–20:50",
+          "min": 50,
+          "engineId": "E1",
+          "type": "write",
+          "text": "집필 보충 블록 — 부족분 채우기",
+          "why": "저작 축 최저"
+        }
+      ]
+    },
+    "2026-08-17": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": {
+        "date": "2026-08-17",
+        "authoring": 0,
+        "capital": 0,
+        "transition": 20,
+        "decision": 9,
+        "total": 29,
+        "grade": "D",
+        "color": "#f43f5e",
+        "raw": {
+          "chars": 0,
+          "contacts": 0,
+          "dealMoves": 0,
+          "billableH": 0,
+          "logged": 0,
+          "reviewRate": 60
+        }
+      },
+      "commands": []
+    },
+    "2026-08-16": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-08-15": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-08-14": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-08-13": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-08-12": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
     }
   },
   "decisions": [
@@ -39,11 +803,46 @@
       "question": "17개 역할 중 중단할 것은?"
     }
   ],
-  "principles": [
-    {
-      "title": "거절이 전략이다",
-      "category": "execution",
-      "id": "p1"
-    }
-  ]
+  "leaks": [],
+  "reports": [],
+  "settings": {
+    "theme": "dark",
+    "userName": "결정디자이너",
+    "geminiApiKey": "",
+    "geminiModel": "gemini-1.5-flash",
+    "aiPersona": "fact",
+    "autoBackupDays": 7,
+    "downgradeGuard": true,
+    "recoveryDaysPerMonth": 4,
+    "defaultHabits": [
+      {
+        "id": "h1",
+        "name": "기상 후 90분 집필 (3,600자)",
+        "icon": "✍️",
+        "engineId": "E1",
+        "target": 1
+      },
+      {
+        "id": "h2",
+        "name": "운동 45분 (주 4회)",
+        "icon": "🏃",
+        "engineId": null,
+        "target": 1
+      },
+      {
+        "id": "h3",
+        "name": "결정 로그 3건 기록",
+        "icon": "🧭",
+        "engineId": null,
+        "target": 1
+      },
+      {
+        "id": "h4",
+        "name": "수면 7시간 확보",
+        "icon": "😴",
+        "engineId": null,
+        "target": 1
+      }
+    ]
+  }
 }
