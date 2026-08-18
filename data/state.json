@@ -1,0 +1,49 @@
+{
+  "goals": [
+    {
+      "title": "부동산 금융 & 디벨로퍼 시스템",
+      "id": "g1",
+      "progress": 40
+    }
+  ],
+  "memos": [
+    {
+      "title": "아이디어 1",
+      "category": "idea",
+      "id": "m1"
+    }
+  ],
+  "meta": {
+    "tz": "Asia/Seoul",
+    "schema": 2
+  },
+  "days": {
+    "2026-08-18": {
+      "journal": {
+        "updatedAt": "2026-08-18",
+        "title": "도면에는 가격표가 붙어 있다",
+        "tags": [
+          "집필",
+          "10조",
+          "부동산"
+        ],
+        "content": "오늘 하루 3,600자 집필과 1% Life OS 시스템을 정비하였다."
+      },
+      "mood": "great"
+    }
+  },
+  "decisions": [
+    {
+      "chosen": "10개 금지 목록 준수",
+      "id": "dc1",
+      "question": "17개 역할 중 중단할 것은?"
+    }
+  ],
+  "principles": [
+    {
+      "title": "거절이 전략이다",
+      "category": "execution",
+      "id": "p1"
+    }
+  ]
+}

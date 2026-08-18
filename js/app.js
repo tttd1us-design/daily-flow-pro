@@ -8,6 +8,9 @@ import { Dashboard } from './dashboard.js';
 import { Journal } from './journal.js';
 import { Calendar } from './calendar.js';
 import { Analytics } from './analytics.js';
+import { todayKST, shiftDate } from './utils.js';
+import { TenTrillion } from './ten-trillion.js';
+import { paintEES } from './ees.js';
 
 const QUOTES = [
   "작은 진전이 모여 큰 성취를 이룬다.",
@@ -22,7 +25,7 @@ const QUOTES = [
 
 class App {
   constructor() {
-    this.currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    this.currentDate = todayKST(); // YYYY-MM-DD
     this.activeTab = 'dashboard';
 
     this.initTheme();
@@ -72,6 +75,8 @@ class App {
     this.journal = new Journal(this);
     this.calendar = new Calendar(this);
     this.analytics = new Analytics(this);
+    this.tenTrillion = new TenTrillion(this);
+    paintEES(this.currentDate);
   }
 
   bindEvents() {
@@ -86,7 +91,7 @@ class App {
     // Date Navigation
     this.prevDayBtn.addEventListener('click', () => this.shiftDate(-1));
     this.nextDayBtn.addEventListener('click', () => this.shiftDate(1));
-    this.todayQuickBtn.addEventListener('click', () => this.setDate(new Date().toISOString().split('T')[0]));
+    this.todayQuickBtn.addEventListener('click', () => this.setDate(todayKST()));
 
     this.datePicker.addEventListener('change', (e) => {
       if (e.target.value) {
@@ -185,9 +190,7 @@ class App {
   }
 
   shiftDate(deltaDays) {
-    const d = new Date(this.currentDate);
-    d.setDate(d.getDate() + deltaDays);
-    const newDateStr = d.toISOString().split('T')[0];
+    const newDateStr = shiftDate(this.currentDate, deltaDays);
     this.setDate(newDateStr);
   }
 
@@ -195,10 +198,12 @@ class App {
     this.updateDateDisplay(dateStr);
     this.dashboard.loadForDate(dateStr);
     this.journal.loadForDate(dateStr);
+    this.tenTrillion?.setDate(dateStr);
+    paintEES(dateStr);
   }
 
   updateDateDisplay(dateStr) {
-    const today = new Date().toISOString().split('T')[0];
+    const today = todayKST();
     const [year, month, day] = dateStr.split('-').map(Number);
     const dObj = new Date(year, month - 1, day);
     

@@ -1,0 +1,3 @@
+@echo off
+cd /d "C:\Users\tttd1\.gemini\antigravity\scratch\daily-dashboard-journal"
+powershell -NoProfile -WindowStyle Hidden -Command "if (-not (Test-NetConnection -ComputerName 127.0.0.1 -Port 8000 -InformationLevel Quiet -WarningAction SilentlyContinue)) { Start-Process python -ArgumentList 'server.py' -WorkingDirectory 'C:\Users\tttd1\.gemini\antigravity\scratch\daily-dashboard-journal' -WindowStyle Hidden; Start-Sleep -Milliseconds 1000 }; Start-Process 'http://127.0.0.1:8000'"

@@ -1,477 +1,12 @@
 /**
- * Daily Flow Pro - 1% Life OS (Commercial Grade Engine)
- * Features:
- * 1. Unlimited IndexedDB Async Storage Engine
- * 2. All-Tab Sidebar Calendar Integration (Dashboard, AI Coach, Study, Goals, Journal, Principles)
- * 3. Deep Focus Zen Mode (Full-screen immersion)
- * 4. Smart Uncompleted Task Rollover System (Zero-leak execution)
- * 5. Gemini 1% Elite Fact-Coaching Engine (Persona-based)
- * 6. Knowledge Wiki & Daily Study Hub with Multi-image attachment
+ * Daily Flow Pro - 1% Life OS (Commercial Grade Engine v2.0)
+ * Integrated with KST Engine, TenTrillion Mastery, EES 4-Axis Realtime Calculator & Valuation Ledger
  */
-
-// =========================================================================
-// 1. Storage Manager (IndexedDB Engine + In-Memory Cache + LocalStorage Fallback)
-// =========================================================================
-const DB_NAME = 'DailyFlowProDB_v1';
-const DB_VERSION = 1;
-const STORE_NAME = 'life_os_store';
-const LS_FALLBACK_KEY = 'daily_flow_pro_state_v9';
-
-const DEFAULT_PRINCIPLES = [
-  { id: 'p1', category: 'execution', title: '완벽주의를 버리고 가장 작은 행동부터 즉각 실행한다', content: '생각이 길어지면 뇌는 핑계를 찾는다. 5분 안에 착수할 수 있는 가장 단순한 행동으로 몰입을 유도한다.' },
-  { id: 'p2', category: 'growth', title: '하루 1시간 복리 지식은 1년 뒤 압도적 격차를 만든다', content: '단순히 일만 하는 것이 아니라, 매일 배운 지식을 기록하고 실무에 적용하여 나만의 지식 자산을 구축한다.' },
-  { id: 'p3', category: 'mindset', title: '통제할 수 없는 환경에 불평하지 않고 내 행동에만 집중한다', content: '외부 변수는 내가 바꿀 수 없다. 오늘 내가 선택하고 실행할 수 있는 단 하나의 우선순위에 모든 에너지를 쏟는다.' }
-];
-
-const DEFAULT_GOALS = [
-  {
-    id: 'g1',
-    pillar: 'career',
-    horizon: 'long',
-    title: '데이터 기반 직무 전문성 확보 및 시니어 전문가 도약',
-    keyResult: '실전 포트폴리오 3편 완성 & 직무 핵심 자격증 취득',
-    actions: ['주 3회 퇴근 후 1시간 전문 강의 수강', '분기별 실전 프로젝트 1건 깃허브/블로그 정리', '월 1회 업계 동향 및 네트워킹 스터디 참석'],
-    deadline: '2027-12-31',
-    progress: 40
-  },
-  {
-    id: 'g2',
-    pillar: 'wealth',
-    horizon: 'mid',
-    title: '경제적 자유를 위한 투자 파이프라인 및 시드 1억 달성',
-    keyResult: '월 저축률 60% 유지 & 배당/지수 ETF 포트폴리오 구축',
-    actions: ['월급날 자동 투자 60% 선저축 집행', '매주 주말 경제 기사 및 기업 분석 리포트 2편 읽기', '불필요한 고정 지출 15% 절감'],
-    deadline: '2026-12-31',
-    progress: 65
-  },
-  {
-    id: 'g3',
-    pillar: 'health',
-    horizon: 'short',
-    title: '체지방 15% 달성 & 딥워크를 위한 최상 컨디션 유지',
-    keyResult: '주 4회 헬스/러닝 & 하루 수면 7.5시간 확보',
-    actions: ['퇴근 후 헬스장 50분 운동 루틴 완료', '기상 직후 미온수 500ml 섭취', '취침 1시간 전 스마트폰 끄고 독서 20분'],
-    deadline: '2026-09-30',
-    progress: 50
-  }
-];
-
-const DEFAULT_STATE = {
-  settings: {
-    theme: 'dark',
-    userName: '프로 직장인 & 성장가',
-    geminiApiKey: '',
-    geminiModel: 'gemini-1.5-flash',
-    aiPersona: 'fact',
-    defaultHabits: [
-      { id: 'h1', name: '핵심 목표 연계 공부 1시간', icon: '📚' },
-      { id: 'h2', name: '오늘의 To-Do 100% 완료 체크', icon: '⚡' },
-      { id: 'h3', name: '하루 일기 & 5단계 회고', icon: '✍️' },
-      { id: 'h4', name: '체력 관리 운동 30분', icon: '🏃' }
-    ]
-  },
-  goals: DEFAULT_GOALS,
-  principles: DEFAULT_PRINCIPLES,
-  days: {}
-};
-
-class IndexedDBStorageManager {
-  constructor() {
-    this.data = JSON.parse(JSON.stringify(DEFAULT_STATE));
-    this.db = null;
-    this.isReady = false;
-  }
-
-  async init() {
-    try {
-      this.db = await this.openIndexedDB();
-      const savedData = await this.getFromDB('root_state');
-      if (savedData) {
-        this.data = {
-          settings: { ...DEFAULT_STATE.settings, ...(savedData.settings || {}) },
-          goals: savedData.goals || DEFAULT_GOALS,
-          principles: savedData.principles || DEFAULT_PRINCIPLES,
-          days: savedData.days || {}
-        };
-      } else {
-        const lsData = localStorage.getItem(LS_FALLBACK_KEY);
-        if (lsData) {
-          const parsed = JSON.parse(lsData);
-          this.data = { ...DEFAULT_STATE, ...parsed };
-        }
-        await this.saveData();
-      }
-    } catch (e) {
-      console.warn('IndexedDB unavailable, falling back to LocalStorage:', e);
-      const lsData = localStorage.getItem(LS_FALLBACK_KEY);
-      if (lsData) {
-        this.data = JSON.parse(lsData);
-      }
-    }
-    this.ensureSampleData();
-    this.isReady = true;
-    return this.data;
-  }
-
-  openIndexedDB() {
-    return new Promise((resolve, reject) => {
-      if (!window.indexedDB) return reject(new Error('IndexedDB not supported'));
-      const req = indexedDB.open(DB_NAME, DB_VERSION);
-      req.onupgradeneeded = (e) => {
-        const db = e.target.result;
-        if (!db.objectStoreNames.contains(STORE_NAME)) {
-          db.createObjectStore(STORE_NAME);
-        }
-      };
-      req.onsuccess = (e) => resolve(e.target.result);
-      req.onerror = (e) => reject(e.target.error);
-    });
-  }
-
-  async getFromDB(key) {
-    if (!this.db) return null;
-    return new Promise((resolve) => {
-      const tx = this.db.transaction(STORE_NAME, 'readonly');
-      const store = tx.objectStore(STORE_NAME);
-      const req = store.get(key);
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => resolve(null);
-    });
-  }
-
-  async setInDB(key, val) {
-    if (!this.db) return;
-    return new Promise((resolve) => {
-      const tx = this.db.transaction(STORE_NAME, 'readwrite');
-      const store = tx.objectStore(STORE_NAME);
-      store.put(val, key);
-      tx.oncomplete = () => resolve(true);
-      tx.onerror = () => resolve(false);
-    });
-  }
-
-  async saveData() {
-    if (this.db) {
-      await this.setInDB('root_state', this.data);
-    }
-    try {
-      const shallowCopy = JSON.parse(JSON.stringify(this.data));
-      for (const day of Object.values(shallowCopy.days)) {
-        if (day.study && day.study.photos) {
-          day.study.photos = day.study.photos.map(p => p.length > 500 ? '[IMAGE_IN_IDB]' : p);
-        }
-      }
-      localStorage.setItem(LS_FALLBACK_KEY, JSON.stringify(shallowCopy));
-    } catch (e) {
-      console.warn('LS sync skipped:', e);
-    }
-  }
-
-  getDayData(dateStr) {
-    if (!this.data.days[dateStr]) {
-      this.data.days[dateStr] = {
-        focus: '',
-        mood: '',
-        todos: [],
-        habits: {},
-        timeBlocks: [],
-        study: { topic: '', til: '', goalHours: 2.0, actualHours: 0, notes: '', photos: [] },
-        condition: { water: 0, energy: 50, sleep: 7.0, memo: '' },
-        journal: { title: '', content: '', tags: [], photos: [], updatedAt: null },
-        aiChatHistory: []
-      };
-      this.saveData();
-    }
-    if (this.data.days[dateStr].study && !this.data.days[dateStr].study.photos) {
-      this.data.days[dateStr].study.photos = [];
-    }
-    return this.data.days[dateStr];
-  }
-
-  updateDayData(dateStr, partialData) {
-    const current = this.getDayData(dateStr);
-    this.data.days[dateStr] = {
-      ...current,
-      ...partialData,
-      study: { ...current.study, ...(partialData.study || {}) },
-      condition: { ...current.condition, ...(partialData.condition || {}) },
-      journal: { ...current.journal, ...(partialData.journal || {}) }
-    };
-    this.saveData();
-    return this.data.days[dateStr];
-  }
-
-  getGoals() { return this.data.goals || []; }
-
-  addGoal(goal) {
-    const newG = { id: 'g_' + Date.now(), progress: 0, ...goal };
-    this.data.goals.unshift(newG);
-    this.saveData();
-    return newG;
-  }
-
-  updateGoal(goalId, partialGoal) {
-    const idx = this.data.goals.findIndex(g => g.id === goalId);
-    if (idx !== -1) {
-      this.data.goals[idx] = { ...this.data.goals[idx], ...partialGoal };
-      this.saveData();
-    }
-  }
-
-  deleteGoal(goalId) {
-    this.data.goals = this.data.goals.filter(g => g.id !== goalId);
-    this.saveData();
-  }
-
-  getHabits() { return this.data.settings.defaultHabits || []; }
-
-  addHabit(name, icon = '✨') {
-    const newH = { id: 'h_' + Date.now(), name, icon };
-    this.data.settings.defaultHabits.push(newH);
-    this.saveData();
-    return newH;
-  }
-
-  deleteHabit(habitId) {
-    this.data.settings.defaultHabits = this.data.settings.defaultHabits.filter(h => h.id !== habitId);
-    this.saveData();
-  }
-
-  getPrinciples() { return this.data.principles || []; }
-
-  addPrinciple(category, title, content) {
-    const newP = { id: 'p_' + Date.now(), category, title, content };
-    this.data.principles.unshift(newP);
-    this.saveData();
-    return newP;
-  }
-
-  deletePrinciple(pId) {
-    this.data.principles = this.data.principles.filter(p => p.id !== pId);
-    this.saveData();
-  }
-
-  // ==========================================
-  // 💡 Memos CRUD (아이디어 퀵 메모)
-  // ==========================================
-  getMemos() {
-    if (!this.data.memos) this.data.memos = [];
-    return this.data.memos;
-  }
-
-  addMemo(memo) {
-    if (!this.data.memos) this.data.memos = [];
-    const newM = {
-      id: 'memo_' + Date.now(),
-      title: memo.title || '새로운 아이디어',
-      content: memo.content || '',
-      category: memo.category || 'idea',
-      pinned: memo.pinned || false,
-      date: memo.date || new Date().toISOString().split('T')[0],
-      createdAt: new Date().toISOString()
-    };
-    this.data.memos.unshift(newM);
-    this.saveData();
-    return newM;
-  }
-
-  updateMemo(id, partialMemo) {
-    if (!this.data.memos) this.data.memos = [];
-    const idx = this.data.memos.findIndex(m => m.id === id);
-    if (idx !== -1) {
-      this.data.memos[idx] = { ...this.data.memos[idx], ...partialMemo };
-      this.saveData();
-    }
-  }
-
-  // ==========================================
-  // 🏛️ Trillion Lifetime Mastery Storage (비전, 가치, 아이디어뱅크)
-  // ==========================================
-  getTrillionMastery() {
-    if (!this.data.trillionMastery) {
-      this.data.trillionMastery = {
-        vision: '',
-        val1: '',
-        val2: '',
-        val3: '',
-        ideas: [
-          {
-            id: 'tidea_1',
-            title: '글로벌 엔터프라이즈 AI 자동화 파이프라인 플랫폼',
-            content: '기업의 반복 노동을 90% 제거하는 소프트웨어 시스템. SaaS 구독 모델로 전 세계 B2B 확장성 확보.',
-            category: 'business',
-            createdAt: new Date().toISOString()
-          },
-          {
-            id: 'tidea_2',
-            title: '독점적 현금흐름 창출 부동산 및 우량 인덱스 복리 매수',
-            content: '매월 창출되는 잉여 현금을 가장 안전하고 강력한 배당/인덱스 자산으로 기계적 재투자.',
-            category: 'invest',
-            createdAt: new Date().toISOString()
-          }
-        ]
-      };
-      this.saveData();
-    }
-    return this.data.trillionMastery;
-  }
-
-  updateTrillionMastery(partial) {
-    const current = this.getTrillionMastery();
-    this.data.trillionMastery = { ...current, ...partial };
-    this.saveData();
-    return this.data.trillionMastery;
-  }
-
-  addTrillionIdea(idea) {
-    const mastery = this.getTrillionMastery();
-    const newIdea = {
-      id: 'tidea_' + Date.now(),
-      title: idea.title || '10조 아이디어',
-      content: idea.content || '',
-      category: idea.category || 'business',
-      createdAt: new Date().toISOString()
-    };
-    mastery.ideas.unshift(newIdea);
-    this.saveData();
-    return newIdea;
-  }
-
-  deleteTrillionIdea(id) {
-    const mastery = this.getTrillionMastery();
-    mastery.ideas = mastery.ideas.filter(i => i.id !== id);
-    this.saveData();
-  }
-
-  getAllJournals() {
-    const list = [];
-    for (const [dateStr, day] of Object.entries(this.data.days)) {
-      if (day.journal && (day.journal.title || day.journal.content)) {
-        list.push({
-          date: dateStr,
-          mood: day.mood || 'neutral',
-          title: day.journal.title || `${dateStr}의 일기`,
-          content: day.journal.content || '',
-          tags: day.journal.tags || [],
-          photos: day.journal.photos || [],
-          updatedAt: day.journal.updatedAt || dateStr
-        });
-      }
-    }
-    return list.sort((a, b) => b.date.localeCompare(a.date));
-  }
-
-  getAllStudies() {
-    const list = [];
-    for (const [dateStr, day] of Object.entries(this.data.days)) {
-      if (day.study && (day.study.topic || day.study.til || day.study.notes || day.study.actualHours > 0 || (day.study.photos && day.study.photos.length > 0))) {
-        list.push({
-          date: dateStr,
-          topic: day.study.topic || '공부 주제 미지정',
-          til: day.study.til || '',
-          actualHours: day.study.actualHours || 0,
-          goalHours: day.study.goalHours || 2.0,
-          notes: day.study.notes || '',
-          photos: day.study.photos || []
-        });
-      }
-    }
-    return list.sort((a, b) => b.date.localeCompare(a.date));
-  }
-
-  exportJson() {
-    const dataStr = JSON.stringify(this.data, null, 2);
-    const blob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `data_state.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  exportGoalsJson() {
-    const dataStr = JSON.stringify(this.data.goals || [], null, 2);
-    const blob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `goals.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  exportPrinciplesJson() {
-    const dataStr = JSON.stringify(this.data.principles || [], null, 2);
-    const blob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `principles.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  async importJson(jsonString) {
-    try {
-      const parsed = JSON.parse(jsonString);
-      if (!parsed.days) throw new Error('올바르지 않은 백업 파일 형식입니다.');
-      this.data = parsed;
-      await this.saveData();
-      return true;
-    } catch (e) {
-      console.error('Import error:', e);
-      return false;
-    }
-  }
-
-  async resetAllData() {
-    this.data = JSON.parse(JSON.stringify(DEFAULT_STATE));
-    this.ensureSampleData();
-    await this.saveData();
-  }
-
-  ensureSampleData() {
-    const today = new Date().toISOString().split('T')[0];
-    if (!this.data.days[today]) {
-      this.data.days[today] = {
-        focus: '데이터 분석 핵심 알고리즘 2시간 마스터 및 보고서 초안 완성',
-        mood: 'great',
-        todos: [
-          { id: 't1', text: '[커리어] 데이터 분석 심화 2시간 집중 수강 및 실습', category: 'career', completed: true },
-          { id: 't2', text: '[재테크] 이번 달 지출 내역 점검 및 ETF 자동 적립 확인', category: 'wealth', completed: true },
-          { id: 't3', text: '[건강] 퇴근 후 헬스장 40분 웨이트 & 러닝 20분', category: 'health', completed: false }
-        ],
-        habits: { 'h1': true, 'h2': true, 'h3': false, 'h4': true },
-        timeBlocks: [
-          { id: 'tb1', start: '09:00', end: '11:00', title: '💼 직무 핵심 보고서 딥워크 집중 작성', category: 'career' },
-          { id: 'tb2', start: '14:00', end: '16:00', title: '📚 데이터 분석 실전 알고리즘 공부', category: 'study' },
-          { id: 'tb3', start: '20:30', end: '21:30', title: '✍️ 하루 실행 점검 & 5단계 회고 일기', category: 'career' }
-        ],
-        study: {
-          topic: '데이터 기반 비즈니스 의사결정 및 SQL 고급 쿼리',
-          til: '복잡한 지표일수록 핵심 KPI 1가지에 집중하여 데이터 파이프라인을 단순화하는 것이 실행 속도를 높인다.',
-          goalHours: 2.0,
-          actualHours: 2.0,
-          notes: '### 💡 오늘의 핵심 배움\n1. Window Function을 활용한 시계열 누적 데이터 집계\n2. 가설 수립 -> A/B 테스트 -> 신속한 의사결정 사이클',
-          photos: []
-        },
-        condition: { water: 6, energy: 85, sleep: 7.5, memo: '1% 몰입 모드로 하루 실행력이 극대화됨!' },
-        journal: {
-          title: '장기 비전을 오늘의 구체적 실행으로 연결하는 하루',
-          content: `### 🌟 오늘의 생각과 사유\n\n내 인생의 5대 영역 목표를 명확히 세우고, 거기서 파생된 단 하나의 행동을 오늘 To-Do로 끌어오니 일과 삶의 방향성이 선명해졌다.\n\n### 🚀 내일을 위한 구체적 실행 가이드\n- [ ] [커리어] 데이터 분석 2강 완강 및 깃허브 코드 업로드\n- [ ] [재테크] 주말 스터디를 위한 반도체 섹터 분석 리포트 1편 독서\n- [ ] [건강] 아침 스트레칭 15분 & 저녁 조깅 30분\n\n### 📚 오늘 위주로 공부한 핵심 주제\n- SQL 데이터 분석 및 비즈니스 KPI 지표 모델링\n\n> "목표를 시각화하고 매일 구체적으로 행동하는 사람만이 인생을 주도한다."`,
-          tags: ['인생목표', '커리어', '실행력', 'GeminiAI'],
-          photos: [],
-          updatedAt: new Date().toISOString()
-        }
-      };
-      this.saveData();
-    }
-  }
-}
-
-const storage = new IndexedDBStorageManager();
-
+import { todayKST, nowHM, shiftDate, fmtKRW, daysBetween, lastNDays, sum } from './utils.js';
+import { storage } from './storage.js';
+import { computeEES, paintEES, weeklyEES, closeWeek } from './ees.js';
+import { TenTrillion } from './ten-trillion.js';
+import { controlAssets, netWorth, LEDGER_RULES } from './valuation.js';
 // =========================================================================
 // 2. Gemini 1% Elite Fact-Coaching REST API Client
 // =========================================================================
@@ -608,7 +143,7 @@ const QUOTES = [
 // =========================================================================
 class DailyFlowApp {
   constructor() {
-    this.currentDate = new Date().toISOString().split('T')[0];
+    this.currentDate = todayKST();
     this.activeTab = 'dashboard';
     this.isPreviewMode = false;
     this.autoSaveTimer = null;
@@ -657,6 +192,11 @@ class DailyFlowApp {
     this.startClock();
     this.showRandomQuote();
     this.updateGeminiStatusBadge();
+
+    window.app = this;
+    window.dailyFlowApp = this;
+    this.tenTrillion = new TenTrillion(this);
+    paintEES(this.currentDate);
 
     this.loadDate(this.currentDate);
   }
@@ -1004,10 +544,10 @@ class DailyFlowApp {
   bindEvents() {
     // Navigation
     this.navItems.forEach(item => {
-      item.addEventListener('click', () => this.switchTab(item.dataset.tab));
+      item?.addEventListener('click', () => this.switchTab(item.dataset.tab));
     });
     if (this.quickStudyBtn) {
-      this.quickStudyBtn.addEventListener('click', () => this.switchTab('study'));
+      this.quickStudyBtn?.addEventListener('click', () => this.switchTab('study'));
     }
 
     // ==========================================
@@ -1026,32 +566,32 @@ class DailyFlowApp {
       this.zenModeOverlay.style.display = 'none';
     };
 
-    if (this.zenModeToggleBtn) this.zenModeToggleBtn.addEventListener('click', enterZen);
-    if (this.zenModeHeaderBtn) this.zenModeHeaderBtn.addEventListener('click', enterZen);
-    if (this.exitZenModeBtn) this.exitZenModeBtn.addEventListener('click', exitZen);
+    if (this.zenModeToggleBtn) this.zenModeToggleBtn?.addEventListener('click', enterZen);
+    if (this.zenModeHeaderBtn) this.zenModeHeaderBtn?.addEventListener('click', enterZen);
+    if (this.exitZenModeBtn) this.exitZenModeBtn?.addEventListener('click', exitZen);
 
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && this.isZenMode) exitZen();
     });
 
     if (this.zenStartTimerBtn) {
-      this.zenStartTimerBtn.addEventListener('click', () => {
+      this.zenStartTimerBtn?.addEventListener('click', () => {
         if (this.timerRunning) this.pauseTimer();
         else this.startTimer();
       });
     }
     if (this.zenResetTimerBtn) {
-      this.zenResetTimerBtn.addEventListener('click', () => this.resetTimer());
+      this.zenResetTimerBtn?.addEventListener('click', () => this.resetTimer());
     }
 
     // ==========================================
     // 🚨 과업 이월 (Rollover)
     // ==========================================
     if (this.rolloverApplyBtn) {
-      this.rolloverApplyBtn.addEventListener('click', () => this.applyTaskRollover());
+      this.rolloverApplyBtn?.addEventListener('click', () => this.applyTaskRollover());
     }
     if (this.rolloverDismissBtn) {
-      this.rolloverDismissBtn.addEventListener('click', () => {
+      this.rolloverDismissBtn?.addEventListener('click', () => {
         this.rolloverBanner.style.display = 'none';
       });
     }
@@ -1060,7 +600,7 @@ class DailyFlowApp {
     // ⭐ 전 탭 우측 캘린더 네비게이션 버튼 이벤트 바인딩 ⭐
     // ==========================================
     document.querySelectorAll('[data-cal-action]').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn?.addEventListener('click', () => {
         const action = btn.dataset.calAction;
         const target = btn.dataset.target || 'dashboard';
         const st = this.tabCalState[target] || this.tabCalState.dashboard;
@@ -1085,7 +625,7 @@ class DailyFlowApp {
     // Dashboard Trouble Chat
     // ==========================================
     if (this.dashChatForm) {
-      this.dashChatForm.addEventListener('submit', async (e) => {
+      this.dashChatForm?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const trouble = this.dashChatInput.value.trim();
         if (!trouble) return;
@@ -1095,13 +635,13 @@ class DailyFlowApp {
     }
 
     document.querySelectorAll('.trouble-chip').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn?.addEventListener('click', () => {
         this.handleDashboardTroubleChat(btn.dataset.trouble);
       });
     });
 
     if (this.clearDashChatBtn) {
-      this.clearDashChatBtn.addEventListener('click', () => {
+      this.clearDashChatBtn?.addEventListener('click', () => {
         this.dashChatMessages.innerHTML = `
           <div class="dash-chat-bubble bot">
             <div class="bubble-avatar"><i class="fa-solid fa-robot"></i></div>
@@ -1118,7 +658,7 @@ class DailyFlowApp {
     // Study Notes & Photo & Copy
     // ==========================================
     if (this.copyStudyNotesBtn) {
-      this.copyStudyNotesBtn.addEventListener('click', () => {
+      this.copyStudyNotesBtn?.addEventListener('click', () => {
         const topic = this.studyMainTopicInput.value.trim();
         const til = this.studyTilSummaryInput.value.trim();
         const notes = this.studyDetailedNotes.value.trim();
@@ -1135,7 +675,7 @@ class DailyFlowApp {
     }
 
     if (this.dashCopyTilBtn) {
-      this.dashCopyTilBtn.addEventListener('click', () => {
+      this.dashCopyTilBtn?.addEventListener('click', () => {
         const til = this.todayStudyTIL.value.trim();
         const topic = this.todayStudyTopic.value.trim();
         if (!til && !topic) {
@@ -1149,7 +689,7 @@ class DailyFlowApp {
     }
 
     if (this.studyPhotoInput) {
-      this.studyPhotoInput.addEventListener('change', (e) => {
+      this.studyPhotoInput?.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
         if (!file.type.startsWith('image/')) {
@@ -1180,13 +720,13 @@ class DailyFlowApp {
     };
     const closeGemini = () => this.geminiModal.classList.remove('active');
 
-    if (this.geminiStatusBtn) this.geminiStatusBtn.addEventListener('click', openGemini);
-    if (this.openGeminiModalBtn) this.openGeminiModalBtn.addEventListener('click', openGemini);
-    if (this.closeGeminiModalBtn) this.closeGeminiModalBtn.addEventListener('click', closeGemini);
-    if (this.cancelGeminiModalBtn) this.cancelGeminiModalBtn.addEventListener('click', closeGemini);
+    if (this.geminiStatusBtn) this.geminiStatusBtn?.addEventListener('click', openGemini);
+    if (this.openGeminiModalBtn) this.openGeminiModalBtn?.addEventListener('click', openGemini);
+    if (this.closeGeminiModalBtn) this.closeGeminiModalBtn?.addEventListener('click', closeGemini);
+    if (this.cancelGeminiModalBtn) this.cancelGeminiModalBtn?.addEventListener('click', closeGemini);
 
     if (this.saveGeminiKeyBtn) {
-      this.saveGeminiKeyBtn.addEventListener('click', async () => {
+      this.saveGeminiKeyBtn?.addEventListener('click', async () => {
         const key = this.geminiApiKeyInput.value.trim();
         const model = this.geminiModelSelect.value;
         storage.data.settings.geminiApiKey = key;
@@ -1203,7 +743,7 @@ class DailyFlowApp {
     }
 
     if (this.removeGeminiKeyBtn) {
-      this.removeGeminiKeyBtn.addEventListener('click', async () => {
+      this.removeGeminiKeyBtn?.addEventListener('click', async () => {
         storage.data.settings.geminiApiKey = '';
         await storage.saveData();
         this.geminiApiKeyInput.value = '';
@@ -1214,15 +754,15 @@ class DailyFlowApp {
     }
 
     // Date navigation
-    this.prevDayBtn.addEventListener('click', () => this.shiftDate(-1));
-    this.nextDayBtn.addEventListener('click', () => this.shiftDate(1));
-    this.todayQuickBtn.addEventListener('click', () => this.setDate(new Date().toISOString().split('T')[0]));
-    this.datePicker.addEventListener('change', (e) => {
+    this.prevDayBtn?.addEventListener('click', () => this.shiftDate(-1));
+    this.nextDayBtn?.addEventListener('click', () => this.shiftDate(1));
+    this.todayQuickBtn?.addEventListener('click', () => this.setDate(todayKST()));
+    this.datePicker?.addEventListener('change', (e) => {
       if (e.target.value) this.setDate(e.target.value);
     });
 
     // Theme Toggle
-    this.themeToggle.addEventListener('click', async () => {
+    this.themeToggle?.addEventListener('click', async () => {
       const curr = document.documentElement.getAttribute('data-theme') || 'dark';
       const next = curr === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
@@ -1253,15 +793,15 @@ class DailyFlowApp {
       if (sidebarBackdrop) sidebarBackdrop.classList.remove('active');
     };
 
-    if (mobileMenuToggleBtn) mobileMenuToggleBtn.addEventListener('click', openDrawer);
-    if (mobileMoreMenuBtn) mobileMoreMenuBtn.addEventListener('click', openDrawer);
-    if (closeSidebarDrawerBtn) closeSidebarDrawerBtn.addEventListener('click', closeDrawer);
-    if (sidebarBackdrop) sidebarBackdrop.addEventListener('click', closeDrawer);
+    if (mobileMenuToggleBtn) mobileMenuToggleBtn?.addEventListener('click', openDrawer);
+    if (mobileMoreMenuBtn) mobileMoreMenuBtn?.addEventListener('click', openDrawer);
+    if (closeSidebarDrawerBtn) closeSidebarDrawerBtn?.addEventListener('click', closeDrawer);
+    if (sidebarBackdrop) sidebarBackdrop?.addEventListener('click', closeDrawer);
 
     // 모바일 하단 탭 바 연동
     if (mobileBottomNav) {
       mobileBottomNav.querySelectorAll('.mbottom-item[data-tab]').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn?.addEventListener('click', () => {
           const tab = btn.dataset.tab;
           this.switchTab(tab);
           closeDrawer();
@@ -1271,7 +811,7 @@ class DailyFlowApp {
 
     // 사이드바 메뉴 클릭 시 모바일이면 자동 닫힘
     this.navItems.forEach(item => {
-      item.addEventListener('click', () => {
+      item?.addEventListener('click', () => {
         if (window.innerWidth <= 768) {
           closeDrawer();
         }
@@ -1281,7 +821,7 @@ class DailyFlowApp {
     // 10조 복리 모멘텀 퀵 진단 버튼
     const quickCompoundBriefBtn = document.getElementById('quickCompoundBriefBtn');
     if (quickCompoundBriefBtn) {
-      quickCompoundBriefBtn.addEventListener('click', async () => {
+      quickCompoundBriefBtn?.addEventListener('click', async () => {
         const score = this.calculateCompoundMomentum();
         const prompt = `[오늘의 10조 복리 모멘텀 지수 실시간 진단]
 오늘 복리 점수: ${score}점 (100점 만점)
@@ -1302,7 +842,7 @@ class DailyFlowApp {
 
     // 제미나이 5개년 10조 시뮬레이터
     if (ai5YearSimulateBtn) {
-      ai5YearSimulateBtn.addEventListener('click', async () => {
+      ai5YearSimulateBtn?.addEventListener('click', async () => {
         if (!fiveYearResultBox) return;
         fiveYearResultBox.innerHTML = '<div style="text-align:center; padding:16px;"><i class="fa-solid fa-spinner fa-spin text-amber" style="font-size:1.5rem;"></i><p style="margin-top:6px; color:var(--text-secondary); font-weight:700;">제미나이가 5개년 10조 초고속 기하급수 시뮬레이션을 연산 중입니다...</p></div>';
 
@@ -1336,7 +876,7 @@ class DailyFlowApp {
     // 10조 서브탭 전환
     if (trillionSubnavBar) {
       trillionSubnavBar.querySelectorAll('.tsub-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn?.addEventListener('click', () => {
           trillionSubnavBar.querySelectorAll('.tsub-btn').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
           const sub = btn.dataset.sub;
@@ -1352,7 +892,7 @@ class DailyFlowApp {
     // 비전 캔버스 저장
     const saveTrillionVisionBtn = document.getElementById('saveTrillionVisionBtn');
     if (saveTrillionVisionBtn) {
-      saveTrillionVisionBtn.addEventListener('click', () => {
+      saveTrillionVisionBtn?.addEventListener('click', () => {
         const vision = document.getElementById('trillionVisionInput')?.value.trim() || '';
         const val1 = document.getElementById('trillionVal1')?.value.trim() || '';
         const val2 = document.getElementById('trillionVal2')?.value.trim() || '';
@@ -1366,7 +906,7 @@ class DailyFlowApp {
     // 10조 아이디어 뱅크 폼 제출
     const trillionIdeaForm = document.getElementById('trillionIdeaForm');
     if (trillionIdeaForm) {
-      trillionIdeaForm.addEventListener('submit', (e) => {
+      trillionIdeaForm?.addEventListener('submit', (e) => {
         e.preventDefault();
         const title = document.getElementById('tideaTitle')?.value.trim();
         const content = document.getElementById('tideaContent')?.value.trim();
@@ -1384,7 +924,7 @@ class DailyFlowApp {
     // AI 10조 아이디어 발굴 브레인스토밍
     const aiTrillionBrainstormBtn = document.getElementById('aiTrillionBrainstormBtn');
     if (aiTrillionBrainstormBtn) {
-      aiTrillionBrainstormBtn.addEventListener('click', async () => {
+      aiTrillionBrainstormBtn?.addEventListener('click', async () => {
         aiTrillionBrainstormBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 발굴 중...';
         const mastery = storage.getTrillionMastery();
         const vision = mastery.vision || '글로벌 초격차 복리 비즈니스 시스템 구축';
@@ -1410,7 +950,7 @@ class DailyFlowApp {
     const runActionAuditBtn = document.getElementById('runActionAuditBtn');
     const auditResultBox = document.getElementById('auditResultBox');
     if (runActionAuditBtn) {
-      runActionAuditBtn.addEventListener('click', async () => {
+      runActionAuditBtn?.addEventListener('click', async () => {
         if (!auditResultBox) return;
         auditResultBox.innerHTML = '<div style="text-align:center; padding:16px;"><i class="fa-solid fa-spinner fa-spin text-emerald" style="font-size:1.5rem;"></i><p style="margin-top:6px; color:var(--text-secondary);">제미나이 행동 감사관이 오늘 하루를 냉정하게 판정 중입니다...</p></div>';
 
@@ -1461,11 +1001,11 @@ class DailyFlowApp {
 
     ['tquest_mindset', 'tquest_habit', 'tquest_ability', 'tquest_learning', 'tquest_action'].forEach(id => {
       const el = document.getElementById(id);
-      if (el) el.addEventListener('change', updateQuestScore);
+      if (el) el?.addEventListener('change', updateQuestScore);
     });
 
     if (pushAllTrillionTodosBtn) {
-      pushAllTrillionTodosBtn.addEventListener('click', () => {
+      pushAllTrillionTodosBtn?.addEventListener('click', () => {
         const tasks = [
           { text: '[1열 마인드셋] 오늘 내가 직접 하지 않고 시스템화/자동화할 1가지 정의', category: 'career' },
           { text: '[2열 초격차습관] 방해 없는 2시간 딥워크로 핵심 복리 비즈니스 시스템 구축', category: 'career' },
@@ -1534,17 +1074,17 @@ class DailyFlowApp {
     };
 
     if (aiTrillionCoachBtn) {
-      aiTrillionCoachBtn.addEventListener('click', () => requestTrillionCoaching('daily'));
+      aiTrillionCoachBtn?.addEventListener('click', () => requestTrillionCoaching('daily'));
     }
 
     document.querySelectorAll('.trillion-prompt-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn?.addEventListener('click', () => {
         requestTrillionCoaching(btn.dataset.type);
       });
     });
 
     document.querySelectorAll('.trillion-action-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn?.addEventListener('click', () => {
         const action = btn.dataset.action;
         this.pushActionToTodayTodo(action, 'career');
         this.showToast('10조 자산가 실행 행동이 오늘의 To-Do로 등록되었습니다! ⚡');
@@ -1555,7 +1095,7 @@ class DailyFlowApp {
     // 💡 Idea Quick Memo Events (사이드바 & 탭)
     // ==========================================
     if (this.sidebarQuickMemoForm) {
-      this.sidebarQuickMemoForm.addEventListener('submit', (e) => {
+      this.sidebarQuickMemoForm?.addEventListener('submit', (e) => {
         e.preventDefault();
         const text = this.sidebarQuickMemoInput.value.trim();
         if (!text) return;
@@ -1575,7 +1115,7 @@ class DailyFlowApp {
 
     if (this.memoCategoryPills) {
       this.memoCategoryPills.querySelectorAll('.mcat-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn?.addEventListener('click', () => {
           this.memoCategoryPills.querySelectorAll('.mcat-btn').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
           this.selectedMemoCategory = btn.dataset.cat;
@@ -1584,7 +1124,7 @@ class DailyFlowApp {
     }
 
     if (this.memoAddForm) {
-      this.memoAddForm.addEventListener('submit', (e) => {
+      this.memoAddForm?.addEventListener('submit', (e) => {
         e.preventDefault();
         const title = this.memoTitleInput.value.trim();
         const content = this.memoContentInput.value.trim();
@@ -1610,7 +1150,7 @@ class DailyFlowApp {
 
     if (this.memoFilterList) {
       this.memoFilterList.querySelectorAll('.filter-pill').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn?.addEventListener('click', () => {
           this.memoFilterList.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
           this.activeMemoFilter = btn.dataset.filter;
@@ -1620,11 +1160,11 @@ class DailyFlowApp {
     }
 
     if (this.memoSearchInput) {
-      this.memoSearchInput.addEventListener('input', () => this.renderMemos());
+      this.memoSearchInput?.addEventListener('input', () => this.renderMemos());
     }
 
     if (this.aiIdeaBrainstormBtn) {
-      this.aiIdeaBrainstormBtn.addEventListener('click', async () => {
+      this.aiIdeaBrainstormBtn?.addEventListener('click', async () => {
         this.aiIdeaBrainstormBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 브레인스토밍 중...';
         const dayData = storage.getDayData(this.currentDate);
         const focus = dayData.focus || '커리어 성장 및 생산성 극대화';
@@ -1653,7 +1193,7 @@ class DailyFlowApp {
     // 🌳 Visual Tree Mode Toggle
     // ==========================================
     if (this.toggleHierarchyViewModeBtn) {
-      this.toggleHierarchyViewModeBtn.addEventListener('click', () => {
+      this.toggleHierarchyViewModeBtn?.addEventListener('click', () => {
         this.isVisualTreeMode = !this.isVisualTreeMode;
         if (this.isVisualTreeMode) {
           this.visualTreeContainer.style.display = 'flex';
@@ -1673,13 +1213,13 @@ class DailyFlowApp {
     // 📊 Weekly Sprint Retro Events
     // ==========================================
     if (this.generateWeeklyReportBtn) {
-      this.generateWeeklyReportBtn.addEventListener('click', async () => {
+      this.generateWeeklyReportBtn?.addEventListener('click', async () => {
         await this.generateWeeklyRetroReport();
       });
     }
 
     if (this.copyWeeklyReportBtn) {
-      this.copyWeeklyReportBtn.addEventListener('click', () => {
+      this.copyWeeklyReportBtn?.addEventListener('click', () => {
         const text = this.weeklyReportContent.innerText;
         navigator.clipboard.writeText(text);
         this.showToast('주간 결산 리포트가 클립보드에 복사되었습니다! 📋');
@@ -1690,7 +1230,7 @@ class DailyFlowApp {
     // ⏱️ Evening Budget Capacity Events
     // ==========================================
     if (this.eveningCapacityInput) {
-      this.eveningCapacityInput.addEventListener('change', () => {
+      this.eveningCapacityInput?.addEventListener('change', () => {
         this.renderEveningOS();
       });
     }
@@ -1699,7 +1239,7 @@ class DailyFlowApp {
     // 🌙 Evening OS Events (퇴근 후 야간 실행)
     // ==========================================
     if (this.saveEveningGoalBtn) {
-      this.saveEveningGoalBtn.addEventListener('click', () => {
+      this.saveEveningGoalBtn?.addEventListener('click', () => {
         const goal = this.eveningGoalInput.value.trim();
         const dayData = storage.getDayData(this.currentDate);
         storage.updateDayData(this.currentDate, {
@@ -1711,7 +1251,7 @@ class DailyFlowApp {
     }
 
     if (this.aiEveningRoutineBtn) {
-      this.aiEveningRoutineBtn.addEventListener('click', async () => {
+      this.aiEveningRoutineBtn?.addEventListener('click', async () => {
         const dayData = storage.getDayData(this.currentDate);
         const focus = dayData.focus || '';
         const studyTopic = dayData.study?.topic || '';
@@ -1741,7 +1281,7 @@ class DailyFlowApp {
     }
 
     if (this.eveningTodayForm) {
-      this.eveningTodayForm.addEventListener('submit', (e) => {
+      this.eveningTodayForm?.addEventListener('submit', (e) => {
         e.preventDefault();
         const text = this.eveningTodayInput.value.trim();
         const duration = parseFloat(this.eveningTaskDuration ? this.eveningTaskDuration.value : 1.0) || 1.0;
@@ -1758,7 +1298,7 @@ class DailyFlowApp {
     }
 
     if (this.eveningTomorrowForm) {
-      this.eveningTomorrowForm.addEventListener('submit', (e) => {
+      this.eveningTomorrowForm?.addEventListener('submit', (e) => {
         e.preventDefault();
         const text = this.eveningTomorrowInput.value.trim();
         if (!text) return;
@@ -1773,7 +1313,7 @@ class DailyFlowApp {
     }
 
     if (this.pushTomorrowToTodayBtn) {
-      this.pushTomorrowToTodayBtn.addEventListener('click', () => {
+      this.pushTomorrowToTodayBtn?.addEventListener('click', () => {
         const dayData = storage.getDayData(this.currentDate);
         const er = dayData.eveningRoutine || { todayTasks: [], tomorrowTasks: [] };
         if (!er.tomorrowTasks || er.tomorrowTasks.length === 0) {
@@ -1792,7 +1332,7 @@ class DailyFlowApp {
     }
 
     if (this.saveEveningReviewBtn) {
-      this.saveEveningReviewBtn.addEventListener('click', () => {
+      this.saveEveningReviewBtn?.addEventListener('click', () => {
         const actualHours = parseFloat(this.eveningActualHours.value) || 0;
         const focusRate = parseInt(this.eveningFocusRate.value) || 100;
         const notes = this.eveningReviewNotes.value.trim();
@@ -1811,7 +1351,7 @@ class DailyFlowApp {
     // ==========================================
     if (this.hierarchyTabsBar) {
       this.hierarchyTabsBar.querySelectorAll('.hierarchy-tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn?.addEventListener('click', () => {
           this.hierarchyTabsBar.querySelectorAll('.hierarchy-tab-btn').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
           this.activeHierarchyLevel = btn.dataset.hlevel;
@@ -1822,7 +1362,7 @@ class DailyFlowApp {
 
     // 인라인 빠른 추가 폼 일괄 바인딩
     document.querySelectorAll('.hierarchy-inline-form').forEach(form => {
-      form.addEventListener('submit', (e) => {
+      form?.addEventListener('submit', (e) => {
         e.preventDefault();
         const level = form.dataset.level || 'yearly';
         const input = form.querySelector('input');
@@ -1850,7 +1390,7 @@ class DailyFlowApp {
 
     const aiBottomUpCascadeBtn = document.getElementById('aiBottomUpCascadeBtn');
     if (aiBottomUpCascadeBtn) {
-      aiBottomUpCascadeBtn.addEventListener('click', async () => {
+      aiBottomUpCascadeBtn?.addEventListener('click', async () => {
         const dayData = storage.getDayData(this.currentDate);
         const todos = dayData.todos || [];
         const dailyGoals = storage.getGoals().filter(g => g.horizon === 'daily');
@@ -1877,7 +1417,7 @@ class DailyFlowApp {
     }
 
     if (this.aiHierarchyBreakdownBtn) {
-      this.aiHierarchyBreakdownBtn.addEventListener('click', async () => {
+      this.aiHierarchyBreakdownBtn?.addEventListener('click', async () => {
         const goals = storage.getGoals().filter(g => g.horizon === 'yearly' || g.horizon === 'long');
         const visionText = goals.length > 0 ? goals.map(g => g.title).join(', ') : '10조 자산가 도약 및 글로벌 비즈니스 인프라 구축';
 
@@ -1903,11 +1443,11 @@ class DailyFlowApp {
       });
     }
     const closeGoalModal = () => this.goalModal.classList.remove('active');
-    if (this.closeGoalModalBtn) this.closeGoalModalBtn.addEventListener('click', closeGoalModal);
-    if (this.cancelGoalBtn) this.cancelGoalBtn.addEventListener('click', closeGoalModal);
+    if (this.closeGoalModalBtn) this.closeGoalModalBtn?.addEventListener('click', closeGoalModal);
+    if (this.cancelGoalBtn) this.cancelGoalBtn?.addEventListener('click', closeGoalModal);
 
     if (this.aiGoalBreakdownBtn) {
-      this.aiGoalBreakdownBtn.addEventListener('click', async () => {
+      this.aiGoalBreakdownBtn?.addEventListener('click', async () => {
         const title = this.goalTitle.value.trim();
         if (!title) {
           this.showToast('먼저 목표 명칭을 간단히 입력해주세요.', 'error');
@@ -1927,7 +1467,7 @@ class DailyFlowApp {
     }
 
     if (this.goalForm) {
-      this.goalForm.addEventListener('submit', (e) => {
+      this.goalForm?.addEventListener('submit', (e) => {
         e.preventDefault();
         const pillar = this.goalPillar.value;
         const horizon = this.goalHorizon.value;
@@ -1955,7 +1495,7 @@ class DailyFlowApp {
 
     if (this.goalPillarFilters) {
       this.goalPillarFilters.querySelectorAll('.pillar-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn?.addEventListener('click', () => {
           this.goalPillarFilters.querySelectorAll('.pillar-btn').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
           this.goalPillarFilter = btn.dataset.pillar;
@@ -1965,19 +1505,19 @@ class DailyFlowApp {
     }
 
     // Daily Focus Save
-    this.saveFocusBtn.addEventListener('click', () => {
+    this.saveFocusBtn?.addEventListener('click', () => {
       const focus = this.focusInput.value.trim();
       storage.updateDayData(this.currentDate, { focus });
       this.renderAllTabCalendars();
       this.showToast('오늘의 북극성 미션이 확정되었습니다! 🎯');
     });
-    this.focusInput.addEventListener('keydown', (e) => {
+    this.focusInput?.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') this.saveFocusBtn.click();
     });
 
     // AI Study Suggest
     if (this.aiStudySuggestBtn) {
-      this.aiStudySuggestBtn.addEventListener('click', async () => {
+      this.aiStudySuggestBtn?.addEventListener('click', async () => {
         const goals = storage.getGoals().map(g => g.title).join(', ');
         this.aiStudySuggestBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 분석 중...';
         const prompt = `나의 현재 인생 목표: [${goals}]\n이 목표들을 달성하기 위해 오늘 직장인으로서 1~2시간 파고들 가장 효과적인 핵심 공부 주제 1개와 핵심 배움 개념을 추천해줘.`;
@@ -1991,7 +1531,7 @@ class DailyFlowApp {
     }
 
     // Dashboard Study Quick Save
-    this.saveStudyDashBtn.addEventListener('click', () => {
+    this.saveStudyDashBtn?.addEventListener('click', () => {
       const topic = this.todayStudyTopic.value.trim();
       const til = this.todayStudyTIL.value.trim();
       const dayData = storage.getDayData(this.currentDate);
@@ -2008,7 +1548,7 @@ class DailyFlowApp {
 
     // AI Study Detailed Analysis
     if (this.aiStudyAnalyzeBtn) {
-      this.aiStudyAnalyzeBtn.addEventListener('click', async () => {
+      this.aiStudyAnalyzeBtn?.addEventListener('click', async () => {
         const notes = this.studyDetailedNotes.value.trim();
         const topic = this.studyMainTopicInput.value.trim();
         if (!notes && !topic) {
@@ -2027,7 +1567,7 @@ class DailyFlowApp {
 
     // Mood Selector
     this.moodSelector.querySelectorAll('.mood-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn?.addEventListener('click', () => {
         const mood = btn.dataset.mood;
         storage.updateDayData(this.currentDate, { mood });
         this.highlightMood(mood);
@@ -2038,7 +1578,7 @@ class DailyFlowApp {
     });
 
     // To-Do Add
-    this.todoForm.addEventListener('submit', (e) => {
+    this.todoForm?.addEventListener('submit', (e) => {
       e.preventDefault();
       const text = this.todoInput.value.trim();
       if (!text) return;
@@ -2053,7 +1593,7 @@ class DailyFlowApp {
     });
 
     // Study Tab Save
-    this.saveStudyNotesBtn.addEventListener('click', () => {
+    this.saveStudyNotesBtn?.addEventListener('click', () => {
       const topic = this.studyMainTopicInput.value.trim();
       const goalHours = parseFloat(this.studyGoalHours.value) || 0;
       const actualHours = parseFloat(this.studyActualHours.value) || 0;
@@ -2073,7 +1613,7 @@ class DailyFlowApp {
     });
 
     let studySearchTimeout;
-    this.studySearchInput.addEventListener('input', (e) => {
+    this.studySearchInput?.addEventListener('input', (e) => {
       clearTimeout(studySearchTimeout);
       studySearchTimeout = setTimeout(() => {
         this.studySearchQuery = e.target.value.trim().toLowerCase();
@@ -2083,19 +1623,19 @@ class DailyFlowApp {
 
     // Journal Actions
     if (this.aiAutoDraftJournalBtn) {
-      this.aiAutoDraftJournalBtn.addEventListener('click', () => {
+      this.aiAutoDraftJournalBtn?.addEventListener('click', () => {
         this.generateAiJournalDraft();
       });
     }
 
     if (this.extractActionGuideBtn) {
-      this.extractActionGuideBtn.addEventListener('click', () => {
+      this.extractActionGuideBtn?.addEventListener('click', () => {
         this.extractActionGuideFromJournal();
       });
     }
 
     if (this.journalSplitToggle) {
-      this.journalSplitToggle.addEventListener('click', () => {
+      this.journalSplitToggle?.addEventListener('click', () => {
         this.toggleSplitView();
       });
     }
@@ -2106,7 +1646,7 @@ class DailyFlowApp {
     const weatherBar = document.getElementById('journalWeatherBar');
     if (weatherBar) {
       weatherBar.querySelectorAll('.weather-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn?.addEventListener('click', () => {
           weatherBar.querySelectorAll('.weather-btn').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
           const dayData = storage.getDayData(this.currentDate);
@@ -2122,7 +1662,7 @@ class DailyFlowApp {
     const jMoodBar = document.getElementById('journalMoodBar');
     if (jMoodBar) {
       jMoodBar.querySelectorAll('.jmood-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn?.addEventListener('click', () => {
           jMoodBar.querySelectorAll('.jmood-btn').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
           const mood = btn.dataset.mood;
@@ -2134,7 +1674,7 @@ class DailyFlowApp {
     }
 
     // Ctrl+V 클립보드 이미지 붙여넣기 지원
-    this.journalContent.addEventListener('paste', (e) => {
+    this.journalContent?.addEventListener('paste', (e) => {
       const items = (e.clipboardData || e.originalEvent.clipboardData).items;
       for (let index in items) {
         const item = items[index];
@@ -2156,7 +1696,7 @@ class DailyFlowApp {
     });
 
     if (this.copyJournalTextBtn) {
-      this.copyJournalTextBtn.addEventListener('click', () => {
+      this.copyJournalTextBtn?.addEventListener('click', () => {
         const title = this.journalTitle.value.trim();
         const content = this.journalContent.value;
         const dayData = storage.getDayData(this.currentDate);
@@ -2170,7 +1710,7 @@ class DailyFlowApp {
     }
 
     if (this.journalPhotoInput) {
-      this.journalPhotoInput.addEventListener('change', (e) => {
+      this.journalPhotoInput?.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
@@ -2196,11 +1736,11 @@ class DailyFlowApp {
       this.autoSaveIndicator.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 저장 중...';
       this.autoSaveTimer = setTimeout(() => this.saveJournal(false), 600);
     };
-    this.journalTitle.addEventListener('input', triggerAutoSave);
-    this.journalContent.addEventListener('input', triggerAutoSave);
+    this.journalTitle?.addEventListener('input', triggerAutoSave);
+    this.journalContent?.addEventListener('input', triggerAutoSave);
 
     // Ctrl+S & Shortcut support
-    this.journalContent.addEventListener('keydown', (e) => {
+    this.journalContent?.addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault();
         this.saveJournal(true);
@@ -2215,27 +1755,27 @@ class DailyFlowApp {
       }
     });
 
-    this.saveJournalBtn.addEventListener('click', () => this.saveJournal(true));
-    this.journalPreviewToggle.addEventListener('click', () => this.togglePreview());
-    this.exportMdBtn.addEventListener('click', () => this.exportMarkdown());
-    this.printJournalBtn.addEventListener('click', () => window.print());
+    this.saveJournalBtn?.addEventListener('click', () => this.saveJournal(true));
+    this.journalPreviewToggle?.addEventListener('click', () => this.togglePreview());
+    this.exportMdBtn?.addEventListener('click', () => this.exportMarkdown());
+    this.printJournalBtn?.addEventListener('click', () => window.print());
 
     this.editorToolbar.querySelectorAll('.tool-btn').forEach(btn => {
-      btn.addEventListener('click', () => this.applyToolbarCmd(btn.dataset.cmd));
+      btn?.addEventListener('click', () => this.applyToolbarCmd(btn.dataset.cmd));
     });
 
     document.querySelectorAll('.btn-template').forEach(btn => {
-      btn.addEventListener('click', () => this.applyTemplate(btn.dataset.template));
+      btn?.addEventListener('click', () => this.applyTemplate(btn.dataset.template));
     });
 
     // Wizard
-    if (this.openWizardBtn) this.openWizardBtn.addEventListener('click', () => this.wizardModal.classList.add('active'));
-    if (this.closeWizardModalBtn) this.closeWizardModalBtn.addEventListener('click', () => this.wizardModal.classList.remove('active'));
-    if (this.applyWizardBtn) this.applyWizardBtn.addEventListener('click', () => this.applyGuidedWizard());
+    if (this.openWizardBtn) this.openWizardBtn?.addEventListener('click', () => this.wizardModal.classList.add('active'));
+    if (this.closeWizardModalBtn) this.closeWizardModalBtn?.addEventListener('click', () => this.wizardModal.classList.remove('active'));
+    if (this.applyWizardBtn) this.applyWizardBtn?.addEventListener('click', () => this.applyGuidedWizard());
 
     // Speech & Timer
     if (this.speechBtn) {
-      this.speechBtn.addEventListener('click', () => {
+      this.speechBtn?.addEventListener('click', () => {
         if (!this.recognition) {
           this.showToast('음성 인식을 지원하지 않는 브라우저입니다.', 'error');
           return;
@@ -2246,16 +1786,16 @@ class DailyFlowApp {
     }
 
     if (this.startTimerBtn) {
-      this.startTimerBtn.addEventListener('click', () => {
+      this.startTimerBtn?.addEventListener('click', () => {
         if (this.timerRunning) this.pauseTimer();
         else this.startTimer();
       });
     }
-    if (this.resetTimerBtn) this.resetTimerBtn.addEventListener('click', () => this.resetTimer());
+    if (this.resetTimerBtn) this.resetTimerBtn?.addEventListener('click', () => this.resetTimer());
 
     // Gemini AI Coach Tab
     if (this.aiChatForm) {
-      this.aiChatForm.addEventListener('submit', async (e) => {
+      this.aiChatForm?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const q = this.aiChatInput.value.trim();
         if (!q) return;
@@ -2265,21 +1805,21 @@ class DailyFlowApp {
     }
 
     document.querySelectorAll('.quick-prompt-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn?.addEventListener('click', () => {
         this.handleAiCoachMessage(btn.dataset.prompt);
       });
     });
 
     // Principles Modal
     if (this.addPrincipleModalBtn) {
-      this.addPrincipleModalBtn.addEventListener('click', () => this.principleModal.classList.add('active'));
+      this.addPrincipleModalBtn?.addEventListener('click', () => this.principleModal.classList.add('active'));
     }
     const closeP = () => this.principleModal.classList.remove('active');
-    if (this.closePrincipleModalBtn) this.closePrincipleModalBtn.addEventListener('click', closeP);
-    if (this.cancelPrincipleBtn) this.cancelPrincipleBtn.addEventListener('click', closeP);
+    if (this.closePrincipleModalBtn) this.closePrincipleModalBtn?.addEventListener('click', closeP);
+    if (this.cancelPrincipleBtn) this.cancelPrincipleBtn?.addEventListener('click', closeP);
 
     if (this.principleForm) {
-      this.principleForm.addEventListener('submit', (e) => {
+      this.principleForm?.addEventListener('submit', (e) => {
         e.preventDefault();
         const cat = this.pCategory.value;
         const title = this.pTitle.value.trim();
@@ -2296,7 +1836,7 @@ class DailyFlowApp {
     }
 
     if (this.aiPrincipleSuggestBtn) {
-      this.aiPrincipleSuggestBtn.addEventListener('click', async () => {
+      this.aiPrincipleSuggestBtn?.addEventListener('click', async () => {
         this.aiPrincipleSuggestBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 생성 중...';
         const prompt = `레이 달리오, 스티브 잡스, 피터 드러커 등 세계적인 리더들의 철학을 바탕으로, 오늘날 직장인과 성장가가 가슴에 새길 강력한 인생 행동 원칙 1개(한 줄 명제 및 실천 지침 2문장)를 추천해줘.`;
         const res = await geminiClient.generateText(prompt);
@@ -2313,12 +1853,12 @@ class DailyFlowApp {
     }
 
     // Habit Modal
-    this.addHabitModalBtn.addEventListener('click', () => {
+    this.addHabitModalBtn?.addEventListener('click', () => {
       this.renderModalHabits();
       this.habitModal.classList.add('active');
     });
-    this.closeHabitModalBtn.addEventListener('click', () => this.habitModal.classList.remove('active'));
-    this.newHabitForm.addEventListener('submit', (e) => {
+    this.closeHabitModalBtn?.addEventListener('click', () => this.habitModal.classList.remove('active'));
+    this.newHabitForm?.addEventListener('submit', (e) => {
       e.preventDefault();
       const name = this.newHabitName.value.trim();
       const icon = this.newHabitIcon.value.trim() || '✨';
@@ -2332,11 +1872,11 @@ class DailyFlowApp {
     });
 
     // Time Block Modal
-    this.addTimeBlockBtn.addEventListener('click', () => this.timeBlockModal.classList.add('active'));
+    this.addTimeBlockBtn?.addEventListener('click', () => this.timeBlockModal.classList.add('active'));
     const closeTb = () => this.timeBlockModal.classList.remove('active');
-    this.closeTimeBlockModalBtn.addEventListener('click', closeTb);
-    this.cancelTimeBlockBtn.addEventListener('click', closeTb);
-    this.timeBlockForm.addEventListener('submit', (e) => {
+    this.closeTimeBlockModalBtn?.addEventListener('click', closeTb);
+    this.cancelTimeBlockBtn?.addEventListener('click', closeTb);
+    this.timeBlockForm?.addEventListener('submit', (e) => {
       e.preventDefault();
       const dayData = storage.getDayData(this.currentDate);
       dayData.timeBlocks.push({
@@ -2355,7 +1895,7 @@ class DailyFlowApp {
     });
 
     // Condition Events
-    this.energySlider.addEventListener('input', (e) => {
+    this.energySlider?.addEventListener('input', (e) => {
       const val = parseInt(e.target.value);
       this.updateEnergyDisplay(val);
       const dayData = storage.getDayData(this.currentDate);
@@ -2372,12 +1912,12 @@ class DailyFlowApp {
       const dayData = storage.getDayData(this.currentDate);
       storage.updateDayData(this.currentDate, { condition: { ...dayData.condition, sleep: val } });
     };
-    this.sleepMinusBtn.addEventListener('click', () => updateSleep(-0.5));
-    this.sleepPlusBtn.addEventListener('click', () => updateSleep(0.5));
-    this.sleepInput.addEventListener('change', () => updateSleep(0));
+    this.sleepMinusBtn?.addEventListener('click', () => updateSleep(-0.5));
+    this.sleepPlusBtn?.addEventListener('click', () => updateSleep(0.5));
+    this.sleepInput?.addEventListener('change', () => updateSleep(0));
 
     let memoTimeout;
-    this.quickMemoInput.addEventListener('input', (e) => {
+    this.quickMemoInput?.addEventListener('input', (e) => {
       clearTimeout(memoTimeout);
       memoTimeout = setTimeout(() => {
         const dayData = storage.getDayData(this.currentDate);
@@ -2399,23 +1939,23 @@ class DailyFlowApp {
       }
       this.journalTagInput.value = '';
     };
-    this.addTagBtn.addEventListener('click', addTag);
-    this.journalTagInput.addEventListener('keydown', (e) => {
+    this.addTagBtn?.addEventListener('click', addTag);
+    this.journalTagInput?.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') { e.preventDefault(); addTag(); }
     });
 
     // Calendar Tab Navigation
-    this.calPrevMonth.addEventListener('click', () => {
+    this.calPrevMonth?.addEventListener('click', () => {
       this.calMonth--;
       if (this.calMonth < 0) { this.calMonth = 11; this.calYear--; }
       this.renderCalendar();
     });
-    this.calNextMonth.addEventListener('click', () => {
+    this.calNextMonth?.addEventListener('click', () => {
       this.calMonth++;
       if (this.calMonth > 11) { this.calMonth = 0; this.calYear++; }
       this.renderCalendar();
     });
-    this.calTodayBtn.addEventListener('click', () => {
+    this.calTodayBtn?.addEventListener('click', () => {
       const now = new Date();
       this.calYear = now.getFullYear();
       this.calMonth = now.getMonth();
@@ -2424,7 +1964,7 @@ class DailyFlowApp {
 
     // Archive Search
     let searchTimeout;
-    this.archiveSearchInput.addEventListener('input', (e) => {
+    this.archiveSearchInput?.addEventListener('input', (e) => {
       clearTimeout(searchTimeout);
       searchTimeout = setTimeout(() => {
         this.archiveSearchQuery = e.target.value.trim().toLowerCase();
@@ -2433,7 +1973,7 @@ class DailyFlowApp {
     });
 
     this.archiveMoodFilters.querySelectorAll('.filter-pill').forEach(pill => {
-      pill.addEventListener('click', () => {
+      pill?.addEventListener('click', () => {
         this.archiveMoodFilters.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
         pill.classList.add('active');
         this.archiveFilterMood = pill.dataset.filter;
@@ -2441,17 +1981,30 @@ class DailyFlowApp {
       });
     });
 
+    // GitHub Cloud Sync
+    const syncGitHubBtn = document.getElementById('syncGitHubBtn');
+    syncGitHubBtn?.addEventListener('click', async () => {
+      syncGitHubBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> GitHub에 동기화 중...';
+      const res = await storage.syncGitHub();
+      syncGitHubBtn.innerHTML = '<i class="fa-brands fa-github"></i> 지금 GitHub에 즉시 동기화';
+      if (res.status === 'success') {
+        this.showToast('🚀 GitHub에 모든 데이터가 안전하게 동기화 및 백업되었습니다!');
+      } else {
+        this.showToast('동기화 실패: ' + (res.message || '오류 발생'), 'error');
+      }
+    });
+
     // Backup & Restore
-    this.backupBtn.addEventListener('click', () => this.backupModal.classList.add('active'));
-    this.closeBackupModalBtn.addEventListener('click', () => this.backupModal.classList.remove('active'));
-    this.exportJsonBtn.addEventListener('click', () => {
+    this.backupBtn?.addEventListener('click', () => this.backupModal.classList.add('active'));
+    this.closeBackupModalBtn?.addEventListener('click', () => this.backupModal.classList.remove('active'));
+    this.exportJsonBtn?.addEventListener('click', () => {
       storage.exportJson();
       this.showToast('통합 데이터가 data_state.json으로 다운로드되었습니다! 💾');
     });
 
     const exportGoalsBtn = document.getElementById('exportGoalsJsonBtn');
     if (exportGoalsBtn) {
-      exportGoalsBtn.addEventListener('click', () => {
+      exportGoalsBtn?.addEventListener('click', () => {
         storage.exportGoalsJson();
         this.showToast('목표 로드맵이 goals.json으로 다운로드되었습니다! 🎯');
       });
@@ -2459,7 +2012,7 @@ class DailyFlowApp {
 
     const exportPrinciplesBtn = document.getElementById('exportPrinciplesJsonBtn');
     if (exportPrinciplesBtn) {
-      exportPrinciplesBtn.addEventListener('click', () => {
+      exportPrinciplesBtn?.addEventListener('click', () => {
         storage.exportPrinciplesJson();
         this.showToast('인생 원칙이 principles.json으로 다운로드되었습니다! 💎');
       });
@@ -2467,7 +2020,7 @@ class DailyFlowApp {
 
     const exportMemosBtn = document.getElementById('exportMemosJsonBtn');
     if (exportMemosBtn) {
-      exportMemosBtn.addEventListener('click', () => {
+      exportMemosBtn?.addEventListener('click', () => {
         const memos = storage.getMemos();
         const blob = new Blob([JSON.stringify(memos, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
@@ -2482,7 +2035,7 @@ class DailyFlowApp {
 
     const exportWeeklyBtn = document.getElementById('exportWeeklyJsonBtn');
     if (exportWeeklyBtn) {
-      exportWeeklyBtn.addEventListener('click', () => {
+      exportWeeklyBtn?.addEventListener('click', () => {
         const data = { '2026-W34': { totalDeepHours: 14.5, todoCompletionRate: 85, sprintGoalRate: 80, habitSuccessDays: 6 } };
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
@@ -2495,8 +2048,8 @@ class DailyFlowApp {
       });
     }
 
-    this.triggerImportBtn.addEventListener('click', () => this.importJsonInput.click());
-    this.importJsonInput.addEventListener('change', (e) => {
+    this.triggerImportBtn?.addEventListener('click', () => this.importJsonInput.click());
+    this.importJsonInput?.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
@@ -2521,7 +2074,7 @@ class DailyFlowApp {
       this.importJsonInput.value = '';
     });
 
-    this.resetDataBtn.addEventListener('click', async () => {
+    this.resetDataBtn?.addEventListener('click', async () => {
       if (confirm('정말로 모든 데이터를 초기화하시겠습니까? (되돌릴 수 없습니다)')) {
         await storage.resetAllData();
         this.backupModal.classList.remove('active');
@@ -2702,7 +2255,7 @@ class DailyFlowApp {
     if (el) {
       el.querySelector('.bubble-content').innerHTML = newHtmlContent;
       el.querySelectorAll('.copy-chat-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn?.addEventListener('click', () => {
           const raw = decodeURIComponent(btn.dataset.text);
           navigator.clipboard.writeText(raw).then(() => {
             this.showToast('📋 Gemini의 상담 조언이 클립보드에 복사되었습니다!');
@@ -2886,7 +2439,7 @@ class DailyFlowApp {
     if (el) {
       el.querySelector('.chat-bubble').innerHTML = newHtmlContent;
       el.querySelectorAll('.copy-chat-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn?.addEventListener('click', () => {
           const raw = decodeURIComponent(btn.dataset.text);
           navigator.clipboard.writeText(raw).then(() => {
             this.showToast('📋 Gemini의 답변이 클립보드에 복사되었습니다!');
@@ -3013,7 +2566,7 @@ class DailyFlowApp {
         ${hasBadge ? `<span class="tab-cal-badge-dot" style="background:${badgeColor};"></span>` : ''}
       `;
 
-      cell.addEventListener('click', () => {
+      cell?.addEventListener('click', () => {
         this.setDate(fullDate);
       });
 
@@ -3120,7 +2673,7 @@ class DailyFlowApp {
         const row = document.createElement('div');
         row.className = `tab-cal-list-row ${dStr === this.currentDate ? 'active' : ''}`;
         row.innerHTML = rowHtml;
-        row.addEventListener('click', () => this.setDate(dStr));
+        row?.addEventListener('click', () => this.setDate(dStr));
         listEl.appendChild(row);
         renderedCount++;
       }
@@ -3218,7 +2771,7 @@ class DailyFlowApp {
       `;
 
       const slider = card.querySelector('.goal-progress-slider');
-      slider.addEventListener('change', (e) => {
+      slider?.addEventListener('change', (e) => {
         const newP = parseInt(e.target.value);
         storage.updateGoal(goal.id, { progress: newP });
         this.renderGoals();
@@ -3227,14 +2780,14 @@ class DailyFlowApp {
       });
 
       card.querySelectorAll('.goal-push-todo-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn?.addEventListener('click', () => {
           const actionText = `[목표연계: ${pInfo.label.split(' ')[1] || '실행'}] ${btn.dataset.action}`;
           const pillar = btn.dataset.pillar;
           this.pushActionToTodayTodo(actionText, pillar);
         });
       });
 
-      card.querySelector('.todo-delete-btn').addEventListener('click', () => {
+      card.querySelector('.todo-delete-btn')?.addEventListener('click', () => {
         if (confirm(`'${goal.title}' 목표를 삭제하시겠습니까?`)) {
           storage.deleteGoal(goal.id);
           this.renderGoals();
@@ -3362,7 +2915,7 @@ class DailyFlowApp {
         <button class="journal-photo-delete-btn" title="사진 삭제"><i class="fa-solid fa-xmark"></i></button>
       `;
 
-      card.querySelector('.journal-photo-delete-btn').addEventListener('click', (e) => {
+      card.querySelector('.journal-photo-delete-btn')?.addEventListener('click', (e) => {
         e.stopPropagation();
         photos.splice(idx, 1);
         storage.updateDayData(this.currentDate, { journal: { ...dayData.journal, photos } });
@@ -3370,7 +2923,7 @@ class DailyFlowApp {
         this.showToast('일기 사진이 삭제되었습니다.');
       });
 
-      card.addEventListener('click', () => {
+      card?.addEventListener('click', () => {
         const win = window.open('');
         win.document.write(`<body style="margin:0; background:#080d1a; display:flex; align-items:center; justify-content:center; height:100vh;"><img src="${photo}" style="max-width:95vw; max-height:95vh; border-radius:8px; box-shadow:0 0 20px rgba(0,0,0,0.8);"></body>`);
       });
@@ -3523,8 +3076,11 @@ class DailyFlowApp {
   // ==========================================
   switchTab(tabName) {
     this.activeTab = tabName;
-    this.navItems.forEach(item => item.classList.toggle('active', item.dataset.tab === tabName));
-    this.tabPanes.forEach(pane => pane.classList.toggle('active', pane.id === `pane-${tabName}`));
+    if (!this.navItems || !this.navItems.length) this.navItems = document.querySelectorAll('.nav-item');
+    if (!this.tabPanes || !this.tabPanes.length) this.tabPanes = document.querySelectorAll('.tab-pane');
+
+    (this.navItems || []).forEach(item => item?.classList?.toggle('active', item?.dataset?.tab === tabName));
+    (this.tabPanes || []).forEach(pane => pane?.classList?.toggle('active', pane?.id === `pane-${tabName}`));
 
     // 모바일 하단 탭 바 동기화
     const mNav = document.getElementById('mobileBottomNav');
@@ -3535,7 +3091,9 @@ class DailyFlowApp {
     }
 
     if (tabName === 'dashboard') this.renderTabCalendar('dashboard');
-    if (tabName === 'ten-trillion') {
+        if (tabName === 'ten-trillion') {
+      this.tenTrillion?.setDate(this.currentDate);
+      this.tenTrillion?.render();
       this.loadTrillionVision();
       this.renderTrillionIdeas();
       this.renderTabCalendar('trillion');
@@ -3654,13 +3212,13 @@ class DailyFlowApp {
       `;
 
       // Push to Todo
-      card.querySelector('.push-tidea-todo-btn').addEventListener('click', () => {
+      card.querySelector('.push-tidea-todo-btn')?.addEventListener('click', () => {
         this.pushActionToTodayTodo(`[10조 파이프라인] ${idea.title}`, 'wealth');
         this.showToast('10조 아이디어가 오늘의 실행 To-Do로 등록되었습니다! ⚡');
       });
 
       // AI Scale-up Analysis
-      card.querySelector('.ai-scale-tidea-btn').addEventListener('click', async () => {
+      card.querySelector('.ai-scale-tidea-btn')?.addEventListener('click', async () => {
         const btn = card.querySelector('.ai-scale-tidea-btn');
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 분석 중...';
 
@@ -3682,7 +3240,7 @@ class DailyFlowApp {
       });
 
       // Delete
-      card.querySelector('.delete-tidea-btn').addEventListener('click', () => {
+      card.querySelector('.delete-tidea-btn')?.addEventListener('click', () => {
         if (confirm(`'${idea.title}' 아이디어를 삭제하시겠습니까?`)) {
           storage.deleteTrillionIdea(idea.id);
           this.renderTrillionIdeas();
@@ -3724,8 +3282,10 @@ class DailyFlowApp {
 
     // 4. 일기 & 회고 작성 (20점 만점)
     let retroScore = 0;
-    if (dayData.journal && dayData.journal.trim().length > 10) retroScore += 10;
-    if (dayData.eveningOS && dayData.eveningOS.trim().length > 10) retroScore += 10;
+    const jContent = typeof dayData.journal === 'string' ? dayData.journal : (dayData.journal?.content || '');
+    if (jContent.trim().length > 10) retroScore += 10;
+    const eveContent = typeof dayData.eveningOS === 'string' ? dayData.eveningOS : (dayData.eveningRoutine?.review || '');
+    if (eveContent.trim().length > 10) retroScore += 10;
 
     const total = Math.round(questScore + todoScore + deepworkScore + retroScore);
 
@@ -3810,20 +3370,20 @@ class DailyFlowApp {
       `;
 
       // Pin toggle
-      card.querySelector('.pin-memo-btn').addEventListener('click', () => {
+      card.querySelector('.pin-memo-btn')?.addEventListener('click', () => {
         storage.updateMemo(memo.id, { pinned: !memo.pinned });
         this.renderMemos();
         this.showToast(memo.pinned ? '핀 고정이 해제되었습니다.' : '상단에 핀 고정되었습니다! 📌');
       });
 
       // Push to Todo
-      card.querySelector('.push-memo-todo-btn').addEventListener('click', () => {
+      card.querySelector('.push-memo-todo-btn')?.addEventListener('click', () => {
         this.pushActionToTodayTodo(`[아이디어 실행] ${memo.title}`, memo.category || 'career');
         this.showToast('아이디어가 오늘의 To-Do로 즉시 전환되었습니다! ⚡');
       });
 
       // AI Expand
-      card.querySelector('.ai-expand-memo-btn').addEventListener('click', async () => {
+      card.querySelector('.ai-expand-memo-btn')?.addEventListener('click', async () => {
         const btn = card.querySelector('.ai-expand-memo-btn');
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 기획 중...';
 
@@ -3841,7 +3401,7 @@ class DailyFlowApp {
       });
 
       // Delete
-      card.querySelector('.delete-memo-btn').addEventListener('click', () => {
+      card.querySelector('.delete-memo-btn')?.addEventListener('click', () => {
         if (confirm(`'${memo.title}' 메모를 삭제하시겠습니까?`)) {
           storage.deleteMemo(memo.id);
           this.renderMemos();
@@ -3861,7 +3421,9 @@ class DailyFlowApp {
     const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
     this.headerDateText.textContent = `${y}년 ${m}월 ${d}일 (${dayNames[dObj.getDay()]})`;
     this.datePicker.value = dateStr;
-    this.todayTag.style.display = (dateStr === today) ? 'inline-block' : 'none';
+        this.todayTag.style.display = (dateStr === todayKST()) ? 'inline-block' : 'none';
+    this.tenTrillion?.setDate(dateStr);
+    paintEES(dateStr);
 
     // Dashboard
     const dayData = storage.getDayData(dateStr);
@@ -4037,14 +3599,14 @@ class DailyFlowApp {
             </div>
             <button class="todo-delete-btn" title="삭제"><i class="fa-solid fa-trash"></i></button>
           `;
-          li.querySelector('.todo-checkbox').addEventListener('change', (e) => {
+          li.querySelector('.todo-checkbox')?.addEventListener('change', (e) => {
             task.completed = e.target.checked;
             storage.updateDayData(this.currentDate, { eveningRoutine: er });
             this.renderEveningOS();
             this.renderTabCalendar('evening');
             this.calculateEES();
           });
-          li.querySelector('.todo-delete-btn').addEventListener('click', () => {
+          li.querySelector('.todo-delete-btn')?.addEventListener('click', () => {
             er.todayTasks = er.todayTasks.filter(t => t.id !== task.id);
             storage.updateDayData(this.currentDate, { eveningRoutine: er });
             this.renderEveningOS();
@@ -4074,7 +3636,7 @@ class DailyFlowApp {
             </div>
             <button class="todo-delete-btn" title="삭제"><i class="fa-solid fa-trash"></i></button>
           `;
-          li.querySelector('.todo-delete-btn').addEventListener('click', () => {
+          li.querySelector('.todo-delete-btn')?.addEventListener('click', () => {
             er.tomorrowTasks = er.tomorrowTasks.filter(t => t.id !== task.id);
             storage.updateDayData(this.currentDate, { eveningRoutine: er });
             this.renderEveningOS();
@@ -4297,7 +3859,7 @@ class DailyFlowApp {
       `;
 
       // Complete checkbox
-      card.querySelector('.hgoal-check').addEventListener('change', (e) => {
+      card.querySelector('.hgoal-check')?.addEventListener('change', (e) => {
         const p = e.target.checked ? 100 : 0;
         storage.updateGoal(goal.id, { progress: p });
         this.renderGoalHierarchy();
@@ -4307,7 +3869,7 @@ class DailyFlowApp {
 
       // Quick stepper buttons
       card.querySelectorAll('.hgoal-step-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn?.addEventListener('click', () => {
           const add = parseInt(btn.dataset.val);
           const newP = (add === 100) ? 100 : Math.min(100, (goal.progress || 0) + add);
           storage.updateGoal(goal.id, { progress: newP });
@@ -4318,7 +3880,7 @@ class DailyFlowApp {
       });
 
       // Slider
-      card.querySelector('.hgoal-slider').addEventListener('change', (e) => {
+      card.querySelector('.hgoal-slider')?.addEventListener('change', (e) => {
         const p = parseInt(e.target.value);
         storage.updateGoal(goal.id, { progress: p });
         this.renderGoalHierarchy();
@@ -4327,7 +3889,7 @@ class DailyFlowApp {
       });
 
       // Cascade button
-      card.querySelector('.hgoal-cascade-btn').addEventListener('click', () => {
+      card.querySelector('.hgoal-cascade-btn')?.addEventListener('click', () => {
         if (cascadeInfo.nextLevel === 'trillion') {
           this.switchTab('ten-trillion');
           this.showToast('10조 자산가 로드맵으로 연결되었습니다! 👑');
@@ -4346,12 +3908,12 @@ class DailyFlowApp {
       });
 
       // Push to Todo
-      card.querySelector('.goal-push-todo-btn').addEventListener('click', () => {
+      card.querySelector('.goal-push-todo-btn')?.addEventListener('click', () => {
         this.pushActionToTodayTodo(`[${level.toUpperCase()} 목표실행] ${goal.title}`, goal.pillar || 'career');
       });
 
       // Delete
-      card.querySelector('.todo-delete-btn').addEventListener('click', () => {
+      card.querySelector('.todo-delete-btn')?.addEventListener('click', () => {
         if (confirm(`'${goal.title}' 목표를 삭제하시겠습니까?`)) {
           storage.deleteGoal(goal.id);
           this.renderGoalHierarchy();
@@ -4416,7 +3978,7 @@ class DailyFlowApp {
         <button class="todo-delete-btn" title="삭제"><i class="fa-solid fa-trash"></i></button>
       `;
 
-      li.querySelector('.todo-checkbox').addEventListener('change', (e) => {
+      li.querySelector('.todo-checkbox')?.addEventListener('change', (e) => {
         todo.completed = e.target.checked;
         storage.updateDayData(this.currentDate, { todos });
         this.renderTodos();
@@ -4424,7 +3986,7 @@ class DailyFlowApp {
         this.renderAnalytics();
       });
 
-      li.querySelector('.todo-delete-btn').addEventListener('click', () => {
+      li.querySelector('.todo-delete-btn')?.addEventListener('click', () => {
         const updated = todos.filter(t => t.id !== todo.id);
         storage.updateDayData(this.currentDate, { todos: updated });
         this.renderTodos();
@@ -4456,7 +4018,7 @@ class DailyFlowApp {
         <input type="checkbox" ${todo.completed ? 'checked' : ''} style="width: 16px; height: 16px; accent-color: var(--accent-primary);">
         <span>${this.escapeHtml(todo.text)}</span>
       `;
-      li.querySelector('input').addEventListener('change', (e) => {
+      li.querySelector('input')?.addEventListener('change', (e) => {
         todo.completed = e.target.checked;
         storage.updateDayData(this.currentDate, { todos });
         this.renderTodos();
@@ -4493,7 +4055,7 @@ class DailyFlowApp {
         </div>
       `;
 
-      div.addEventListener('click', () => {
+      div?.addEventListener('click', () => {
         dayHabits[habit.id] = !isDone;
         storage.updateDayData(this.currentDate, { habits: dayHabits });
         this.renderHabits();
@@ -4534,7 +4096,7 @@ class DailyFlowApp {
         <span>${habit.icon} ${this.escapeHtml(habit.name)}</span>
         <button class="icon-btn btn-sm" style="color: var(--accent-danger);"><i class="fa-solid fa-trash"></i></button>
       `;
-      item.querySelector('button').addEventListener('click', () => {
+      item.querySelector('button')?.addEventListener('click', () => {
         storage.deleteHabit(habit.id);
         this.renderModalHabits();
         this.renderHabits();
@@ -4562,7 +4124,7 @@ class DailyFlowApp {
         <div class="tb-title">${this.escapeHtml(block.title)}</div>
         <button class="todo-delete-btn" title="삭제"><i class="fa-solid fa-trash"></i></button>
       `;
-      div.querySelector('.todo-delete-btn').addEventListener('click', () => {
+      div.querySelector('.todo-delete-btn')?.addEventListener('click', () => {
         const updated = blocks.filter(b => b.id !== block.id);
         storage.updateDayData(this.currentDate, { timeBlocks: updated });
         this.renderTimeBlocks();
@@ -4582,7 +4144,7 @@ class DailyFlowApp {
       const icon = document.createElement('i');
       icon.className = `fa-solid fa-glass-water water-cup ${i <= cups ? 'filled' : ''}`;
       icon.title = `${i * 250}ml`;
-      icon.addEventListener('click', () => {
+      icon?.addEventListener('click', () => {
         const newW = (i === cups) ? i - 1 : i;
         storage.updateDayData(this.currentDate, { condition: { ...cond, water: newW } });
         this.renderCondition();
@@ -4633,7 +4195,7 @@ class DailyFlowApp {
         <button class="study-photo-delete-btn" title="이미지 삭제"><i class="fa-solid fa-xmark"></i></button>
       `;
 
-      card.querySelector('.study-photo-delete-btn').addEventListener('click', (e) => {
+      card.querySelector('.study-photo-delete-btn')?.addEventListener('click', (e) => {
         e.stopPropagation();
         photos.splice(idx, 1);
         storage.updateDayData(this.currentDate, { study: { ...dayData.study, photos } });
@@ -4643,7 +4205,7 @@ class DailyFlowApp {
         this.showToast('학습 이미지가 삭제되었습니다.');
       });
 
-      card.addEventListener('click', () => {
+      card?.addEventListener('click', () => {
         const win = window.open('');
         win.document.write(`<body style="margin:0; background:#080d1a; display:flex; align-items:center; justify-content:center; height:100vh;"><img src="${photo}" style="max-width:95vw; max-height:95vh; border-radius:8px; box-shadow:0 0 20px rgba(0,0,0,0.8);"></body>`);
       });
@@ -4653,6 +4215,8 @@ class DailyFlowApp {
   }
 
   renderStudyArchive() {
+    if (!this.studyArchiveList) this.studyArchiveList = document.getElementById('studyArchiveList');
+    if (!this.studyArchiveList) return;
     const studies = storage.getAllStudies();
     this.studyArchiveList.innerHTML = '';
 
@@ -4692,7 +4256,7 @@ class DailyFlowApp {
         </div>
       `;
 
-      card.querySelector('.copy-archive-btn').addEventListener('click', (e) => {
+      card.querySelector('.copy-archive-btn')?.addEventListener('click', (e) => {
         e.stopPropagation();
         const textToCopy = `[${s.date} 학습 기록]\n📚 주제: ${s.topic}\n⏱️ 달성 시간: ${s.actualHours}시간\n💡 핵심 TIL: ${s.til}\n\n📝 상세 노트:\n${s.notes}`;
         navigator.clipboard.writeText(textToCopy).then(() => {
@@ -4700,7 +4264,7 @@ class DailyFlowApp {
         });
       });
 
-      card.addEventListener('click', () => {
+      card?.addEventListener('click', () => {
         this.setDate(s.date);
       });
 
@@ -4712,6 +4276,8 @@ class DailyFlowApp {
   // 15. Principles Rendering
   // ==========================================
   renderPrinciples() {
+    if (!this.principlesGrid) this.principlesGrid = document.getElementById('principlesGrid');
+    if (!this.principlesGrid) return;
     const list = storage.getPrinciples();
     this.principlesGrid.innerHTML = '';
 
@@ -4734,7 +4300,7 @@ class DailyFlowApp {
         <div class="principle-content">${this.escapeHtml(p.content)}</div>
       `;
 
-      card.querySelector('.todo-delete-btn').addEventListener('click', (e) => {
+      card.querySelector('.todo-delete-btn')?.addEventListener('click', (e) => {
         e.stopPropagation();
         if (confirm('이 원칙을 삭제하시겠습니까?')) {
           storage.deletePrinciple(p.id);
@@ -4912,7 +4478,7 @@ class DailyFlowApp {
       const span = document.createElement('span');
       span.className = 'tag-badge';
       span.innerHTML = `#${this.escapeHtml(tag)} <i class="fa-solid fa-xmark tag-remove-btn"></i>`;
-      span.querySelector('.tag-remove-btn').addEventListener('click', () => {
+      span.querySelector('.tag-remove-btn')?.addEventListener('click', () => {
         const updated = tags.filter(t => t !== tag);
         storage.updateDayData(this.currentDate, { journal: { ...dayData.journal, tags: updated } });
         this.renderTags();
@@ -4971,6 +4537,7 @@ class DailyFlowApp {
   // 17. Journal Right Sidebar Calendar (고화질 감성 캘린더)
   // ==========================================
   renderJournalRightCalendar() {
+    if (!document.getElementById('journalRightCalDays')) return;
     const titleEl = document.getElementById('jCalTitle');
     const gridEl = document.getElementById('jCalGrid');
     const listEl = document.getElementById('jCalMonthList');
@@ -5018,7 +4585,7 @@ class DailyFlowApp {
         ${hasPhotos ? '<span class="jcal-photo-dot" title="사진 포함"></span>' : ''}
       `;
 
-      cell.addEventListener('click', () => {
+      cell?.addEventListener('click', () => {
         this.setDate(fullDate);
       });
 
@@ -5052,7 +4619,7 @@ class DailyFlowApp {
             <div class="jfeed-title">${this.escapeHtml(j.title || '무제')}</div>
             <div class="jfeed-snippet">${this.escapeHtml(snippet || '내용 없음...')}</div>
           `;
-          card.addEventListener('click', () => this.setDate(j.date));
+          card?.addEventListener('click', () => this.setDate(j.date));
           listEl.appendChild(card);
         });
       }
@@ -5063,7 +4630,10 @@ class DailyFlowApp {
   // 18. Calendar Tab & Analytics
   // ==========================================
   renderCalendar() {
-    this.calendarMonthTitle.textContent = `${this.calYear}년 ${this.calMonth + 1}월`;
+    if (!this.calendarDaysGrid) this.calendarDaysGrid = document.getElementById('calendarDaysGrid');
+    if (!this.calendarMonthTitle) this.calendarMonthTitle = document.getElementById('calendarMonthTitle');
+    if (!this.calendarDaysGrid) return;
+    if (this.calendarMonthTitle) this.calendarMonthTitle.textContent = `${this.calYear}년 ${this.calMonth + 1}월`;
     this.calendarDaysGrid.innerHTML = '';
 
     const first = new Date(this.calYear, this.calMonth, 1);
@@ -5104,7 +4674,7 @@ class DailyFlowApp {
         </div>
       `;
 
-      cell.addEventListener('click', () => {
+      cell?.addEventListener('click', () => {
         this.setDate(fullDate);
         this.renderCalendar();
       });
@@ -5116,6 +4686,8 @@ class DailyFlowApp {
   }
 
   renderArchive() {
+    if (!this.archiveList) this.archiveList = document.getElementById('archiveList');
+    if (!this.archiveList) return;
     const journals = storage.getAllJournals();
     this.archiveList.innerHTML = '';
 
@@ -5152,7 +4724,7 @@ class DailyFlowApp {
         ${tagsHtml ? `<div style="margin-top: 8px;">${tagsHtml}</div>` : ''}
       `;
 
-      card.addEventListener('click', () => {
+      card?.addEventListener('click', () => {
         this.setDate(j.date);
         this.switchTab('journal');
       });
@@ -5182,15 +4754,15 @@ class DailyFlowApp {
         break;
       }
     }
-    this.streakDays.textContent = `${streak}일`;
-    this.streakSub.textContent = streak > 0 ? '꾸준함이 비범함을 만듭니다' : '오늘 첫 일기를 작성해보세요 ✨';
+    if (this.streakDays) this.streakDays.textContent = `${streak}일`;
+    if (this.streakSub) this.streakSub.textContent = streak > 0 ? '꾸준함이 비범함을 만듭니다' : '오늘 첫 일기를 작성해보세요 ✨';
 
     const goals = storage.getGoals();
     let totalP = 0;
     goals.forEach(g => { totalP += (g.progress || 0); });
     const avgGoalRate = goals.length > 0 ? Math.round(totalP / goals.length) : 0;
-    this.totalGoalRateVal.textContent = `${avgGoalRate}%`;
-    this.totalGoalCountVal.textContent = `총 ${goals.length}개 목표 관리 중`;
+    if (this.totalGoalRateVal) this.totalGoalRateVal.textContent = `${avgGoalRate}%`;
+    if (this.totalGoalCountVal) this.totalGoalCountVal.textContent = `총 ${goals.length}개 목표 관리 중`;
 
     let totalStudyHours = 0;
     let totalStudyCount = 0;
@@ -5200,8 +4772,8 @@ class DailyFlowApp {
         if (day.study.topic) totalStudyCount++;
       }
     }
-    this.totalStudyHoursVal.textContent = `${totalStudyHours}시간`;
-    this.totalStudyCountVal.textContent = `총 ${totalStudyCount}개 주제 학습`;
+    if (this.totalStudyHoursVal) this.totalStudyHoursVal.textContent = `${totalStudyHours}시간`;
+    if (this.totalStudyCountVal) this.totalStudyCountVal.textContent = `총 ${totalStudyCount}개 주제 학습`;
 
     let totalT = 0, compT = 0;
     for (let i = 0; i < 7; i++) {
@@ -5217,8 +4789,8 @@ class DailyFlowApp {
       }
     }
     const rate = totalT > 0 ? Math.round((compT / totalT) * 100) : 0;
-    this.todoRateVal.textContent = `${rate}%`;
-    this.todoRateSub.textContent = `최근 7일 (${compT}/${totalT} 완료)`;
+    if (this.todoRateVal) this.todoRateVal.textContent = `${rate}%`;
+    if (this.todoRateSub) this.todoRateSub.textContent = `최근 7일 (${compT}/${totalT} 완료)`;
 
     const moodCounts = { great: 0, good: 0, neutral: 0, tired: 0, stressed: 0 };
     let totalMood = 0;
@@ -5236,18 +4808,21 @@ class DailyFlowApp {
       { key: 'tired', label: '🥱 피곤해요', color: '#f59e0b' },
       { key: 'stressed', label: '😣 스트레스', color: '#ef4444' }
     ];
-    this.moodAnalyticsBars.innerHTML = '';
-    moodConfig.forEach(cfg => {
-      const c = moodCounts[cfg.key] || 0;
-      const pct = totalMood > 0 ? Math.round((c / totalMood) * 100) : 0;
-      const row = document.createElement('div');
-      row.className = 'stat-bar-row';
-      row.innerHTML = `
-        <div class="stat-bar-label"><span>${cfg.label}</span><span>${c}일 (${pct}%)</span></div>
-        <div class="stat-bar-track"><div class="stat-bar-fill" style="width:${pct}%; background-color:${cfg.color};"></div></div>
-      `;
-      this.moodAnalyticsBars.appendChild(row);
-    });
+    if (!this.moodAnalyticsBars) this.moodAnalyticsBars = document.getElementById('moodAnalyticsBars');
+    if (this.moodAnalyticsBars) {
+      this.moodAnalyticsBars.innerHTML = '';
+      moodConfig.forEach(cfg => {
+        const c = moodCounts[cfg.key] || 0;
+        const pct = totalMood > 0 ? Math.round((c / totalMood) * 100) : 0;
+        const row = document.createElement('div');
+        row.className = 'stat-bar-row';
+        row.innerHTML = `
+          <div class="stat-bar-label"><span>${cfg.label}</span><span>${c}일 (${pct}%)</span></div>
+          <div class="stat-bar-track"><div class="stat-bar-fill" style="width:${pct}%; background-color:${cfg.color};"></div></div>
+        `;
+        this.moodAnalyticsBars.appendChild(row);
+      });
+    }
 
     const habits = storage.getHabits();
     let monthDaysCount = 0;
@@ -5263,19 +4838,22 @@ class DailyFlowApp {
         }
       }
     }
-    this.habitAnalyticsBars.innerHTML = '';
-    const colors = ['#6366f1', '#06b6d4', '#10b981', '#f59e0b', '#ec4899'];
-    habits.forEach((h, idx) => {
-      const c = habitSuccess[h.id] || 0;
-      const pct = monthDaysCount > 0 ? Math.min(100, Math.round((c / monthDaysCount) * 100)) : 0;
-      const row = document.createElement('div');
-      row.className = 'stat-bar-row';
-      row.innerHTML = `
-        <div class="stat-bar-label"><span>${h.icon} ${this.escapeHtml(h.name)}</span><span>${c}일 달성 (${pct}%)</span></div>
-        <div class="stat-bar-track"><div class="stat-bar-fill" style="width:${pct}%; background-color:${colors[idx % colors.length]};"></div></div>
-      `;
-      this.habitAnalyticsBars.appendChild(row);
-    });
+    if (!this.habitAnalyticsBars) this.habitAnalyticsBars = document.getElementById('habitAnalyticsBars');
+    if (this.habitAnalyticsBars) {
+      this.habitAnalyticsBars.innerHTML = '';
+      const colors = ['#6366f1', '#06b6d4', '#10b981', '#f59e0b', '#ec4899'];
+      habits.forEach((h, idx) => {
+        const c = habitSuccess[h.id] || 0;
+        const pct = monthDaysCount > 0 ? Math.min(100, Math.round((c / monthDaysCount) * 100)) : 0;
+        const row = document.createElement('div');
+        row.className = 'stat-bar-row';
+        row.innerHTML = `
+          <div class="stat-bar-label"><span>${h.icon} ${this.escapeHtml(h.name)}</span><span>${c}일 달성 (${pct}%)</span></div>
+          <div class="stat-bar-track"><div class="stat-bar-fill" style="width:${pct}%; background-color:${colors[idx % colors.length]};"></div></div>
+        `;
+        this.habitAnalyticsBars.appendChild(row);
+      });
+    }
   }
 
   // ==========================================
@@ -5340,10 +4918,157 @@ class DailyFlowApp {
     if (!str) return '';
     return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
+
+  // ==========================================
+  // 🛠️ 추가된 필수 헬퍼 & AI 연동 메서드
+  // ==========================================
+  formatDateKey(d) {
+    if (!d) return todayKST();
+    if (typeof d === 'string') return d;
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${dd}`;
+  }
+
+  setMood(mood) {
+    const dayData = storage.getDayData(this.currentDate);
+    storage.updateDayData(this.currentDate, { mood });
+    this.highlightMood(mood);
+    this.showToast(`오늘의 기분이 '${mood}'(으)로 기록되었습니다.`);
+  }
+
+  async handleDashboardTroubleChat(trouble) {
+    if (!trouble) return;
+    this.appendDashChatMessage('user', trouble);
+    const bubbleId = 'dash_bot_' + Date.now();
+    this.appendDashChatMessage('bot', '<i class="fa-solid fa-spinner fa-spin"></i> 1% AI 코치가 분석 중입니다...', bubbleId);
+    
+    const dayData = storage.getDayData(this.currentDate);
+    const focus = dayData.focus || '목표 미설정';
+    const prompt = `[Daily Flow 1% 실행 코칭]\n오늘 북극성 목표: ${focus}\n사용자 질문/고민: "${trouble}"\n\n상황을 꿰뚫는 명쾌하고 실행 가능한 1% 실행 지침 3가지를 제시해줘.`;
+    
+    try {
+      const res = await geminiClient.generateText(prompt);
+      this.updateDashChatMessage(bubbleId, this.parseMarkdown(res));
+    } catch (e) {
+      this.updateDashChatMessage(bubbleId, 'AI 응답을 생성하지 못했습니다. 설정을 확인해주세요.');
+    }
+  }
+
+  openGlobalAiModal(prompt) {
+    if (this.geminiModal) {
+      this.geminiModal.classList.add('active');
+    }
+  }
+
+  async generateWeeklyRetroReport() {
+    if (!this.weeklyReportContent) return;
+    this.weeklyReportContent.innerHTML = '<div style="text-align:center; padding:30px;"><i class="fa-solid fa-spinner fa-spin text-emerald" style="font-size:2rem;"></i><p style="margin-top:10px;">Gemini가 지난 7일간의 실행 데이터를 종합 결산 분석 중입니다...</p></div>';
+    
+    const ws = weeklyEES(this.currentDate);
+    const win = lastNDays(this.currentDate, 7);
+    const allDays = storage.data.days || {};
+    let totalChars = 0;
+    let totalTodos = 0;
+    let doneTodos = 0;
+    win.forEach(dStr => {
+      const d = allDays[dStr];
+      if (d) {
+        (d.todos || []).forEach(t => { totalTodos++; if (t.completed) doneTodos++; });
+        (d.deepwork || []).forEach(b => { totalChars += (Number(b.chars) || 0); });
+      }
+    });
+
+    const prompt = `[주간 자동 결산 리포트]
+기준일: ${this.currentDate}
+주간 EES 평균: ${ws.avg}점 (${ws.grade})
+7일간 총 집필 자수: ${totalChars.toLocaleString()}자
+To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneTodos/totalTodos*100) : 0}%)
+결정 로그: ${storage.data.decisions.length}건
+
+위 데이터를 기반으로 다음 항목으로 주간 결산 리포트를 작성해줘:
+1. 🏆 **이번 주 핵심 성과 & 1% 실행 하이라이트**
+2. ⚠️ **가장 취약했던 지점 및 병목 원인 분석**
+3. 🚀 **다음 주 단 하나의 돌파 과업 및 실행 시간표**`;
+
+    try {
+      const res = await geminiClient.generateText(prompt);
+      this.weeklyReportContent.innerHTML = this.parseMarkdown(res);
+      this.showToast('주간 자동 결산 리포트가 생성되었습니다! 📊');
+    } catch (e) {
+      this.weeklyReportContent.innerHTML = '<p style="color:var(--accent-rose);">리포트 생성 중 오류가 발생했습니다.</p>';
+    }
+  }
+
+  async generateAiJournalDraft() {
+    const dayData = storage.getDayData(this.currentDate);
+    const todos = (dayData.todos || []).filter(t => t.completed).map(t => t.text).join(', ');
+    const focus = dayData.focus || '오늘의 집중 목표';
+    
+    this.showToast('AI가 오늘의 실행 데이터를 바탕으로 일기 초안을 작성 중입니다...');
+    const prompt = `오늘의 날짜: ${this.currentDate}\n오늘의 집중: ${focus}\n완료한 주요 과업: ${todos || '기본 업무 완료'}\n\n위 실행 내역을 바탕으로 1% 성장 관점의 진솔하고 깊이 있는 하루 일기 초안을 작성해줘. (사실-느낌-교훈-실행 4단계 포함)`;
+    
+    try {
+      const draft = await geminiClient.generateText(prompt);
+      if (this.journalContent) {
+        this.journalContent.value = draft;
+        this.updateJournalStats();
+        this.autoSaveJournal();
+        this.showToast('AI 일기 초안이 작성되었습니다! ✨');
+      }
+    } catch (e) {
+      this.showToast('일기 생성에 실패했습니다.', 'error');
+    }
+  }
+
+  async extractActionGuideFromJournal() {
+    const content = this.journalContent?.value?.trim();
+    if (!content) {
+      this.showToast('일기 본문 내용이 없습니다.', 'error');
+      return;
+    }
+    this.showToast('일기에서 핵심 실행 지침을 추출 중입니다...');
+    const prompt = `[일기 내용]\n${content}\n\n위 일기에서 내일 즉시 행동으로 옮겨야 할 [핵심 실행 액션 3가지]를 명확한 할 일 형태로 뽑아줘.`;
+    try {
+      const res = await geminiClient.generateText(prompt);
+      const firstLine = res.split('\n')[0].replace(/^[-*0-9.\s]+/, '') || '일기 피드백 액션 실행';
+      this.pushActionToTodayTodo(`[일기 피드백] ${firstLine}`, 'career');
+      this.showToast('일기에서 추출된 실행 지침이 오늘의 To-Do로 등록되었습니다! ⚡');
+    } catch (e) {
+      this.showToast('추출에 실패했습니다.', 'error');
+    }
+  }
+
+  async handleAiCoachMessage(msg) {
+    if (!msg) return;
+    this.appendChatMessage('user', msg);
+    const bubbleId = 'ai_bot_' + Date.now();
+    this.appendChatMessage('bot', '<i class="fa-solid fa-spinner fa-spin"></i> 제미나이 1% 코치가 분석 중입니다...', bubbleId);
+    
+    const dayData = storage.getDayData(this.currentDate);
+    const prompt = `당신은 최고 수준의 1% Life OS 전략 코치입니다.\n현재 날짜: ${this.currentDate}\n오늘의 포커스: ${dayData.focus || '미정'}\n질문: "${msg}"\n\n직설적이고 냉철하며 실질적인 지침을 제시해주세요.`;
+    
+    try {
+      const res = await geminiClient.generateText(prompt);
+      this.updateChatMessage(bubbleId, this.parseMarkdown(res));
+    } catch (e) {
+      this.updateChatMessage(bubbleId, '코칭 응답 생성 중 오류가 발생했습니다.');
+    }
+  }
 }
 
 // Global initialization
-window.addEventListener('DOMContentLoaded', async () => {
-  window.dailyFlowApp = new DailyFlowApp();
-  await window.dailyFlowApp.init();
-});
+async function initDailyFlow() {
+  if (!window.dailyFlowApp) {
+    window.dailyFlowApp = new DailyFlowApp();
+    window.app = window.dailyFlowApp;
+    await window.dailyFlowApp.init();
+  }
+}
+
+if (document.readyState === 'loading') {
+  window.addEventListener('DOMContentLoaded', initDailyFlow);
+} else {
+  initDailyFlow();
+}

@@ -37,7 +37,8 @@ export class Journal {
     this.journalTagInput = document.getElementById('journalTagInput');
     this.addTagBtn = document.getElementById('addTagBtn');
     this.journalPhotoInput = document.getElementById('journalPhotoInput');
-    this.journalPhotoPreview = document.getElementById('journalPhotoPreview');
+    this.journalPhotoPreview = document.getElementById('journalPhotoPreview') || document.getElementById('journalPhotoGallery');
+    this.journalPhotosBar = document.getElementById('journalPhotosBar');
 
     // Templates
     this.templateBtns = document.querySelectorAll('.btn-template');
@@ -311,6 +312,10 @@ export class Journal {
   renderPhotos() {
     const dayData = storage.getDayData(this.currentDate);
     const photos = dayData.journal.photos || [];
+    if (this.journalPhotosBar) {
+      this.journalPhotosBar.style.display = photos.length > 0 ? 'block' : 'none';
+    }
+    if (!this.journalPhotoPreview) return;
     this.journalPhotoPreview.innerHTML = '';
 
     photos.forEach((photo, idx) => {
