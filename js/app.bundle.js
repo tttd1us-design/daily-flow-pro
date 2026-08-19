@@ -2466,7 +2466,181 @@ class DailyFlowApp {
     this.renderTabCalendar('principles');
   }
 
+  renderDashboardRightCalendar() {
+    const titleEl = document.getElementById('dashCalTitle');
+    const subtitleEl = document.getElementById('dashCalSubtitle');
+    const gridEl = document.getElementById('dashCalGrid');
+    const listEl = document.getElementById('dashCalMonthList');
+    const summaryBadge = document.getElementById('dashCalMonthSummaryBadge');
+    if (!titleEl || !gridEl) return;
+
+    const st = this.tabCalState.dashboard || { year: new Date().getFullYear(), month: new Date().getMonth() };
+    titleEl.textContent = `${st.year}년 ${st.month + 1}월`;
+    gridEl.innerHTML = '';
+
+    const first = new Date(st.year, st.month, 1);
+    const last = new Date(st.year, st.month + 1, 0);
+    const startDay = first.getDay();
+    const totalDays = last.getDate();
+
+    // Previous month filler
+    const prevLast = new Date(st.year, st.month, 0).getDate();
+    for (let i = startDay - 1; i >= 0; i--) {
+      const cell = document.createElement('div');
+      cell.className = 'dash-cal-cell other-month';
+      cell.innerHTML = `<span class="dash-cal-num">${prevLast - i}</span>`;
+      gridEl.appendChild(cell);
+    }
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    const allDays = storage.data.days || {};
+    const ymPrefix = `${st.year}-${String(st.month + 1).padStart(2, '0')}`;
+
+    let monthRecordedDays = 0;
+    let monthTotalTodos = 0;
+    let monthDoneTodos = 0;
+    let monthEesSum = 0;
+    let monthEesCount = 0;
+
+    for (let d = 1; d <= totalDays; d++) {
+      const mStr = String(st.month + 1).padStart(2, '0');
+      const dStr = String(d).padStart(2, '0');
+      const fullDate = `${st.year}-${mStr}-${dStr}`;
+
+      const cell = document.createElement('div');
+      cell.className = 'dash-cal-cell';
+      if (fullDate === todayStr) cell.classList.add('today');
+      if (fullDate === this.currentDate) cell.classList.add('selected');
+
+      const dayData = allDays[fullDate] || {};
+      const todos = dayData.todos || [];
+      const done = todos.filter(t => t.completed).length;
+      const hasFocus = !!dayData.focus;
+      const hasJournal = dayData.journal && (dayData.journal.title || dayData.journal.content);
+      const isComplete = (todos.length > 0 && done === todos.length);
+      const isPartial = (todos.length > 0 && done > 0 && !isComplete);
+
+      if (todos.length > 0 || hasFocus || hasJournal) {
+        monthRecordedDays++;
+        monthTotalTodos += todos.length;
+        monthDoneTodos += done;
+        if (dayData.ees && dayData.ees.total) {
+          monthEesSum += dayData.ees.total;
+          monthEesCount++;
+        }
+      }
+
+      // Tooltip
+      const tooltipParts = [`[${fullDate}]`];
+      if (hasFocus) tooltipParts.push(`🎯 북극성: ${dayData.focus}`);
+      if (todos.length > 0) tooltipParts.push(`⚡ 할 일: ${done}/${todos.length} (${Math.round((done / todos.length) * 100)}%)`);
+      if (hasJournal) tooltipParts.push(`📝 일기 작성됨`);
+      cell.title = tooltipParts.join('\n');
+
+      let dotHtml = '';
+      if (isComplete) {
+        dotHtml += `<span class="dash-cal-dot complete" title="100% 완료"></span>`;
+      } else if (isPartial) {
+        dotHtml += `<span class="dash-cal-dot progress" title="진행 중"></span>`;
+      } else if (todos.length > 0) {
+        dotHtml += `<span class="dash-cal-dot" style="background:#64748b;" title="대기 중"></span>`;
+      }
+
+      if (hasFocus) {
+        dotHtml += `<span style="font-size:0.62rem; color:var(--accent-gold); line-height:1;" title="북극성 미션">👑</span>`;
+      }
+      if (hasJournal) {
+        dotHtml += `<span class="dash-cal-dot journal" title="일기"></span>`;
+      }
+
+      cell.innerHTML = `
+        <span class="dash-cal-num">${d}</span>
+        <div class="dash-cal-badges">${dotHtml}</div>
+      `;
+
+      cell.addEventListener('click', () => {
+        this.setDate(fullDate);
+      });
+
+      gridEl.appendChild(cell);
+    }
+
+    // Monthly Subtitle Stats
+    if (subtitleEl) {
+      const avgRate = monthTotalTodos > 0 ? Math.round((monthDoneTodos / monthTotalTodos) * 100) : 0;
+      const avgEes = monthEesCount > 0 ? Math.round(monthEesSum / monthEesCount) : null;
+      subtitleEl.innerHTML = `🎯 To-Do ${avgRate}% 달성 · ${monthRecordedDays}일 실천${avgEes ? ` · EES 평균 ${avgEes}점` : ''}`;
+    }
+
+    if (summaryBadge) {
+      summaryBadge.textContent = `${monthRecordedDays}일 기록`;
+    }
+
+    // Render Timeline Feed List
+    if (listEl) {
+      listEl.innerHTML = '';
+      const monthKeys = Object.keys(allDays).filter(k => k.startsWith(ymPrefix)).sort().reverse();
+
+      if (monthKeys.length === 0) {
+        listEl.innerHTML = `
+          <div style="text-align:center; color:var(--text-muted); padding:24px 10px; font-size:0.75rem;">
+            <i class="fa-solid fa-calendar-plus" style="font-size:1.5rem; margin-bottom:6px; opacity:0.5;"></i>
+            <p>이달에 작성된 실행 기록이 없습니다.<br>오늘의 첫 북극성 미션과 To-Do를 시작해보세요! 🚀</p>
+          </div>
+        `;
+        return;
+      }
+
+      const moodEmojis = { great: '😆', good: '😊', neutral: '😐', tired: '🥱', stressed: '😣' };
+      const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+
+      monthKeys.forEach(dStr => {
+        const day = allDays[dStr];
+        const dayDate = new Date(dStr);
+        const dayOfWeek = dayNames[dayDate.getDay()] || '';
+        const dayNum = dStr.split('-')[2];
+        const todos = day.todos || [];
+        const done = todos.filter(t => t.completed).length;
+        const total = todos.length;
+        const rate = total > 0 ? Math.round((done / total) * 100) : 0;
+        const mood = day.mood ? moodEmojis[day.mood] || '✨' : '✨';
+        const focusText = day.focus || (todos.length > 0 ? todos[0].text : '기록 없음');
+        const isCurrent = (dStr === this.currentDate);
+
+        const card = document.createElement('div');
+        card.className = `dash-feed-card ${isCurrent ? 'active' : ''}`;
+        card.innerHTML = `
+          <div class="dash-feed-top">
+            <span class="dash-feed-date">
+              <i class="fa-regular fa-calendar" style="color:var(--accent-primary);"></i>
+              ${dayNum}일 (${dayOfWeek}) ${mood}
+            </span>
+            <span class="badge ${rate === 100 && total > 0 ? 'badge-success' : (rate >= 50 ? 'badge-warning' : 'badge-secondary')}" style="font-size:0.68rem; padding:1px 5px;">
+              ${done}/${total} 완료 (${rate}%)
+            </span>
+          </div>
+          <div class="dash-feed-focus">
+            ${day.focus ? '🎯 ' : '⚡ '}${this.escapeHtml(focusText)}
+          </div>
+          <div class="dash-feed-progress-bar">
+            <div class="dash-feed-progress-fill" style="width: ${rate}%;"></div>
+          </div>
+        `;
+
+        card.addEventListener('click', () => {
+          this.setDate(dStr);
+        });
+
+        listEl.appendChild(card);
+      });
+    }
+  }
+
   renderTabCalendar(target) {
+    if (target === 'dashboard') {
+      this.renderDashboardRightCalendar();
+      return;
+    }
     const titleEl = document.getElementById(`${target}CalTitle`);
     const gridEl = document.getElementById(`${target}CalGrid`);
     const listEl = document.getElementById(`${target}CalMonthList`);

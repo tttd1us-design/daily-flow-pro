@@ -18,9 +18,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&family=Nanum+Myeongjo:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
-  <link rel="stylesheet" href="css/style.css?v=2.0.2">
-  <link rel="stylesheet" href="css/print.css?v=2.0.2">
-  <link rel="stylesheet" href="css/tt.css?v=2.0.2">
+  <link rel="stylesheet" href="css/style.css?v=2.0.3">
+  <link rel="stylesheet" href="css/print.css?v=2.0.3">
+  <link rel="stylesheet" href="css/tt.css?v=2.0.3">
 </head>
 <body>
   <div class="app-container" id="appContainer">
@@ -446,26 +446,48 @@
 
           <!-- 우측 대시보드 전용 실행 캘린더 사이드바 -->
           <div class="tab-calendar-sidebar">
-            <div class="tab-cal-widget card">
-              <div class="tab-cal-header">
-                <button class="nav-mini-btn" data-cal-action="prev" data-target="dashboard"><i class="fa-solid fa-chevron-left"></i></button>
-                <h4 class="tab-cal-title" id="dashCalTitle">2026년 8월</h4>
-                <button class="nav-mini-btn" data-cal-action="next" data-target="dashboard"><i class="fa-solid fa-chevron-right"></i></button>
-                <button class="btn btn-secondary btn-sm" data-cal-action="today" data-target="dashboard" style="padding: 2px 8px; font-size: 0.75rem;">오늘</button>
+            <div class="tab-cal-widget card" style="background: linear-gradient(180deg, rgba(19, 27, 46, 0.95), rgba(11, 17, 30, 0.95)); border: 1px solid rgba(0, 120, 212, 0.25);">
+              <div class="tab-cal-header" style="margin-bottom: 8px;">
+                <button class="nav-mini-btn" data-cal-action="prev" data-target="dashboard" title="이전 달"><i class="fa-solid fa-chevron-left"></i></button>
+                <div style="text-align:center;">
+                  <h4 class="tab-cal-title" id="dashCalTitle" style="font-size:0.9rem; font-weight:800; color:var(--text-primary);">2026년 8월</h4>
+                  <div id="dashCalSubtitle" style="font-size:0.68rem; color:var(--accent-gold); font-weight:600; margin-top:2px;">실행률 계산 중...</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:4px;">
+                  <button class="nav-mini-btn" data-cal-action="next" data-target="dashboard" title="다음 달"><i class="fa-solid fa-chevron-right"></i></button>
+                  <button class="btn btn-secondary btn-sm" data-cal-action="today" data-target="dashboard" style="padding: 2px 7px; font-size: 0.72rem;">오늘</button>
+                </div>
               </div>
               <div class="tab-cal-weekdays">
-                <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+                <span style="color:#f87171; font-weight:700;">일</span>
+                <span>월</span>
+                <span>화</span>
+                <span>수</span>
+                <span>목</span>
+                <span>금</span>
+                <span style="color:#60a5fa; font-weight:700;">토</span>
               </div>
               <div class="tab-cal-days-grid" id="dashCalGrid"></div>
+
+              <!-- 하단 범례 (Legend) -->
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding-top:6px; border-top:1px solid rgba(255,255,255,0.06); font-size:0.65rem; color:var(--text-muted);">
+                <span style="display:flex; align-items:center; gap:3px;"><span class="dash-cal-dot complete" style="width:5px; height:5px;"></span>100%</span>
+                <span style="display:flex; align-items:center; gap:3px;"><span class="dash-cal-dot progress" style="width:5px; height:5px;"></span>진행</span>
+                <span style="display:flex; align-items:center; gap:2px;"><span style="color:var(--accent-gold);">👑</span>원씽</span>
+                <span style="display:flex; align-items:center; gap:2px;">📝일기</span>
+              </div>
             </div>
 
-            <div class="card" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
-              <div class="card-header" style="padding: 10px 14px;">
-                <h4 style="font-size: 0.82rem; font-weight: 700; margin: 0; display:flex; align-items:center; gap:6px;">
-                  <i class="fa-solid fa-calendar-check text-emerald"></i> 이달의 실행률 피드
-                </h4>
+            <div class="card" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08);">
+              <div class="card-header" style="padding: 9px 12px; background: rgba(0, 0, 0, 0.15);">
+                <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+                  <h4 style="font-size: 0.82rem; font-weight: 700; margin: 0; display:flex; align-items:center; gap:6px;">
+                    <i class="fa-solid fa-calendar-check text-emerald"></i> 이달의 실행 타임라인 피드
+                  </h4>
+                  <span id="dashCalMonthSummaryBadge" class="badge badge-primary" style="font-size:0.68rem; padding:2px 6px;">0일 기록</span>
+                </div>
               </div>
-              <div class="tab-cal-item-list" id="dashCalMonthList"></div>
+              <div class="tab-cal-item-list" id="dashCalMonthList" style="padding: 8px; gap: 6px;"></div>
             </div>
           </div>
         </div>
@@ -2317,6 +2339,6 @@
 
   <div class="toast-container" id="toastContainer"></div>
 
-  <script type="module" src="js/app.bundle.js?v=2.0.2"></script>
+  <script type="module" src="js/app.bundle.js?v=2.0.3"></script>
 </body>
 </html>

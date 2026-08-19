@@ -338,6 +338,146 @@ body {
 .tab-cal-badge-dot { width: 4px; height: 4px; border-radius: var(--radius-full); position: absolute; bottom: 2px; }
 .tab-cal-day-cell.selected .tab-cal-badge-dot { background: #ffffff !important; }
 
+/* Dashboard Premium Right Calendar & Feed */
+.dash-cal-cell {
+  aspect-ratio: 1;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 500;
+  position: relative;
+  transition: all var(--transition-fast);
+  padding: 2px;
+  user-select: none;
+}
+.dash-cal-cell:hover {
+  border-color: var(--accent-primary);
+  background: var(--bg-tertiary);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.dash-cal-cell.other-month {
+  opacity: 0.22;
+}
+.dash-cal-cell.today {
+  border: 2px solid var(--accent-gold);
+  font-weight: 800;
+  color: var(--accent-gold);
+  box-shadow: 0 0 8px rgba(250, 204, 21, 0.25);
+}
+.dash-cal-cell.selected {
+  background: linear-gradient(135deg, #0078d4, #00b7c3);
+  color: #ffffff !important;
+  border-color: #22d3ee;
+  font-weight: 800;
+  box-shadow: 0 0 12px rgba(0, 183, 195, 0.4);
+}
+.dash-cal-cell.selected .dash-cal-badges span {
+  filter: drop-shadow(0 0 2px rgba(0,0,0,0.8));
+}
+.dash-cal-num {
+  font-size: 0.74rem;
+  line-height: 1;
+}
+.dash-cal-badges {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  margin-top: 2px;
+  height: 8px;
+}
+.dash-cal-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.dash-cal-dot.complete {
+  background: #10b981;
+  box-shadow: 0 0 4px #10b981;
+}
+.dash-cal-dot.progress {
+  background: #f59e0b;
+}
+.dash-cal-dot.empty {
+  background: transparent;
+}
+.dash-cal-dot.journal {
+  background: #6366f1;
+}
+
+/* Dashboard Month Feed Card */
+.dash-feed-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.dash-feed-card:hover {
+  border-color: var(--accent-primary);
+  background: var(--bg-tertiary);
+  transform: translateX(2px);
+}
+.dash-feed-card.active {
+  border: 1px solid rgba(250, 204, 21, 0.5);
+  background: linear-gradient(135deg, rgba(250, 204, 21, 0.1), rgba(19, 27, 46, 0.95));
+  box-shadow: 0 0 10px rgba(250, 204, 21, 0.15);
+}
+.dash-feed-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.76rem;
+}
+.dash-feed-date {
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.dash-feed-focus {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent-gold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+}
+.dash-feed-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+.dash-feed-progress-bar {
+  background: rgba(255, 255, 255, 0.08);
+  height: 4px;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 3px;
+}
+.dash-feed-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f59e0b, #10b981);
+  border-radius: 2px;
+}
+
 .tab-cal-item-list { display: flex; flex-direction: column; gap: 5px; overflow-y: auto; flex: 1; padding: 8px 10px; max-height: 380px; }
 .tab-cal-list-row {
   display: flex; align-items: center; justify-content: space-between; padding: 6px 8px;
