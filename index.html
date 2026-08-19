@@ -18,9 +18,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&family=Nanum+Myeongjo:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
-  <link rel="stylesheet" href="css/style.css?v=2.0.4">
-  <link rel="stylesheet" href="css/print.css?v=2.0.4">
-  <link rel="stylesheet" href="css/tt.css?v=2.0.4">
+  <link rel="stylesheet" href="css/style.css?v=2.0.5">
+  <link rel="stylesheet" href="css/print.css?v=2.0.5">
+  <link rel="stylesheet" href="css/tt.css?v=2.0.5">
 </head>
 <body>
   <div class="app-container" id="appContainer">
@@ -959,26 +959,32 @@
 
           <!-- 우측 10조 로드맵 캘린더 사이드바 -->
           <div class="tab-calendar-sidebar">
-            <div class="tab-cal-widget card">
-              <div class="tab-cal-header">
-                <button class="nav-mini-btn" data-cal-action="prev" data-target="trillion"><i class="fa-solid fa-chevron-left"></i></button>
-                <h4 class="tab-cal-title" id="trillionCalTitle">2026년 8월</h4>
-                <button class="nav-mini-btn" data-cal-action="next" data-target="trillion"><i class="fa-solid fa-chevron-right"></i></button>
-                <button class="btn btn-secondary btn-sm" data-cal-action="today" data-target="trillion" style="padding: 2px 8px; font-size: 0.75rem;">오늘</button>
+            <div class="tab-cal-widget card" style="background: linear-gradient(180deg, rgba(19, 27, 46, 0.95), rgba(11, 17, 30, 0.95)); border: 1px solid rgba(250, 204, 21, 0.25);">
+              <div class="tab-cal-header" style="margin-bottom: 8px;">
+                <button class="nav-mini-btn" data-cal-action="prev" data-target="trillion" title="이전 달"><i class="fa-solid fa-chevron-left"></i></button>
+                <div style="text-align:center;">
+                  <h4 class="tab-cal-title" id="trillionCalTitle" style="font-size:0.9rem; font-weight:800; color:var(--text-primary);">2026년 8월</h4>
+                  <div id="trillionCalSubtitle" style="font-size:0.68rem; color:#facc15; font-weight:600; margin-top:2px;">10조 로드맵 집계 중...</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:4px;">
+                  <button class="nav-mini-btn" data-cal-action="next" data-target="trillion" title="다음 달"><i class="fa-solid fa-chevron-right"></i></button>
+                  <button class="btn btn-secondary btn-sm" data-cal-action="today" data-target="trillion" style="padding: 2px 7px; font-size: 0.72rem;">오늘</button>
+                </div>
               </div>
               <div class="tab-cal-weekdays">
-                <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+                <span style="color:#f87171; font-weight:700;">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span style="color:#60a5fa; font-weight:700;">토</span>
               </div>
               <div class="tab-cal-days-grid" id="trillionCalGrid"></div>
             </div>
 
-            <div class="card" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
-              <div class="card-header" style="padding: 10px 14px;">
+            <div class="card" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08);">
+              <div class="card-header" style="padding: 8px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); display:flex; justify-content:space-between; align-items:center;">
                 <h4 style="font-size: 0.82rem; font-weight: 700; margin: 0; display:flex; align-items:center; gap:6px;">
                   <i class="fa-solid fa-crown text-yellow"></i> 10조 자산가 실천 기록 피드
                 </h4>
+                <span class="badge badge-warning" id="trillionMonthCountBadge" style="font-size:0.68rem; padding:2px 6px;">0건</span>
               </div>
-              <div class="tab-cal-item-list" id="trillionCalMonthList"></div>
+              <div class="tab-cal-item-list" id="trillionCalMonthList" style="padding: 4px 6px; gap: 6px;"></div>
             </div>
           </div>
         </div>
@@ -1055,26 +1061,32 @@
 
           <!-- 우측 아이디어 캘린더 사이드바 -->
           <div class="tab-calendar-sidebar">
-            <div class="tab-cal-widget card">
-              <div class="tab-cal-header">
-                <button class="nav-mini-btn" data-cal-action="prev" data-target="memo"><i class="fa-solid fa-chevron-left"></i></button>
-                <h4 class="tab-cal-title" id="memoCalTitle">2026년 8월</h4>
-                <button class="nav-mini-btn" data-cal-action="next" data-target="memo"><i class="fa-solid fa-chevron-right"></i></button>
-                <button class="btn btn-secondary btn-sm" data-cal-action="today" data-target="memo" style="padding: 2px 8px; font-size: 0.75rem;">오늘</button>
+            <div class="tab-cal-widget card" style="background: linear-gradient(180deg, rgba(19, 27, 46, 0.95), rgba(11, 17, 30, 0.95)); border: 1px solid rgba(250, 204, 21, 0.25);">
+              <div class="tab-cal-header" style="margin-bottom: 8px;">
+                <button class="nav-mini-btn" data-cal-action="prev" data-target="memo" title="이전 달"><i class="fa-solid fa-chevron-left"></i></button>
+                <div style="text-align:center;">
+                  <h4 class="tab-cal-title" id="memoCalTitle" style="font-size:0.9rem; font-weight:800; color:var(--text-primary);">2026년 8월</h4>
+                  <div id="memoCalSubtitle" style="font-size:0.68rem; color:#facc15; font-weight:600; margin-top:2px;">아이디어 캡처 집계 중...</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:4px;">
+                  <button class="nav-mini-btn" data-cal-action="next" data-target="memo" title="다음 달"><i class="fa-solid fa-chevron-right"></i></button>
+                  <button class="btn btn-secondary btn-sm" data-cal-action="today" data-target="memo" style="padding: 2px 7px; font-size: 0.72rem;">오늘</button>
+                </div>
               </div>
               <div class="tab-cal-weekdays">
-                <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+                <span style="color:#f87171; font-weight:700;">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span style="color:#60a5fa; font-weight:700;">토</span>
               </div>
               <div class="tab-cal-days-grid" id="memoCalGrid"></div>
             </div>
 
-            <div class="card" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
-              <div class="card-header" style="padding: 10px 14px;">
+            <div class="card" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08);">
+              <div class="card-header" style="padding: 8px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); display:flex; justify-content:space-between; align-items:center;">
                 <h4 style="font-size: 0.82rem; font-weight: 700; margin: 0; display:flex; align-items:center; gap:6px;">
                   <i class="fa-solid fa-lightbulb text-yellow"></i> 이달의 아이디어 피드
                 </h4>
+                <span class="badge badge-warning" id="memoMonthCountBadge" style="font-size:0.68rem; padding:2px 6px;">0건</span>
               </div>
-              <div class="tab-cal-item-list" id="memoCalMonthList"></div>
+              <div class="tab-cal-item-list" id="memoCalMonthList" style="padding: 4px 6px; gap: 6px;"></div>
             </div>
           </div>
         </div>
@@ -1204,26 +1216,32 @@
 
           <!-- 우측 퇴근 후 실행 캘린더 사이드바 -->
           <div class="tab-calendar-sidebar">
-            <div class="tab-cal-widget card">
-              <div class="tab-cal-header">
-                <button class="nav-mini-btn" data-cal-action="prev" data-target="evening"><i class="fa-solid fa-chevron-left"></i></button>
-                <h4 class="tab-cal-title" id="eveningCalTitle">2026년 8월</h4>
-                <button class="nav-mini-btn" data-cal-action="next" data-target="evening"><i class="fa-solid fa-chevron-right"></i></button>
-                <button class="btn btn-secondary btn-sm" data-cal-action="today" data-target="evening" style="padding: 2px 8px; font-size: 0.75rem;">오늘</button>
+            <div class="tab-cal-widget card" style="background: linear-gradient(180deg, rgba(19, 27, 46, 0.95), rgba(11, 17, 30, 0.95)); border: 1px solid rgba(168, 85, 247, 0.25);">
+              <div class="tab-cal-header" style="margin-bottom: 8px;">
+                <button class="nav-mini-btn" data-cal-action="prev" data-target="evening" title="이전 달"><i class="fa-solid fa-chevron-left"></i></button>
+                <div style="text-align:center;">
+                  <h4 class="tab-cal-title" id="eveningCalTitle" style="font-size:0.9rem; font-weight:800; color:var(--text-primary);">2026년 8월</h4>
+                  <div id="eveningCalSubtitle" style="font-size:0.68rem; color:#c084fc; font-weight:600; margin-top:2px;">야간 몰입 집계 중...</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:4px;">
+                  <button class="nav-mini-btn" data-cal-action="next" data-target="evening" title="다음 달"><i class="fa-solid fa-chevron-right"></i></button>
+                  <button class="btn btn-secondary btn-sm" data-cal-action="today" data-target="evening" style="padding: 2px 7px; font-size: 0.72rem;">오늘</button>
+                </div>
               </div>
               <div class="tab-cal-weekdays">
-                <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+                <span style="color:#f87171; font-weight:700;">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span style="color:#60a5fa; font-weight:700;">토</span>
               </div>
               <div class="tab-cal-days-grid" id="eveningCalGrid"></div>
             </div>
 
-            <div class="card" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
-              <div class="card-header" style="padding: 10px 14px;">
+            <div class="card" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08);">
+              <div class="card-header" style="padding: 8px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); display:flex; justify-content:space-between; align-items:center;">
                 <h4 style="font-size: 0.82rem; font-weight: 700; margin: 0; display:flex; align-items:center; gap:6px;">
-                  <i class="fa-solid fa-moon text-yellow"></i> 이달의 야간 성장 기록
+                  <i class="fa-solid fa-moon text-purple"></i> 이달의 야간 성장 기록
                 </h4>
+                <span class="badge badge-primary" id="eveningMonthCountBadge" style="font-size:0.68rem; padding:2px 6px;">0건</span>
               </div>
-              <div class="tab-cal-item-list" id="eveningCalMonthList"></div>
+              <div class="tab-cal-item-list" id="eveningCalMonthList" style="padding: 4px 6px; gap: 6px;"></div>
             </div>
           </div>
         </div>
@@ -1377,26 +1395,32 @@
 
           <!-- 우측 목표 마감 D-Day 캘린더 사이드바 -->
           <div class="tab-calendar-sidebar">
-            <div class="tab-cal-widget card">
-              <div class="tab-cal-header">
-                <button class="nav-mini-btn" data-cal-action="prev" data-target="goals"><i class="fa-solid fa-chevron-left"></i></button>
-                <h4 class="tab-cal-title" id="goalsCalTitle">2026년 8월</h4>
-                <button class="nav-mini-btn" data-cal-action="next" data-target="goals"><i class="fa-solid fa-chevron-right"></i></button>
-                <button class="btn btn-secondary btn-sm" data-cal-action="today" data-target="goals" style="padding: 2px 8px; font-size: 0.75rem;">오늘</button>
+            <div class="tab-cal-widget card" style="background: linear-gradient(180deg, rgba(19, 27, 46, 0.95), rgba(11, 17, 30, 0.95)); border: 1px solid rgba(236, 72, 153, 0.25);">
+              <div class="tab-cal-header" style="margin-bottom: 8px;">
+                <button class="nav-mini-btn" data-cal-action="prev" data-target="goals" title="이전 달"><i class="fa-solid fa-chevron-left"></i></button>
+                <div style="text-align:center;">
+                  <h4 class="tab-cal-title" id="goalsCalTitle" style="font-size:0.9rem; font-weight:800; color:var(--text-primary);">2026년 8월</h4>
+                  <div id="goalsCalSubtitle" style="font-size:0.68rem; color:#f472b6; font-weight:600; margin-top:2px;">목표 마감 D-Day 집계 중...</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:4px;">
+                  <button class="nav-mini-btn" data-cal-action="next" data-target="goals" title="다음 달"><i class="fa-solid fa-chevron-right"></i></button>
+                  <button class="btn btn-secondary btn-sm" data-cal-action="today" data-target="goals" style="padding: 2px 7px; font-size: 0.72rem;">오늘</button>
+                </div>
               </div>
               <div class="tab-cal-weekdays">
-                <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+                <span style="color:#f87171; font-weight:700;">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span style="color:#60a5fa; font-weight:700;">토</span>
               </div>
               <div class="tab-cal-days-grid" id="goalsCalGrid"></div>
             </div>
 
-            <div class="card" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
-              <div class="card-header" style="padding: 10px 14px;">
+            <div class="card" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08);">
+              <div class="card-header" style="padding: 8px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); display:flex; justify-content:space-between; align-items:center;">
                 <h4 style="font-size: 0.82rem; font-weight: 700; margin: 0; display:flex; align-items:center; gap:6px;">
-                  <i class="fa-solid fa-flag-checkered text-cyan"></i> 목표별 마감 D-Day 타임라인
+                  <i class="fa-solid fa-flag-checkered text-pink"></i> 목표별 마감 D-Day 타임라인
                 </h4>
+                <span class="badge badge-danger" id="goalsMonthCountBadge" style="font-size:0.68rem; padding:2px 6px;">0건</span>
               </div>
-              <div class="tab-cal-item-list" id="goalsCalMonthList"></div>
+              <div class="tab-cal-item-list" id="goalsCalMonthList" style="padding: 4px 6px; gap: 6px;"></div>
             </div>
           </div>
         </div>
@@ -1484,26 +1508,32 @@
 
           <!-- 우측 주간 결산 캘린더 사이드바 -->
           <div class="tab-calendar-sidebar">
-            <div class="tab-cal-widget card">
-              <div class="tab-cal-header">
-                <button class="nav-mini-btn" data-cal-action="prev" data-target="weekly"><i class="fa-solid fa-chevron-left"></i></button>
-                <h4 class="tab-cal-title" id="weeklyCalTitle">2026년 8월</h4>
-                <button class="nav-mini-btn" data-cal-action="next" data-target="weekly"><i class="fa-solid fa-chevron-right"></i></button>
-                <button class="btn btn-secondary btn-sm" data-cal-action="today" data-target="weekly" style="padding: 2px 8px; font-size: 0.75rem;">오늘</button>
+            <div class="tab-cal-widget card" style="background: linear-gradient(180deg, rgba(19, 27, 46, 0.95), rgba(11, 17, 30, 0.95)); border: 1px solid rgba(0, 120, 212, 0.25);">
+              <div class="tab-cal-header" style="margin-bottom: 8px;">
+                <button class="nav-mini-btn" data-cal-action="prev" data-target="weekly" title="이전 달"><i class="fa-solid fa-chevron-left"></i></button>
+                <div style="text-align:center;">
+                  <h4 class="tab-cal-title" id="weeklyCalTitle" style="font-size:0.9rem; font-weight:800; color:var(--text-primary);">2026년 8월</h4>
+                  <div id="weeklyCalSubtitle" style="font-size:0.68rem; color:#60a5fa; font-weight:600; margin-top:2px;">주간 결산 집계 중...</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:4px;">
+                  <button class="nav-mini-btn" data-cal-action="next" data-target="weekly" title="다음 달"><i class="fa-solid fa-chevron-right"></i></button>
+                  <button class="btn btn-secondary btn-sm" data-cal-action="today" data-target="weekly" style="padding: 2px 7px; font-size: 0.72rem;">오늘</button>
+                </div>
               </div>
               <div class="tab-cal-weekdays">
-                <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+                <span style="color:#f87171; font-weight:700;">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span style="color:#60a5fa; font-weight:700;">토</span>
               </div>
               <div class="tab-cal-days-grid" id="weeklyCalGrid"></div>
             </div>
 
-            <div class="card" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
-              <div class="card-header" style="padding: 10px 14px;">
+            <div class="card" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08);">
+              <div class="card-header" style="padding: 8px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); display:flex; justify-content:space-between; align-items:center;">
                 <h4 style="font-size: 0.82rem; font-weight: 700; margin: 0; display:flex; align-items:center; gap:6px;">
-                  <i class="fa-solid fa-clipboard-list text-cyan"></i> 주차별 결산 히스토리
+                  <i class="fa-solid fa-chart-line text-blue"></i> 주차별 결산 히스토리
                 </h4>
+                <span class="badge badge-primary" id="weeklyMonthCountBadge" style="font-size:0.68rem; padding:2px 6px;">0건</span>
               </div>
-              <div class="tab-cal-item-list" id="weeklyCalMonthList"></div>
+              <div class="tab-cal-item-list" id="weeklyCalMonthList" style="padding: 4px 6px; gap: 6px;"></div>
             </div>
           </div>
         </div>
@@ -1551,26 +1581,32 @@
 
           <!-- 우측 AI 코칭 상담 캘린더 사이드바 -->
           <div class="tab-calendar-sidebar">
-            <div class="tab-cal-widget card">
-              <div class="tab-cal-header">
-                <button class="nav-mini-btn" data-cal-action="prev" data-target="ai"><i class="fa-solid fa-chevron-left"></i></button>
-                <h4 class="tab-cal-title" id="aiCalTitle">2026년 8월</h4>
-                <button class="nav-mini-btn" data-cal-action="next" data-target="ai"><i class="fa-solid fa-chevron-right"></i></button>
-                <button class="btn btn-secondary btn-sm" data-cal-action="today" data-target="ai" style="padding: 2px 8px; font-size: 0.75rem;">오늘</button>
+            <div class="tab-cal-widget card" style="background: linear-gradient(180deg, rgba(19, 27, 46, 0.95), rgba(11, 17, 30, 0.95)); border: 1px solid rgba(6, 182, 212, 0.25);">
+              <div class="tab-cal-header" style="margin-bottom: 8px;">
+                <button class="nav-mini-btn" data-cal-action="prev" data-target="ai" title="이전 달"><i class="fa-solid fa-chevron-left"></i></button>
+                <div style="text-align:center;">
+                  <h4 class="tab-cal-title" id="aiCalTitle" style="font-size:0.9rem; font-weight:800; color:var(--text-primary);">2026년 8월</h4>
+                  <div id="aiCalSubtitle" style="font-size:0.68rem; color:#22d3ee; font-weight:600; margin-top:2px;">AI 코칭 집계 중...</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:4px;">
+                  <button class="nav-mini-btn" data-cal-action="next" data-target="ai" title="다음 달"><i class="fa-solid fa-chevron-right"></i></button>
+                  <button class="btn btn-secondary btn-sm" data-cal-action="today" data-target="ai" style="padding: 2px 7px; font-size: 0.72rem;">오늘</button>
+                </div>
               </div>
               <div class="tab-cal-weekdays">
-                <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+                <span style="color:#f87171; font-weight:700;">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span style="color:#60a5fa; font-weight:700;">토</span>
               </div>
               <div class="tab-cal-days-grid" id="aiCalGrid"></div>
             </div>
 
-            <div class="card" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
-              <div class="card-header" style="padding: 10px 14px;">
+            <div class="card" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08);">
+              <div class="card-header" style="padding: 8px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); display:flex; justify-content:space-between; align-items:center;">
                 <h4 style="font-size: 0.82rem; font-weight: 700; margin: 0; display:flex; align-items:center; gap:6px;">
-                  <i class="fa-solid fa-comments text-cyan"></i> 이달의 코칭 & 상담 내역
+                  <i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> 이달의 코칭 & 상담 내역
                 </h4>
+                <span class="badge" id="aiMonthCountBadge" style="background:rgba(6,182,212,0.2); color:#22d3ee; font-size:0.68rem; padding:2px 6px;">0건</span>
               </div>
-              <div class="tab-cal-item-list" id="aiCalMonthList"></div>
+              <div class="tab-cal-item-list" id="aiCalMonthList" style="padding: 4px 6px; gap: 6px;"></div>
             </div>
           </div>
         </div>
@@ -1652,26 +1688,32 @@
 
           <!-- 우측 지식/학습 캘린더 사이드바 -->
           <div class="tab-calendar-sidebar">
-            <div class="tab-cal-widget card">
-              <div class="tab-cal-header">
-                <button class="nav-mini-btn" data-cal-action="prev" data-target="study"><i class="fa-solid fa-chevron-left"></i></button>
-                <h4 class="tab-cal-title" id="studyCalTitle">2026년 8월</h4>
-                <button class="nav-mini-btn" data-cal-action="next" data-target="study"><i class="fa-solid fa-chevron-right"></i></button>
-                <button class="btn btn-secondary btn-sm" data-cal-action="today" data-target="study" style="padding: 2px 8px; font-size: 0.75rem;">오늘</button>
+            <div class="tab-cal-widget card" style="background: linear-gradient(180deg, rgba(19, 27, 46, 0.95), rgba(11, 17, 30, 0.95)); border: 1px solid rgba(250, 204, 21, 0.25);">
+              <div class="tab-cal-header" style="margin-bottom: 8px;">
+                <button class="nav-mini-btn" data-cal-action="prev" data-target="study" title="이전 달"><i class="fa-solid fa-chevron-left"></i></button>
+                <div style="text-align:center;">
+                  <h4 class="tab-cal-title" id="studyCalTitle" style="font-size:0.9rem; font-weight:800; color:var(--text-primary);">2026년 8월</h4>
+                  <div id="studyCalSubtitle" style="font-size:0.68rem; color:#facc15; font-weight:600; margin-top:2px;">학습 기록 집계 중...</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:4px;">
+                  <button class="nav-mini-btn" data-cal-action="next" data-target="study" title="다음 달"><i class="fa-solid fa-chevron-right"></i></button>
+                  <button class="btn btn-secondary btn-sm" data-cal-action="today" data-target="study" style="padding: 2px 7px; font-size: 0.72rem;">오늘</button>
+                </div>
               </div>
               <div class="tab-cal-weekdays">
-                <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+                <span style="color:#f87171; font-weight:700;">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span style="color:#60a5fa; font-weight:700;">토</span>
               </div>
               <div class="tab-cal-days-grid" id="studyCalGrid"></div>
             </div>
 
-            <div class="card" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
-              <div class="card-header" style="padding: 10px 14px;">
+            <div class="card" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08);">
+              <div class="card-header" style="padding: 8px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); display:flex; justify-content:space-between; align-items:center;">
                 <h4 style="font-size: 0.82rem; font-weight: 700; margin: 0; display:flex; align-items:center; gap:6px;">
                   <i class="fa-solid fa-graduation-cap text-yellow"></i> 이달의 학습 타임라인
                 </h4>
+                <span class="badge badge-warning" id="studyMonthCountBadge" style="font-size:0.68rem; padding:2px 6px;">0건</span>
               </div>
-              <div class="tab-cal-item-list" id="studyCalMonthList"></div>
+              <div class="tab-cal-item-list" id="studyCalMonthList" style="padding: 4px 6px; gap: 6px;"></div>
             </div>
           </div>
         </div>
@@ -1892,26 +1934,32 @@
 
           <!-- 우측 원칙 & 회고 캘린더 사이드바 -->
           <div class="tab-calendar-sidebar">
-            <div class="tab-cal-widget card">
-              <div class="tab-cal-header">
-                <button class="nav-mini-btn" data-cal-action="prev" data-target="principles"><i class="fa-solid fa-chevron-left"></i></button>
-                <h4 class="tab-cal-title" id="principlesCalTitle">2026년 8월</h4>
-                <button class="nav-mini-btn" data-cal-action="next" data-target="principles"><i class="fa-solid fa-chevron-right"></i></button>
-                <button class="btn btn-secondary btn-sm" data-cal-action="today" data-target="principles" style="padding: 2px 8px; font-size: 0.75rem;">오늘</button>
+            <div class="tab-cal-widget card" style="background: linear-gradient(180deg, rgba(19, 27, 46, 0.95), rgba(11, 17, 30, 0.95)); border: 1px solid rgba(245, 158, 11, 0.25);">
+              <div class="tab-cal-header" style="margin-bottom: 8px;">
+                <button class="nav-mini-btn" data-cal-action="prev" data-target="principles" title="이전 달"><i class="fa-solid fa-chevron-left"></i></button>
+                <div style="text-align:center;">
+                  <h4 class="tab-cal-title" id="principlesCalTitle" style="font-size:0.9rem; font-weight:800; color:var(--text-primary);">2026년 8월</h4>
+                  <div id="principlesCalSubtitle" style="font-size:0.68rem; color:#fbbf24; font-weight:600; margin-top:2px;">원칙 회고 집계 중...</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:4px;">
+                  <button class="nav-mini-btn" data-cal-action="next" data-target="principles" title="다음 달"><i class="fa-solid fa-chevron-right"></i></button>
+                  <button class="btn btn-secondary btn-sm" data-cal-action="today" data-target="principles" style="padding: 2px 7px; font-size: 0.72rem;">오늘</button>
+                </div>
               </div>
               <div class="tab-cal-weekdays">
-                <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+                <span style="color:#f87171; font-weight:700;">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span style="color:#60a5fa; font-weight:700;">토</span>
               </div>
               <div class="tab-cal-days-grid" id="principlesCalGrid"></div>
             </div>
 
-            <div class="card" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
-              <div class="card-header" style="padding: 10px 14px;">
+            <div class="card" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08);">
+              <div class="card-header" style="padding: 8px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); display:flex; justify-content:space-between; align-items:center;">
                 <h4 style="font-size: 0.82rem; font-weight: 700; margin: 0; display:flex; align-items:center; gap:6px;">
                   <i class="fa-solid fa-gem text-amber"></i> 원칙 실천 기록
                 </h4>
+                <span class="badge badge-warning" id="principlesMonthCountBadge" style="font-size:0.68rem; padding:2px 6px;">0건</span>
               </div>
-              <div class="tab-cal-item-list" id="principlesCalMonthList"></div>
+              <div class="tab-cal-item-list" id="principlesCalMonthList" style="padding: 4px 6px; gap: 6px;"></div>
             </div>
           </div>
         </div>
@@ -2359,6 +2407,6 @@
 
   <div class="toast-container" id="toastContainer"></div>
 
-  <script type="module" src="js/app.bundle.js?v=2.0.4"></script>
+  <script type="module" src="js/app.bundle.js?v=2.0.5"></script>
 </body>
 </html>

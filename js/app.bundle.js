@@ -2641,9 +2641,16 @@ class DailyFlowApp {
       this.renderDashboardRightCalendar();
       return;
     }
+    if (target === 'journal') {
+      this.renderJournalRightCalendar();
+      return;
+    }
+
     const titleEl = document.getElementById(`${target}CalTitle`);
+    const subtitleEl = document.getElementById(`${target}CalSubtitle`);
     const gridEl = document.getElementById(`${target}CalGrid`);
     const listEl = document.getElementById(`${target}CalMonthList`);
+    const countBadge = document.getElementById(`${target}MonthCountBadge`);
     if (!titleEl || !gridEl) return;
 
     const st = this.tabCalState[target] || { year: new Date().getFullYear(), month: new Date().getMonth() };
@@ -2658,12 +2665,14 @@ class DailyFlowApp {
     const prevLast = new Date(st.year, st.month, 0).getDate();
     for (let i = startDay - 1; i >= 0; i--) {
       const cell = document.createElement('div');
-      cell.className = 'tab-cal-day-cell other-month';
-      cell.innerHTML = `<span>${prevLast - i}</span>`;
+      cell.className = 'dash-cal-cell other-month';
+      cell.innerHTML = `<span class="dash-cal-num">${prevLast - i}</span>`;
       gridEl.appendChild(cell);
     }
 
     const todayStr = new Date().toISOString().split('T')[0];
+    const allDays = storage.data.days || {};
+    let recordedCount = 0;
 
     for (let d = 1; d <= totalDays; d++) {
       const mStr = String(st.month + 1).padStart(2, '0');
@@ -2671,83 +2680,109 @@ class DailyFlowApp {
       const fullDate = `${st.year}-${mStr}-${dStr}`;
 
       const cell = document.createElement('div');
-      cell.className = 'tab-cal-day-cell';
+      cell.className = 'dash-cal-cell';
       if (fullDate === todayStr) cell.classList.add('today');
       if (fullDate === this.currentDate) cell.classList.add('selected');
 
-      const dayData = storage.data.days[fullDate] || {};
+      const dayData = allDays[fullDate] || {};
+      let dotsHtml = '';
+      let tooltipLines = [`[${fullDate}]`];
 
-      // Tab-specific badge indicator dot
-      let hasBadge = false;
-      let badgeColor = '#6366f1';
-
-      if (target === 'dashboard') {
-        const todos = dayData.todos || [];
-        if (todos.length > 0) {
-          hasBadge = true;
+      if (target === 'trillion') {
+        const todos = (dayData.todos || []).filter(t => t.text && (t.text.includes('[레버리지') || t.text.includes('[초격차') || t.text.includes('[자립') || t.text.includes('[역량') || t.text.includes('10조') || t.text.includes('도면') || t.text.includes('집필')));
+        const dw = dayData.deepwork || [];
+        if (todos.length > 0 || dw.length > 0) {
+          recordedCount++;
           const done = todos.filter(t => t.completed).length;
-          badgeColor = (done === todos.length && todos.length > 0) ? '#10b981' : '#f59e0b';
-        }
-      } else if (target === 'trillion') {
-        const todos = (dayData.todos || []).filter(t => t.text.includes('[레버리지') || t.text.includes('[초격차') || t.text.includes('[자립') || t.text.includes('[역량'));
-        if (todos.length > 0) {
-          hasBadge = true;
-          badgeColor = '#f59e0b';
+          if (done === todos.length && todos.length > 0) {
+            dotsHtml += '<span class="dash-cal-dot complete" title="10조 과업 완수"></span>';
+          } else {
+            dotsHtml += '<span class="dash-cal-dot" style="background:#f59e0b;" title="10조 과업 진행"></span>';
+          }
+          tooltipLines.push(`👑 10조 과업: ${done}/${todos.length} 완료`);
         }
       } else if (target === 'memo') {
         const memos = storage.getMemos().filter(m => m.date === fullDate);
         if (memos.length > 0) {
-          hasBadge = true;
-          badgeColor = '#facc15';
+          recordedCount += memos.length;
+          dotsHtml += '<span class="dash-cal-dot" style="background:#facc15;" title="아이디어 메모"></span>';
+          tooltipLines.push(`💡 메모 ${memos.length}개: ${memos[0].title}`);
         }
       } else if (target === 'evening') {
         const er = dayData.eveningRoutine || {};
-        if (er.goal || (er.todayTasks && er.todayTasks.length > 0)) {
-          hasBadge = true;
-          badgeColor = '#facc15';
+        const hasER = er.goal || (er.todayTasks && er.todayTasks.length > 0);
+        if (hasER) {
+          recordedCount++;
+          const done = (er.todayTasks || []).filter(t => t.completed).length;
+          dotsHtml += '<span class="dash-cal-dot" style="background:#a855f7;" title="야간 루틴"></span>';
+          tooltipLines.push(`🌙 저녁 몰입: ${er.goal || '루틴'} (${done}/${(er.todayTasks||[]).length})`);
+        }
+      } else if (target === 'goals') {
+        const goals = storage.getGoals().filter(g => g.deadline === fullDate);
+        if (goals.length > 0) {
+          recordedCount += goals.length;
+          dotsHtml += '<span class="dash-cal-dot" style="background:#ec4899;" title="목표 D-Day"></span>';
+          tooltipLines.push(`🎯 D-Day: ${goals.map(g => g.title).join(', ')}`);
         }
       } else if (target === 'weekly') {
         const todos = dayData.todos || [];
         if (todos.length > 0) {
-          hasBadge = true;
-          badgeColor = '#0078d4';
-        }
-      } else if (target === 'study') {
-        if (dayData.study && (dayData.study.topic || dayData.study.actualHours > 0 || (dayData.study.photos && dayData.study.photos.length > 0))) {
-          hasBadge = true;
-          badgeColor = '#facc15';
+          recordedCount++;
+          const done = todos.filter(t => t.completed).length;
+          dotsHtml += `<span class="dash-cal-dot" style="background:${done === todos.length ? '#10b981' : '#3b82f6'};"></span>`;
+          tooltipLines.push(`📊 실행 To-Do ${done}/${todos.length} 완료`);
         }
       } else if (target === 'ai') {
-        if (dayData.todos && dayData.todos.some(t => t.text.includes('[커리어]') || t.text.includes('[이월]'))) {
-          hasBadge = true;
-          badgeColor = '#22d3ee';
+        if (dayData.focus || (dayData.todos && dayData.todos.length > 0)) {
+          recordedCount++;
+          dotsHtml += '<span class="dash-cal-dot" style="background:#06b6d4;" title="AI 코칭"></span>';
+          tooltipLines.push(`🤖 포커스: ${dayData.focus || '실행 중'}`);
         }
-      } else if (target === 'goals') {
-        const goals = storage.getGoals();
-        if (goals.some(g => g.deadline === fullDate)) {
-          hasBadge = true;
-          badgeColor = '#ec4899';
+      } else if (target === 'study') {
+        const study = dayData.study || {};
+        const hasStudy = study.topic || (study.actualHours > 0) || (study.photos && study.photos.length > 0);
+        if (hasStudy) {
+          recordedCount++;
+          dotsHtml += '<span class="dash-cal-dot" style="background:#facc15;" title="학습 기록"></span>';
+          if (study.photos && study.photos.length > 0) dotsHtml += '<span class="dash-cal-dot" style="background:#38bdf8;" title="학습 캡처"></span>';
+          tooltipLines.push(`📚 학습: ${study.topic || '학습'} (${study.actualHours || 0}h)`);
         }
       } else if (target === 'principles') {
-        if (dayData.journal && dayData.journal.content && dayData.journal.content.includes('원칙')) {
-          hasBadge = true;
-          badgeColor = '#fbbf24';
+        if (dayData.journal && dayData.journal.title) {
+          recordedCount++;
+          dotsHtml += '<span class="dash-cal-dot" style="background:#f59e0b;" title="원칙 회고"></span>';
+          tooltipLines.push(`💎 일기/원칙: ${dayData.journal.title}`);
         }
       }
 
+      cell.title = tooltipLines.join('\n');
       cell.innerHTML = `
-        <span>${d}</span>
-        ${hasBadge ? `<span class="tab-cal-badge-dot" style="background:${badgeColor};"></span>` : ''}
+        <span class="dash-cal-num">${d}</span>
+        <div class="dash-cal-dots">${dotsHtml}</div>
       `;
 
-      cell?.addEventListener('click', () => {
+      cell.addEventListener('click', () => {
         this.setDate(fullDate);
       });
 
       gridEl.appendChild(cell);
     }
 
-    // Render Bottom Month Timeline List
+    if (subtitleEl) {
+      if (target === 'trillion') subtitleEl.innerHTML = `👑 실천 기록 ${recordedCount}일`;
+      else if (target === 'memo') subtitleEl.innerHTML = `💡 아이디어 ${recordedCount}개`;
+      else if (target === 'evening') subtitleEl.innerHTML = `🌙 야간 몰입 ${recordedCount}일`;
+      else if (target === 'goals') subtitleEl.innerHTML = `🎯 마감 목표 ${recordedCount}개`;
+      else if (target === 'weekly') subtitleEl.innerHTML = `📊 기록 ${recordedCount}일`;
+      else if (target === 'ai') subtitleEl.innerHTML = `🤖 코칭 ${recordedCount}일`;
+      else if (target === 'study') subtitleEl.innerHTML = `📚 학습 ${recordedCount}일`;
+      else if (target === 'principles') subtitleEl.innerHTML = `💎 회고 ${recordedCount}일`;
+    }
+
+    if (countBadge) {
+      countBadge.textContent = `${recordedCount}건`;
+    }
+
     if (listEl) {
       this.renderTabMonthList(target, listEl, st.year, st.month);
     }
@@ -2758,103 +2793,130 @@ class DailyFlowApp {
     const ym = `${year}-${String(month + 1).padStart(2, '0')}`;
     const allDays = storage.data.days || {};
     const dateKeys = Object.keys(allDays).filter(k => k.startsWith(ym)).sort().reverse();
-
-    if (dateKeys.length === 0) {
-      listEl.innerHTML = `<div style="text-align:center; color: var(--text-muted); padding: 14px; font-size: 0.75rem;">이달의 기록이 아직 없습니다.</div>`;
-      return;
-    }
+    const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
 
     let renderedCount = 0;
 
     dateKeys.forEach(dStr => {
       const day = allDays[dStr];
+      const dayDate = new Date(dStr);
+      const dayOfWeek = dayNames[dayDate.getDay()] || '';
       const dayNum = dStr.split('-')[2];
-      let rowHtml = '';
+      const isCurrent = (dStr === this.currentDate);
 
-      if (target === 'dashboard') {
-        const todos = day.todos || [];
-        const done = todos.filter(t => t.completed).length;
-        const focus = day.focus ? day.focus.substring(0, 16) + '...' : (todos.length > 0 ? `${done}/${todos.length} 완료` : '기록 없음');
-        rowHtml = `
-          <span class="tab-cal-row-date">${dayNum}일</span>
-          <span class="tab-cal-row-title">${this.escapeHtml(focus)}</span>
-          <span class="tab-cal-row-tag category-career">${done}/${todos.length}</span>
-        `;
-      } else if (target === 'trillion') {
-        const todos = (day.todos || []).filter(t => t.text.includes('[레버리지') || t.text.includes('[초격차') || t.text.includes('[자립') || t.text.includes('[역량'));
+      let cardHtml = '';
+
+      if (target === 'trillion') {
+        const todos = (day.todos || []).filter(t => t.text && (t.text.includes('[레버리지') || t.text.includes('[초격차') || t.text.includes('[자립') || t.text.includes('[역량') || t.text.includes('10조') || t.text.includes('도면') || t.text.includes('집필')));
         if (todos.length === 0) return;
         const done = todos.filter(t => t.completed).length;
-        rowHtml = `
-          <span class="tab-cal-row-date">${dayNum}일</span>
-          <span class="tab-cal-row-title">${this.escapeHtml(todos[0].text.substring(0, 16))}</span>
-          <span class="tab-cal-row-tag category-wealth">💎 ${done}/${todos.length}</span>
+        const pct = Math.round((done / todos.length) * 100);
+        cardHtml = `
+          <div class="dash-feed-top">
+            <span class="dash-feed-date"><i class="fa-solid fa-crown text-yellow"></i> ${dayNum}일 (${dayOfWeek})</span>
+            <span class="badge ${pct === 100 ? 'badge-primary' : 'badge-warning'}" style="font-size:0.68rem; padding:1px 5px;">${done}/${todos.length} 완료</span>
+          </div>
+          <div class="dash-feed-focus" style="color:var(--text-primary); margin-top:2px;">${this.escapeHtml(todos[0].text)}</div>
+          <div class="dash-feed-progress-bar"><div class="dash-feed-progress-fill" style="width:${pct}%;"></div></div>
         `;
       } else if (target === 'memo') {
-        const dayMemos = storage.getMemos().filter(m => m.date === dateKey);
+        const dayMemos = storage.getMemos().filter(m => m.date === dStr);
         if (dayMemos.length === 0) return;
-        rowHtml = `
-          <span class="tab-cal-row-date">${dayNum}일</span>
-          <span class="tab-cal-row-title">${this.escapeHtml(dayMemos[0].title.substring(0, 16))}</span>
-          <span class="tab-cal-row-tag category-wealth">💡 ${dayMemos.length}개</span>
+        cardHtml = `
+          <div class="dash-feed-top">
+            <span class="dash-feed-date"><i class="fa-solid fa-lightbulb text-yellow"></i> ${dayNum}일 (${dayOfWeek})</span>
+            <span class="badge badge-warning" style="font-size:0.68rem; padding:1px 5px;">${dayMemos.length}개</span>
+          </div>
+          <div class="dash-feed-focus" style="color:var(--text-primary); margin-top:2px;">${this.escapeHtml(dayMemos[0].title)}</div>
+          <div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">${this.escapeHtml((dayMemos[0].content || '').substring(0, 50))}</div>
         `;
       } else if (target === 'evening') {
         const er = day.eveningRoutine || {};
         if (!er.goal && (!er.todayTasks || er.todayTasks.length === 0)) return;
-        const eGoal = er.goal || (er.todayTasks[0]?.text || '저녁 실행');
-        rowHtml = `
-          <span class="tab-cal-row-date">${dayNum}일</span>
-          <span class="tab-cal-row-title">${this.escapeHtml(eGoal.substring(0, 16))}</span>
-          <span class="tab-cal-row-tag category-wealth">🌙 ${er.actualHours || 1.5}h</span>
+        const tasks = er.todayTasks || [];
+        const done = tasks.filter(t => t.completed).length;
+        const pct = tasks.length > 0 ? Math.round((done / tasks.length) * 100) : 100;
+        cardHtml = `
+          <div class="dash-feed-top">
+            <span class="dash-feed-date"><i class="fa-solid fa-moon text-purple"></i> ${dayNum}일 (${dayOfWeek})</span>
+            <span class="badge badge-primary" style="font-size:0.68rem; padding:1px 5px;">${er.actualHours || 2.0}h (${pct}%)</span>
+          </div>
+          <div class="dash-feed-focus" style="color:var(--text-primary); margin-top:2px;">${this.escapeHtml(er.goal || tasks[0]?.text || '야간 몰입 루틴')}</div>
+          <div class="dash-feed-progress-bar"><div class="dash-feed-progress-fill" style="width:${pct}%;"></div></div>
         `;
       } else if (target === 'weekly') {
         const todos = day.todos || [];
+        if (todos.length === 0) return;
         const done = todos.filter(t => t.completed).length;
-        rowHtml = `
-          <span class="tab-cal-row-date">${dayNum}일</span>
-          <span class="tab-cal-row-title">${todos.length > 0 ? `${done}/${todos.length} 완료` : '기록'}</span>
-          <span class="tab-cal-row-tag category-career">📊 주간데이터</span>
+        const pct = Math.round((done / todos.length) * 100);
+        cardHtml = `
+          <div class="dash-feed-top">
+            <span class="dash-feed-date"><i class="fa-solid fa-chart-line text-blue"></i> ${dayNum}일 (${dayOfWeek})</span>
+            <span class="badge ${pct === 100 ? 'badge-primary' : 'badge-warning'}" style="font-size:0.68rem; padding:1px 5px;">${done}/${todos.length} (${pct}%)</span>
+          </div>
+          <div class="dash-feed-focus" style="color:var(--text-primary); margin-top:2px;">${this.escapeHtml(day.focus || '일일 결산 완료')}</div>
+          <div class="dash-feed-progress-bar"><div class="dash-feed-progress-fill" style="width:${pct}%;"></div></div>
         `;
       } else if (target === 'study') {
-        if (!day.study || (!day.study.topic && day.study.actualHours === 0)) return;
-        rowHtml = `
-          <span class="tab-cal-row-date">${dayNum}일</span>
-          <span class="tab-cal-row-title">${this.escapeHtml(day.study.topic || '학습 메모')}</span>
-          <span class="tab-cal-row-tag category-study">${day.study.actualHours}h</span>
+        const study = day.study || {};
+        if (!study.topic && study.actualHours === 0 && (!study.photos || study.photos.length === 0)) return;
+        const photoCount = study.photos ? study.photos.length : 0;
+        cardHtml = `
+          <div class="dash-feed-top">
+            <span class="dash-feed-date"><i class="fa-solid fa-book-open text-yellow"></i> ${dayNum}일 (${dayOfWeek})</span>
+            <span class="badge badge-primary" style="font-size:0.68rem; padding:1px 5px;">${study.actualHours || 1.0}h ${photoCount > 0 ? `📷 ${photoCount}` : ''}</span>
+          </div>
+          <div class="dash-feed-focus" style="color:var(--text-primary); margin-top:2px;">${this.escapeHtml(study.topic || '학습 아카이브')}</div>
+          <div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">${this.escapeHtml((study.til || study.notes || '').substring(0, 50))}</div>
         `;
       } else if (target === 'ai') {
-        rowHtml = `
-          <span class="tab-cal-row-date">${dayNum}일</span>
-          <span class="tab-cal-row-title">${day.focus ? this.escapeHtml(day.focus.substring(0, 15)) : '코칭 연동 기록'}</span>
-          <span class="tab-cal-row-tag" style="background:rgba(6,182,212,0.2); color:#22d3ee;">AI</span>
+        if (!day.focus && (!day.todos || day.todos.length === 0)) return;
+        cardHtml = `
+          <div class="dash-feed-top">
+            <span class="dash-feed-date"><i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> ${dayNum}일 (${dayOfWeek})</span>
+            <span class="badge" style="background:rgba(6,182,212,0.2); color:#22d3ee; font-size:0.68rem; padding:1px 5px;">AI 지침</span>
+          </div>
+          <div class="dash-feed-focus" style="color:var(--text-primary); margin-top:2px;">${this.escapeHtml(day.focus || '코칭 실행')}</div>
         `;
       } else if (target === 'goals') {
         const goals = storage.getGoals().filter(g => g.deadline === dStr);
         if (goals.length === 0) return;
-        rowHtml = `
-          <span class="tab-cal-row-date">${dayNum}일</span>
-          <span class="tab-cal-row-title">${this.escapeHtml(goals[0].title)}</span>
-          <span class="tab-cal-row-tag" style="background:rgba(236,72,153,0.2); color:#f472b6;">D-Day</span>
+        cardHtml = `
+          <div class="dash-feed-top">
+            <span class="dash-feed-date"><i class="fa-solid fa-bullseye text-pink"></i> ${dayNum}일 (${dayOfWeek})</span>
+            <span class="badge badge-danger" style="font-size:0.68rem; padding:1px 5px;">D-Day</span>
+          </div>
+          <div class="dash-feed-focus" style="color:var(--text-primary); margin-top:2px;">${this.escapeHtml(goals[0].title)}</div>
+          <div class="dash-feed-progress-bar"><div class="dash-feed-progress-fill" style="width:${goals[0].progress || 0}%;"></div></div>
         `;
       } else if (target === 'principles') {
-        rowHtml = `
-          <span class="tab-cal-row-date">${dayNum}일</span>
-          <span class="tab-cal-row-title">${day.journal?.title ? this.escapeHtml(day.journal.title) : '원칙 회고'}</span>
-          <span class="tab-cal-row-tag category-wealth">💎</span>
+        if (!day.journal?.title) return;
+        cardHtml = `
+          <div class="dash-feed-top">
+            <span class="dash-feed-date"><i class="fa-solid fa-gem text-amber"></i> ${dayNum}일 (${dayOfWeek})</span>
+            <span class="badge badge-warning" style="font-size:0.68rem; padding:1px 5px;">원칙</span>
+          </div>
+          <div class="dash-feed-focus" style="color:var(--text-primary); margin-top:2px;">${this.escapeHtml(day.journal.title)}</div>
         `;
       }
 
-      if (rowHtml) {
-        const row = document.createElement('div');
-        row.className = `tab-cal-list-row ${dStr === this.currentDate ? 'active' : ''}`;
-        row.innerHTML = rowHtml;
-        row?.addEventListener('click', () => this.setDate(dStr));
-        listEl.appendChild(row);
+      if (cardHtml) {
+        const card = document.createElement('div');
+        card.className = `dash-feed-card ${isCurrent ? 'active' : ''}`;
+        card.innerHTML = cardHtml;
+        card.addEventListener('click', () => this.setDate(dStr));
+        listEl.appendChild(card);
         renderedCount++;
       }
     });
 
     if (renderedCount === 0) {
-      listEl.innerHTML = `<div style="text-align:center; color: var(--text-muted); padding: 14px; font-size: 0.75rem;">해당 항목의 기록이 없습니다.</div>`;
+      listEl.innerHTML = `
+        <div style="text-align:center; color: var(--text-muted); padding: 20px 10px; font-size: 0.76rem;">
+          <i class="fa-regular fa-calendar-check" style="font-size:1.4rem; opacity:0.4; margin-bottom:4px;"></i>
+          <p>이달에 기록된 실천 데이터가 없습니다.<br>오늘의 실천을 기록해보세요! 🚀</p>
+        </div>
+      `;
     }
   }
 
@@ -4297,6 +4359,7 @@ class DailyFlowApp {
         <div class="tb-time">${block.start} - ${block.end}</div>
         <div class="tb-title">${this.escapeHtml(block.title)}</div>
         <button class="todo-delete-btn" title="삭제"><i class="fa-solid fa-trash"></i></button>
+      `;
       div.querySelector('.todo-delete-btn')?.addEventListener('click', () => {
         const updated = blocks.filter(b => b.id !== block.id);
         storage.updateDayData(this.currentDate, { timeBlocks: updated });
