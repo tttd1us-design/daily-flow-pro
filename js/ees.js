@@ -110,3 +110,5 @@ export function paintEES(date = todayKST()) {
   bar('axDecision',  e.decision  / 25 * 100, '#f43f5e');
   return e;
 }
+
+export { computeEES as calculateEES };

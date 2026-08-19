@@ -4297,7 +4297,6 @@ class DailyFlowApp {
         <div class="tb-time">${block.start} - ${block.end}</div>
         <div class="tb-title">${this.escapeHtml(block.title)}</div>
         <button class="todo-delete-btn" title="삭제"><i class="fa-solid fa-trash"></i></button>
-      `;
       div.querySelector('.todo-delete-btn')?.addEventListener('click', () => {
         const updated = blocks.filter(b => b.id !== block.id);
         storage.updateDayData(this.currentDate, { timeBlocks: updated });
