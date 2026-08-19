@@ -4773,14 +4773,14 @@ class DailyFlowApp {
   // 17. Journal Right Sidebar Calendar (고화질 감성 캘린더)
   // ==========================================
   renderJournalRightCalendar() {
-    if (!document.getElementById('journalRightCalDays')) return;
     const titleEl = document.getElementById('jCalTitle');
+    const subtitleEl = document.getElementById('jCalSubtitle');
     const gridEl = document.getElementById('jCalGrid');
     const listEl = document.getElementById('jCalMonthList');
     const countBadge = document.getElementById('journalMonthCountBadge');
     if (!titleEl || !gridEl) return;
 
-    const st = this.tabCalState.journal;
+    const st = this.tabCalState.journal || { year: new Date().getFullYear(), month: new Date().getMonth() };
     titleEl.textContent = `${st.year}년 ${st.month + 1}월`;
     gridEl.innerHTML = '';
 
@@ -4792,13 +4792,18 @@ class DailyFlowApp {
     const prevLast = new Date(st.year, st.month, 0).getDate();
     for (let i = startDay - 1; i >= 0; i--) {
       const cell = document.createElement('div');
-      cell.className = 'jcal-day-cell other-month';
-      cell.innerHTML = `<span class="jcal-day-num">${prevLast - i}</span>`;
+      cell.className = 'dash-cal-cell other-month';
+      cell.innerHTML = `<span class="dash-cal-num">${prevLast - i}</span>`;
       gridEl.appendChild(cell);
     }
 
     const todayStr = new Date().toISOString().split('T')[0];
     const moodEmojis = { great: '😆', good: '😊', neutral: '😐', tired: '🥱', stressed: '😣' };
+    const allDays = storage.data.days || {};
+    const ymPrefix = `${st.year}-${String(st.month + 1).padStart(2, '0')}`;
+
+    let monthJournalCount = 0;
+    let monthPhotoCount = 0;
 
     for (let d = 1; d <= totalDays; d++) {
       const mStr = String(st.month + 1).padStart(2, '0');
@@ -4806,56 +4811,97 @@ class DailyFlowApp {
       const fullDate = `${st.year}-${mStr}-${dStr}`;
 
       const cell = document.createElement('div');
-      cell.className = 'jcal-day-cell';
+      cell.className = 'dash-cal-cell';
       if (fullDate === todayStr) cell.classList.add('today');
       if (fullDate === this.currentDate) cell.classList.add('selected');
 
-      const dayData = storage.data.days[fullDate];
-      const hasJournal = dayData && dayData.journal && (dayData.journal.title || dayData.journal.content);
-      const hasPhotos = dayData && dayData.journal && dayData.journal.photos && dayData.journal.photos.length > 0;
-      const mood = dayData && dayData.mood ? moodEmojis[dayData.mood] || '' : '';
+      const dayData = allDays[fullDate] || {};
+      const journal = dayData.journal || {};
+      const hasJournal = journal && (journal.title || journal.content);
+      const photoCount = (journal.photos ? journal.photos.length : 0) + (journal.photoIds ? journal.photoIds.length : 0);
+      const mood = dayData.mood ? moodEmojis[dayData.mood] || '' : '';
+
+      if (hasJournal) {
+        monthJournalCount++;
+        monthPhotoCount += photoCount;
+      }
+
+      // Rich tooltip
+      const tooltip = [
+        `[${fullDate}]`,
+        hasJournal ? `📝 ${journal.title || '제목 없는 일기'}` : '일기 미작성',
+        mood ? `기분: ${mood}` : '',
+        photoCount > 0 ? `📷 사진 ${photoCount}장` : ''
+      ].filter(Boolean).join('\n');
+      cell.title = tooltip;
+
+      let badgesHtml = '';
+      if (mood) badgesHtml += `<span style="font-size:0.75rem; line-height:1;">${mood}</span>`;
+      else if (hasJournal) badgesHtml += `<span style="font-size:0.75rem; line-height:1;">📝</span>`;
+      if (photoCount > 0) badgesHtml += `<span class="dash-cal-dot" style="background:#38bdf8;" title="사진 포함"></span>`;
 
       cell.innerHTML = `
-        <span class="jcal-day-num">${d}</span>
-        <span class="jcal-mood-emoji">${mood || (hasJournal ? '📝' : '')}</span>
-        ${hasPhotos ? '<span class="jcal-photo-dot" title="사진 포함"></span>' : ''}
+        <span class="dash-cal-num">${d}</span>
+        <div class="dash-cal-badges">${badgesHtml}</div>
       `;
 
-      cell?.addEventListener('click', () => {
+      cell.addEventListener('click', () => {
         this.setDate(fullDate);
       });
 
       gridEl.appendChild(cell);
     }
 
+    // Subtitle summary
+    if (subtitleEl) {
+      subtitleEl.innerHTML = `✍️ ${monthJournalCount}편 작성${monthPhotoCount > 0 ? ` · 📷 ${monthPhotoCount}장` : ''}`;
+    }
+
     if (listEl) {
       listEl.innerHTML = '';
-      const targetYM = `${st.year}-${String(st.month + 1).padStart(2, '0')}`;
       const allJournals = storage.getAllJournals();
-      const monthJournals = allJournals.filter(j => j.date.startsWith(targetYM));
+      const monthJournals = allJournals.filter(j => j.date && j.date.startsWith(ymPrefix));
 
       if (countBadge) countBadge.textContent = `${monthJournals.length}편`;
 
       if (monthJournals.length === 0) {
-        listEl.innerHTML = `<div style="text-align:center; color: var(--text-muted); padding: 24px 10px; font-size: 0.78rem;">이달에 작성된 일기가 없습니다.<br>[AI 일기 자동 생성]으로 첫 일기를 써보세요! ✨</div>`;
+        listEl.innerHTML = `
+          <div style="text-align:center; color: var(--text-muted); padding: 24px 10px; font-size: 0.78rem;">
+            <i class="fa-solid fa-feather-pointed" style="font-size:1.5rem; margin-bottom:6px; opacity:0.5; color:#c084fc;"></i>
+            <p>이달에 작성된 일기가 아직 없습니다.<br>[오늘 활동 기반 AI 일기 자동 생성]으로 하루를 남겨보세요! ✨</p>
+          </div>
+        `;
       } else {
+        const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+
         monthJournals.forEach(j => {
           const card = document.createElement('div');
-          card.className = `jfeed-card ${j.date === this.currentDate ? 'active' : ''}`;
+          const isCurrent = (j.date === this.currentDate);
+          card.className = `dash-feed-card ${isCurrent ? 'active' : ''}`;
+
+          const dayDate = new Date(j.date);
+          const dayOfWeek = dayNames[dayDate.getDay()] || '';
           const dayNum = j.date.split('-')[2];
           const mood = moodEmojis[j.mood] || '📝';
           const weather = j.weather || '☀️';
-          const snippet = (j.content || '').replace(/[#*`_]/g, '').substring(0, 70);
+          const snippet = (j.content || '').replace(/[#*`_>]/g, '').trim().substring(0, 80);
+          const tags = j.tags || [];
+          const tagsHtml = tags.length > 0 ? `<div style="display:flex; gap:4px; flex-wrap:wrap; margin-top:4px;">${tags.map(t => `<span class="badge" style="background:rgba(192,132,252,0.18); color:#c084fc; font-size:0.65rem; padding:1px 4px;">#${this.escapeHtml(t)}</span>`).join('')}</div>` : '';
 
           card.innerHTML = `
-            <div class="jfeed-card-header">
-              <span class="jfeed-date"><i class="fa-regular fa-calendar"></i> ${dayNum}일 (${j.date})</span>
+            <div class="dash-feed-top">
+              <span class="dash-feed-date"><i class="fa-regular fa-calendar" style="color:#c084fc;"></i> ${dayNum}일 (${dayOfWeek})</span>
               <span>${weather} ${mood}</span>
             </div>
-            <div class="jfeed-title">${this.escapeHtml(j.title || '무제')}</div>
-            <div class="jfeed-snippet">${this.escapeHtml(snippet || '내용 없음...')}</div>
+            <div class="dash-feed-focus" style="color:var(--text-primary); margin-top:2px;">${this.escapeHtml(j.title || `${j.date}의 일기`)}</div>
+            <div style="font-size:0.74rem; color:var(--text-muted); margin-top:2px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${this.escapeHtml(snippet || '내용 없음...')}</div>
+            ${tagsHtml}
           `;
-          card?.addEventListener('click', () => this.setDate(j.date));
+
+          card.addEventListener('click', () => {
+            this.setDate(j.date);
+          });
+
           listEl.appendChild(card);
         });
       }
