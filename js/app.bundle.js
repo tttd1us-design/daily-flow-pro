@@ -3802,13 +3802,22 @@ class DailyFlowApp {
       oneThingInput.value = dayData.oneThing || dayData.focus || '';
     }
 
-    // 2. To-Do List
+    // 2. To-Do List with Filter & Priority
     const todoListEl = document.getElementById('simpleTodoList');
     const badgeEl = document.getElementById('simpleTaskCountBadge');
     if (todoListEl) {
       todoListEl.innerHTML = '';
       const todos = dayData.todos || [];
       const completedCount = todos.filter(t => t.completed).length;
+      const activeCount = todos.length - completedCount;
+
+      // Update Filter counts
+      const countAllEl = document.getElementById('simpleTodoCountAll');
+      const countActiveEl = document.getElementById('simpleTodoCountActive');
+      const countDoneEl = document.getElementById('simpleTodoCountDone');
+      if (countAllEl) countAllEl.textContent = todos.length;
+      if (countActiveEl) countActiveEl.textContent = activeCount;
+      if (countDoneEl) countDoneEl.textContent = completedCount;
 
       if (badgeEl) {
         badgeEl.textContent = `${completedCount}/${todos.length} 완료`;
@@ -3823,23 +3832,37 @@ class DailyFlowApp {
         }
       }
 
-      if (todos.length === 0) {
+      this.simpleTodoFilter = this.simpleTodoFilter || 'all';
+      const filteredTodos = todos.filter(t => {
+        if (this.simpleTodoFilter === 'active') return !t.completed;
+        if (this.simpleTodoFilter === 'done') return !!t.completed;
+        return true;
+      });
+
+      if (filteredTodos.length === 0) {
         todoListEl.innerHTML = `
           <div style="text-align:center; color:var(--text-muted); padding:24px 10px; font-size:0.8rem;">
-            등록된 할 일이 없습니다.<br>오늘의 첫 과업을 위에 입력해보세요! ✨
+            ${todos.length === 0 ? '등록된 과업이 없습니다.<br>오늘의 첫 실행 과업을 위에 입력해보세요! ✨' : '해당 필터에 맞는 과업이 없습니다.'}
           </div>
         `;
       } else {
-        todos.forEach(todo => {
+        filteredTodos.forEach(todo => {
           const item = document.createElement('div');
           item.className = `simple-todo-item ${todo.completed ? 'completed' : ''}`;
           const catMap = {
             career: { label: '💼 지식', color: 'rgba(99, 102, 241, 0.2)', text: '#818cf8' },
             wealth: { label: '💰 자본', color: 'rgba(245, 158, 11, 0.2)', text: '#fbbf24' },
             health: { label: '💪 건강', color: 'rgba(16, 185, 129, 0.2)', text: '#34d399' },
-            routine: { label: '⚡ 시스템', color: 'rgba(6, 182, 212, 0.2)', text: '#22d3ee' }
+            routine: { label: '⚡ 루틴', color: 'rgba(6, 182, 212, 0.2)', text: '#22d3ee' }
           };
           const cInfo = catMap[todo.category] || catMap.career;
+
+          let priBadge = '';
+          if (todo.priority === 'high') {
+            priBadge = `<span class="simple-priority-badge high">⭐ 1순위</span>`;
+          } else if (todo.priority === 'urgent') {
+            priBadge = `<span class="simple-priority-badge urgent">🔥 중요</span>`;
+          }
 
           item.innerHTML = `
             <div class="simple-todo-left">
@@ -3847,6 +3870,7 @@ class DailyFlowApp {
                 <i class="fa-solid fa-check"></i>
               </div>
               <span class="simple-todo-cat-tag" style="background:${cInfo.color}; color:${cInfo.text};">${cInfo.label}</span>
+              ${priBadge}
               <span class="simple-todo-text">${this.escapeHtml(todo.text)}</span>
             </div>
             <button class="simple-todo-del-btn" title="삭제"><i class="fa-solid fa-trash-can"></i></button>
@@ -3899,11 +3923,8 @@ class DailyFlowApp {
       btn.classList.toggle('active', btn.dataset.mood === dayData.mood);
     });
 
-    // 4. Quick Memo
-    const memoInput = document.getElementById('simpleQuickMemo');
-    if (memoInput) {
-      memoInput.value = dayData.condition?.memo || dayData.quickMemo || '';
-    }
+    // 4. Render Thought & Idea Notepad Cards
+    this.renderSimpleMemos();
 
     // 5. 10조 자산가 복리 습관 & 격언
     const quote50sEl = document.getElementById('simple50sQuote');
@@ -3921,6 +3942,328 @@ class DailyFlowApp {
   // =========================================================================
   // 👑 50대 10조 자산가 5대 황금 습관 & AI 인생 코칭 엔진
   // =========================================================================
+  // =========================================================================
+  // 💡 생각 & 10조 아이디어 메모장 관리 엔진
+  // =========================================================================
+  renderSimpleMemos() {
+    const gridEl = document.getElementById('simpleMemoCardsGrid');
+    const badgeEl = document.getElementById('simpleMemoCountBadge');
+    if (!gridEl) return;
+
+    let memos = storage.getMemos() || [];
+    if (memos.length === 0) {
+      // Initialize default high-value sample memos if totally empty
+      memos = [
+        {
+          id: 'memo_sample_1',
+          title: 'AI 기반 직무 지식 자산화 전자책 & SaaS 파이프라인',
+          content: '30년간 축적된 산업 도면/엔지니어링/기획 데이터를 체계화하여 구독형 노하우 플랫폼으로 전환. 주말 2시간씩 모듈화 집필.',
+          category: 'business',
+          pinned: true,
+          date: this.currentDate,
+          time: '09:00'
+        },
+        {
+          id: 'memo_sample_2',
+          title: '글로벌 지주사 배당 및 복리 재투자 모델',
+          content: '현금흐름 창출 자산을 우량 글로벌 ETF 및 독점 기술주로 분산하여 배당 복리 엔진 구축.',
+          category: 'wealth',
+          pinned: false,
+          date: this.currentDate,
+          time: '14:30'
+        }
+      ];
+      storage.data.memos = memos;
+      storage.saveData();
+    }
+
+    if (badgeEl) badgeEl.textContent = `${memos.length}개 아이디어`;
+
+    const q = (this.simpleMemoSearchQuery || '').toLowerCase().trim();
+    let displayMemos = memos.filter(m => {
+      if (!q) return true;
+      return (m.title || '').toLowerCase().includes(q) || (m.content || '').toLowerCase().includes(q);
+    });
+
+    // Pinned first, then newest
+    displayMemos.sort((a, b) => {
+      if (a.pinned && !b.pinned) return -1;
+      if (!a.pinned && b.pinned) return 1;
+      return (b.id || '').localeCompare(a.id || '');
+    });
+
+    gridEl.innerHTML = '';
+    if (displayMemos.length === 0) {
+      gridEl.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:20px; font-size:0.8rem;">검색된 아이디어가 없습니다.</div>`;
+      return;
+    }
+
+    const catMap = {
+      idea: { label: '💡 영감', color: 'rgba(234, 179, 8, 0.2)', text: '#fde047' },
+      business: { label: '💼 비즈니스', color: 'rgba(99, 102, 241, 0.2)', text: '#818cf8' },
+      wealth: { label: '💰 자본', color: 'rgba(16, 185, 129, 0.2)', text: '#34d399' },
+      misc: { label: '📝 메모', color: 'rgba(148, 163, 184, 0.2)', text: '#cbd5e1' }
+    };
+
+    displayMemos.forEach(memo => {
+      const card = document.createElement('div');
+      card.className = `simple-memo-card ${memo.pinned ? 'pinned' : ''}`;
+      const cInfo = catMap[memo.category] || catMap.idea;
+
+      card.innerHTML = `
+        <div class="simple-memo-card-header">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span class="simple-todo-cat-tag" style="background:${cInfo.color}; color:${cInfo.text};">${cInfo.label}</span>
+            <span class="simple-memo-card-title">${this.escapeHtml(memo.title || '무제 메모')}</span>
+          </div>
+          <button class="simple-memo-action-btn" data-action="pin" title="${memo.pinned ? '핀 고정 해제' : '상단 핀 고정'}">
+            <i class="fa-solid fa-thumbtack ${memo.pinned ? 'text-yellow' : ''}"></i>
+          </button>
+        </div>
+        <div class="simple-memo-card-content">${this.escapeHtml(memo.content || '')}</div>
+        <div class="simple-memo-card-footer">
+          <span>${memo.date || ''} ${memo.time || ''}</span>
+          <div class="simple-memo-actions-group">
+            <button class="simple-memo-action-btn" data-action="push-todo" title="오늘의 To-Do로 등록"><i class="fa-solid fa-bolt text-cyan"></i> To-Do</button>
+            <button class="simple-memo-action-btn" data-action="ai-scale" title="10조 AI 스케일업 기획"><i class="fa-solid fa-wand-magic-sparkles text-yellow"></i> AI기획</button>
+            <button class="simple-memo-action-btn" data-action="delete" title="메모 삭제"><i class="fa-solid fa-trash-can text-rose"></i></button>
+          </div>
+        </div>
+      `;
+
+      // Event bindings
+      card.querySelector('[data-action="pin"]')?.addEventListener('click', () => {
+        memo.pinned = !memo.pinned;
+        storage.saveData();
+        this.renderSimpleMemos();
+      });
+
+      card.querySelector('[data-action="push-todo"]')?.addEventListener('click', () => {
+        const currentDayData = storage.getDayData(this.currentDate);
+        currentDayData.todos = currentDayData.todos || [];
+        currentDayData.todos.push({
+          id: 't_' + Date.now(),
+          text: `[아이디어] ${memo.title}`,
+          category: memo.category === 'wealth' ? 'wealth' : 'career',
+          priority: 'high',
+          completed: false
+        });
+        storage.updateDayData(this.currentDate, { todos: currentDayData.todos });
+        this.renderSimpleMode();
+        this.renderTodos();
+        this.renderTabCalendar('dashboard');
+        this.showToast(`✨ [${memo.title}] 과업이 오늘 To-Do로 등록되었습니다!`);
+      });
+
+      card.querySelector('[data-action="ai-scale"]')?.addEventListener('click', async () => {
+        const resultBox = document.getElementById('simple50sCoachResultBox');
+        const contentEl = document.getElementById('simple50sCoachContent');
+        if (!resultBox || !contentEl) return;
+        resultBox.style.display = 'block';
+        contentEl.innerHTML = '<div style="text-align:center; padding:18px;"><i class="fa-solid fa-spinner fa-spin text-cyan" style="font-size:1.4rem;"></i><p style="margin-top:8px; color:var(--text-secondary);">10조 규모의 비즈니스 모델로 스케일업 분석 중...</p></div>';
+
+        const prompt = `[👑 10조 자산가 아이디어 스케일업 & SaaS 비즈니스 도면 기획]
+- 아이디어 제목: "${memo.title}"
+- 아이디어 상세: "${memo.content}"
+- 분류: ${memo.category}
+
+위 아이디어를 글로벌 10조 자산가/지주사 오너 수준의 비즈니스 아키텍처로 스케일업해줘.
+1. 💎 **[10조 규모 시장 정의 & 독점적 해자(Moat)]**
+2. ⚙️ **[자동화 시스템 & 레버리지 설계]** (코드/노코드, SaaS, 글로벌 위탁 운영)
+3. 💰 **[현금흐름 복리화 & 투자 구조]**
+4. 🚀 **[이번 주말 2시간 안에 끝낼 MVP 1단계 실행 과업 3가지]**`;
+
+        try {
+          const res = await geminiClient.generateText(prompt);
+          contentEl.innerHTML = this.parseMarkdown(res);
+          this.showToast('10조 스케일업 기획안이 생성되었습니다! 💡');
+        } catch (e) {
+          contentEl.innerHTML = `<p style="color:var(--accent-danger);">기획안 생성 실패: ${e.message}</p>`;
+        }
+      });
+
+      card.querySelector('[data-action="delete"]')?.addEventListener('click', () => {
+        storage.data.memos = storage.getMemos().filter(m => m.id !== memo.id);
+        storage.saveData();
+        this.renderSimpleMemos();
+        this.showToast('메모가 삭제되었습니다.');
+      });
+
+      gridEl.appendChild(card);
+    });
+  }
+
+  addSimpleMemo() {
+    const titleInput = document.getElementById('simpleMemoTitleInput');
+    const contentInput = document.getElementById('simpleMemoContentInput');
+    const catSelect = document.getElementById('simpleMemoCategory');
+    if (!titleInput || !contentInput) return;
+
+    const title = titleInput.value.trim();
+    const content = contentInput.value.trim();
+    const category = catSelect ? catSelect.value : 'idea';
+
+    if (!title && !content) {
+      this.showToast('메모 제목 또는 내용을 입력해주세요.');
+      return;
+    }
+
+    const newMemo = {
+      id: 'memo_' + Date.now(),
+      title: title || '새로운 아이디어',
+      content: content,
+      category: category,
+      pinned: false,
+      date: this.currentDate,
+      time: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
+    };
+
+    const memos = storage.getMemos() || [];
+    memos.unshift(newMemo);
+    storage.data.memos = memos;
+    storage.saveData();
+
+    titleInput.value = '';
+    contentInput.value = '';
+    this.renderSimpleMemos();
+    this.showToast('💡 생각 & 아이디어가 안전하게 기록되었습니다!');
+  }
+
+  applySimpleJournalFormat(cmd) {
+    const el = document.getElementById('simpleJournalContent');
+    if (!el) return;
+    const start = el.selectionStart;
+    const end = el.selectionEnd;
+    const val = el.value;
+    const selected = val.substring(start, end);
+
+    let insert = '';
+    if (cmd === 'bold') insert = `**${selected || '굵은 텍스트'}**`;
+    else if (cmd === 'heading') insert = `
+### ${selected || '소제목'}
+`;
+    else if (cmd === 'task') insert = `
+- [ ] ${selected || '실천 과업'}
+`;
+    else if (cmd === 'quote') insert = `
+> ${selected || '중요한 통찰 및 격언'}
+`;
+
+    el.value = val.substring(0, start) + insert + val.substring(end);
+    el.focus();
+    const charCountEl = document.getElementById('simpleCharCount');
+    if (charCountEl) charCountEl.textContent = el.value.length.toLocaleString();
+  }
+
+  applySimpleJournalTemplate(type) {
+    const el = document.getElementById('simpleJournalContent');
+    const titleEl = document.getElementById('simpleJournalTitle');
+    if (!el) return;
+
+    const tpls = {
+      quick1min: {
+        title: '⚡ 오늘의 1분 성장 회고',
+        content: `⚡ [1분 핵심 회고]
+1. 오늘 가장 보람찼던 1가지:
+- 
+
+2. 오늘 감사했던 1가지:
+- 
+
+3. 내일 실행할 1% 개선 액션:
+- `
+      },
+      trillion: {
+        title: '👑 10조 자산가 관점의 결정과 사유',
+        content: `👑 [10조 자산가 복리 회고]
+1. 오늘의 핵심 의사결정 및 통찰:
+- 
+
+2. 노동 소득을 시스템/자산으로 전환한 활동:
+- 
+
+3. 내일 구축할 독점적 해자(Moat) & 복리 레버리지:
+- `
+      },
+      gratitude: {
+        title: '💖 감사와 평온의 하루 기록',
+        content: `💖 [감사 & 웰빙 일기]
+1. 오늘 내 신체와 건강을 위해 감사한 점:
+- 
+
+2. 오늘 만난 사람과 가족에게 감사한 점:
+- 
+
+3. 평온하고 풍요로운 일상에 감사한 점:
+- `
+      }
+    };
+
+    const target = tpls[type];
+    if (!target) return;
+
+    if (titleEl && !titleEl.value) titleEl.value = target.title;
+    if (el.value.trim()) {
+      el.value = el.value + '\n\n' + target.content;
+    } else {
+      el.value = target.content;
+    }
+    el.focus();
+    const charCountEl = document.getElementById('simpleCharCount');
+    if (charCountEl) charCountEl.textContent = el.value.length.toLocaleString();
+    this.showToast(`'${target.title}' 템플릿이 적용되었습니다.`);
+  }
+
+  async extractActionGuideFromSimpleJournal() {
+    const content = document.getElementById('simpleJournalContent')?.value || '';
+    if (!content.trim()) {
+      this.showToast('먼저 일기 내용을 작성해주세요.');
+      return;
+    }
+
+    const btn = document.getElementById('simpleExtractTodoFromJournalBtn');
+    if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-yellow"></i> 추출 중...';
+
+    const prompt = `다음 일기/회고 글을 분석하여, 사용자가 내일 즉시 실행해야 할 가장 중요한 핵심 To-Do 3가지를 간결한 문장으로 추출해줘:
+
+[일기 내용]
+${content}
+
+형식:
+- [할일1]
+- [할일2]
+- [할일3]`;
+
+    try {
+      const res = await geminiClient.generateText(prompt);
+      const lines = res.split('\n').filter(l => l.trim().startsWith('-') || l.trim().startsWith('*') || /^\d+\./.test(l.trim()));
+      const currentDayData = storage.getDayData(this.currentDate);
+      currentDayData.todos = currentDayData.todos || [];
+
+      lines.forEach(l => {
+        const cleanText = l.replace(/^[-*\d.]+\s*/, '').trim();
+        if (cleanText) {
+          currentDayData.todos.push({
+            id: 't_' + Date.now() + Math.random().toString(36).substr(2, 4),
+            text: cleanText,
+            category: 'career',
+            priority: 'high',
+            completed: false
+          });
+        }
+      });
+
+      storage.updateDayData(this.currentDate, { todos: currentDayData.todos });
+      this.renderSimpleMode();
+      this.renderTodos();
+      this.showToast('✨ 일기에서 핵심 To-Do가 성공적으로 추출되어 등록되었습니다!');
+    } catch (e) {
+      this.showToast(`To-Do 추출 실패: ${e.message}`);
+    } finally {
+      if (btn) btn.innerHTML = '<i class="fa-solid fa-bolt text-yellow"></i> To-Do 추출';
+    }
+  }
+
   renderSimple50sHabits() {
     const dayData = storage.getDayData(this.currentDate);
     const habits50s = dayData.habits50s || {};
@@ -4137,17 +4480,20 @@ class DailyFlowApp {
       if (e.key === 'Enter') saveOneThing();
     });
 
-    // 2. Add To-Do
+    // 2. Add To-Do with Priority & Category
     const addTodo = () => {
       const input = document.getElementById('simpleTodoInput');
       if (!input) return;
       const text = input.value.trim();
       if (!text) return;
       const catSelect = document.getElementById('simpleTodoCat');
+      const priSelect = document.getElementById('simpleTodoPriority');
       const cat = catSelect ? catSelect.value : 'career';
+      const pri = priSelect ? priSelect.value : 'normal';
+
       const currentDayData = storage.getDayData(this.currentDate);
       const currentTodos = currentDayData.todos || [];
-      currentTodos.push({ id: 't_' + Date.now(), text, category: cat, completed: false });
+      currentTodos.push({ id: 't_' + Date.now(), text, category: cat, priority: pri, completed: false });
       storage.updateDayData(this.currentDate, { todos: currentTodos });
       input.value = '';
       this.renderSimpleMode();
@@ -4159,6 +4505,32 @@ class DailyFlowApp {
     document.getElementById('simpleAddTodoBtn')?.addEventListener('click', addTodo);
     document.getElementById('simpleTodoInput')?.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') addTodo();
+    });
+
+    // 2-1. To-Do Filter Buttons
+    document.querySelectorAll('#simpleTodoFilterBar .simple-filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.simpleTodoFilter = btn.dataset.filter || 'all';
+        document.querySelectorAll('#simpleTodoFilterBar .simple-filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.renderSimpleMode();
+      });
+    });
+
+    // 2-2. Clear Completed Todos
+    document.getElementById('simpleClearCompletedTodosBtn')?.addEventListener('click', () => {
+      const currentDayData = storage.getDayData(this.currentDate);
+      const currentTodos = (currentDayData.todos || []).filter(t => !t.completed);
+      storage.updateDayData(this.currentDate, { todos: currentTodos });
+      this.renderSimpleMode();
+      this.renderTodos();
+      this.showToast('완료된 과업이 모두 정리되었습니다. 🧹');
+    });
+
+    // 2-3. Rollover Yesterday's unfinished tasks
+    document.getElementById('simpleRolloverTasksBtn')?.addEventListener('click', () => {
+      this.rolloverUnfinishedTasks();
+      this.renderSimpleMode();
     });
 
     // 3. Mood Selection
@@ -4201,6 +4573,36 @@ class DailyFlowApp {
         saveJournal();
       });
     }
+
+    // 4-1. Journal Format Buttons
+    document.querySelectorAll('.simple-fmt-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const cmd = btn.dataset.cmd;
+        if (cmd) this.applySimpleJournalFormat(cmd);
+      });
+    });
+
+    // 4-2. Journal Template Buttons
+    document.querySelectorAll('.simple-tpl-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tpl = btn.dataset.tpl;
+        if (tpl) this.applySimpleJournalTemplate(tpl);
+      });
+    });
+
+    // 4-3. Extract To-Do from Journal
+    document.getElementById('simpleExtractTodoFromJournalBtn')?.addEventListener('click', () => {
+      this.extractActionGuideFromSimpleJournal();
+    });
+
+    // 4-4. Idea Notepad Form & Search
+    document.getElementById('simpleAddMemoBtn')?.addEventListener('click', () => {
+      this.addSimpleMemo();
+    });
+    document.getElementById('simpleMemoSearchInput')?.addEventListener('input', (e) => {
+      this.simpleMemoSearchQuery = e.target.value;
+      this.renderSimpleMemos();
+    });
 
     // 5. AI Journal Draft in Simple Mode
     document.getElementById('simpleAiJournalBtn')?.addEventListener('click', async () => {
