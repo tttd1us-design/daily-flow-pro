@@ -7584,7 +7584,7 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
     let gridRows = '<tr>';
     let cellCount = 0;
 
-    // Previous month padding days
+    // Previous month padding days (clean, simple day number, no overlap)
     const prevMonthNum = month === 0 ? 12 : month;
     const prevMonthYear = month === 0 ? year - 1 : year;
     for (let i = firstDayIndex - 1; i >= 0; i--) {
@@ -7594,24 +7594,24 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
       const isSun = dayOfWeek === 0;
       const isSat = dayOfWeek === 6;
       const holiday = this.getHolidayName(prevMonthYear, prevMonthNum, dayNum);
-      const isHoliday = !!holiday;
       const events = this.getEventsForDate(dStr);
 
-      const colorCls = isSun ? 'is-sun' : isSat ? 'is-sat' : isHoliday ? 'is-holiday' : '';
+      const colorCls = isSun ? 'is-sun' : isSat ? 'is-sat' : holiday ? 'is-holiday' : '';
 
       gridRows += `
         <td class="outlook-month-cell other-month ${colorCls}" data-date="${dStr}">
           <div class="outlook-cell-header-line">
-            <span class="outlook-cell-date-num">${prevMonthNum}월 ${dayNum}일</span>
+            <span class="outlook-cell-date-num">${dayNum}</span>
             ${holiday ? `<span class="holiday-badge">${holiday}</span>` : ''}
+            <button class="outlook-cell-quick-add-btn" data-date="${dStr}" title="이 날짜에 새 일정 등록"><i class="fa-solid fa-plus"></i></button>
           </div>
-          <div class="outlook-cell-events-box">${this.renderOutlookCellBadges(events)}</div>
+          <div class="outlook-cell-events-box">${this.renderOutlookCellBadges(events, dStr)}</div>
         </td>
       `;
       cellCount++;
     }
 
-    // Current month days
+    // Current month days (clean, spacious, effortless editing)
     for (let d = 1; d <= daysInMonth; d++) {
       if (cellCount > 0 && cellCount % 7 === 0) {
         gridRows += '</tr><tr>';
@@ -7622,26 +7622,26 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
       const isSun = dayOfWeek === 0;
       const isSat = dayOfWeek === 6;
       const holiday = this.getHolidayName(year, month + 1, d);
-      const isHoliday = !!holiday;
       const events = this.getEventsForDate(dStr);
 
       let colorCls = '';
-      if (isSun || isHoliday) colorCls = 'is-sun';
+      if (isSun || holiday) colorCls = 'is-sun';
       else if (isSat) colorCls = 'is-sat';
 
       gridRows += `
         <td class="outlook-month-cell ${isToday ? 'today-cell' : ''} ${colorCls}" data-date="${dStr}">
           <div class="outlook-cell-header-line">
-            <span class="outlook-cell-date-num">${d}일</span>
+            <span class="outlook-cell-date-num">${d}</span>
             ${holiday ? `<span class="holiday-badge">${holiday}</span>` : ''}
+            <button class="outlook-cell-quick-add-btn" data-date="${dStr}" title="이 날짜에 새 일정 등록"><i class="fa-solid fa-plus"></i></button>
           </div>
-          <div class="outlook-cell-events-box">${this.renderOutlookCellBadges(events)}</div>
+          <div class="outlook-cell-events-box">${this.renderOutlookCellBadges(events, dStr)}</div>
         </td>
       `;
       cellCount++;
     }
 
-    // Next month padding days
+    // Next month padding days (clean, simple day number, no overlap)
     const nextMonthNum = month === 11 ? 1 : month + 2;
     const nextMonthYear = month === 11 ? year + 1 : year;
     let nextDayNum = 1;
@@ -7661,10 +7661,11 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
       gridRows += `
         <td class="outlook-month-cell other-month ${colorCls}" data-date="${dStr}">
           <div class="outlook-cell-header-line">
-            <span class="outlook-cell-date-num">${nextMonthNum}월 ${nextDayNum}일</span>
+            <span class="outlook-cell-date-num">${nextDayNum}</span>
             ${holiday ? `<span class="holiday-badge">${holiday}</span>` : ''}
+            <button class="outlook-cell-quick-add-btn" data-date="${dStr}" title="이 날짜에 새 일정 등록"><i class="fa-solid fa-plus"></i></button>
           </div>
-          <div class="outlook-cell-events-box">${this.renderOutlookCellBadges(events)}</div>
+          <div class="outlook-cell-events-box">${this.renderOutlookCellBadges(events, dStr)}</div>
         </td>
       `;
       nextDayNum++;
@@ -7679,10 +7680,27 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
       </table>
     `;
 
+    // Click on day cell or quick add button opens modal
     container.querySelectorAll('.outlook-month-cell').forEach(cell => {
       cell.addEventListener('click', (e) => {
-        if (e.target.closest('.outlook-event-badge')) return;
+        if (e.target.closest('.outlook-event-badge') || e.target.closest('.outlook-cell-quick-add-btn')) return;
         const date = cell.dataset.date;
+        this.currentDate = date;
+        this.rootOutlookDate = date;
+        if (this.datePicker) this.datePicker.value = date;
+        this.updateHeaderDate();
+        this.openOutlookEventModal(null, date);
+      });
+    });
+
+    container.querySelectorAll('.outlook-cell-quick-add-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const date = btn.dataset.date;
+        this.currentDate = date;
+        this.rootOutlookDate = date;
+        if (this.datePicker) this.datePicker.value = date;
+        this.updateHeaderDate();
         this.openOutlookEventModal(null, date);
       });
     });
@@ -7699,18 +7717,18 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
     });
   }
 
-  renderOutlookCellBadges(events) {
+  renderOutlookCellBadges(events, dateStr = '') {
     if (!events || events.length === 0) return '';
     let html = '';
-    events.slice(0, 3).forEach(e => {
+    events.slice(0, 4).forEach(e => {
       html += `
-        <div class="outlook-event-badge cat-${e.category || 'career'}" data-event-id="${e.id}" title="${this.escapeHtml(e.title)} (${e.startTime}~${e.endTime})">
-          ${this.escapeHtml(e.startTime || '')} ${this.escapeHtml(e.title)}
+        <div class="outlook-event-badge cat-${e.category || 'career'}" data-event-id="${e.id}" data-event-date="${dateStr}" title="${this.escapeHtml(e.title)} (${e.startTime || ''}~${e.endTime || ''}) - 클릭하여 수정">
+          <span style="font-weight:700; opacity:0.9;">${this.escapeHtml(e.startTime || '')}</span> ${this.escapeHtml(e.title)}
         </div>
       `;
     });
-    if (events.length > 3) {
-      html += `<div style="font-size:0.68rem; color:rgba(255,255,255,0.7); text-align:right;">+${events.length - 3}건 더보기</div>`;
+    if (events.length > 4) {
+      html += `<div style="font-size:0.72rem; color:var(--text-muted); text-align:right; font-weight:700; padding-top:2px;">+${events.length - 4}건 더보기</div>`;
     }
     return html;
   }

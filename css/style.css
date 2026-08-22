@@ -4178,3 +4178,126 @@ body {
   background: rgba(255, 255, 255, 0.2) !important;
   border-color: rgba(255, 255, 255, 0.4) !important;
 }
+
+/* =========================================================================
+   ✨ 겹침 없는 완벽한 아웃룩 캘린더 (Zero-Overlap & High Usability)
+   ========================================================================= */
+
+/* 사이드 플로팅 탭 완전 제거 (테이블 겹침 방지) */
+.outlook-side-nav-tab {
+  display: none !important;
+}
+
+/* 툴바 내비게이션 버튼 그룹 */
+.outlook-nav-btn-group {
+  display: inline-flex;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.outlook-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.outlook-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #38bdf8;
+}
+
+[data-theme="light"] .outlook-nav-btn-group {
+  background: #e2e8f0;
+  border-color: #cbd5e1;
+}
+
+[data-theme="light"] .outlook-nav-btn {
+  color: #1e293b;
+}
+
+[data-theme="light"] .outlook-nav-btn:hover {
+  background: #ffffff;
+  color: #0284c7;
+}
+
+/* 캘린더 셀 헤더 라인 & 원클릭 빠른 일정 추가(+) 버튼 */
+.outlook-cell-header-line {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 6px !important;
+}
+
+.outlook-cell-quick-add-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.15s ease;
+}
+
+.outlook-month-cell:hover .outlook-cell-quick-add-btn {
+  opacity: 1;
+}
+
+.outlook-cell-quick-add-btn:hover {
+  background: #0078d4;
+  color: #ffffff;
+  border-color: #0078d4;
+  transform: scale(1.1);
+}
+
+[data-theme="light"] .outlook-cell-quick-add-btn {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #64748b;
+}
+
+[data-theme="light"] .outlook-cell-quick-add-btn:hover {
+  background: #0078d4;
+  color: #ffffff;
+  border-color: #0078d4;
+}
+
+/* 이전/다음 달 여백 셀 흐리게 처리 (현재 달과 명확히 구분) */
+.outlook-month-cell.other-month {
+  opacity: 0.38 !important;
+  background: rgba(0, 0, 0, 0.22) !important;
+}
+
+[data-theme="light"] .outlook-month-cell.other-month {
+  opacity: 0.45 !important;
+  background: #f8fafc !important;
+}
+
+/* 캘린더 전체 그리드 여백 및 여유 공간 */
+.outlook-month-full-table {
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+.outlook-month-cell {
+  height: 120px !important;
+  min-height: 120px !important;
+  padding: 8px 10px !important;
+}

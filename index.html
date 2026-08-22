@@ -18,9 +18,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&family=Nanum+Myeongjo:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
-  <link rel="stylesheet" href="css/style.css?v=2.4.1">
-  <link rel="stylesheet" href="css/print.css?v=2.4.1">
-  <link rel="stylesheet" href="css/tt.css?v=2.4.1">
+  <link rel="stylesheet" href="css/style.css?v=2.4.2">
+  <link rel="stylesheet" href="css/print.css?v=2.4.2">
+  <link rel="stylesheet" href="css/tt.css?v=2.4.2">
 </head>
 <body>
   <div class="app-container" id="appContainer">
@@ -222,9 +222,9 @@
           <div class="outlook-app-toolbar">
             <div class="outlook-toolbar-left">
               <button class="outlook-btn-primary" id="rootOutlookTodayBtn">오늘</button>
-              <div class="outlook-arrow-group">
-                <button class="outlook-nav-btn" id="rootOutlookPrevBtn" title="이전 (일/주/월/년)"><i class="fa-solid fa-chevron-left"></i></button>
-                <button class="outlook-nav-btn" id="rootOutlookNextBtn" title="다음 (일/주/월/년)"><i class="fa-solid fa-chevron-right"></i></button>
+              <div class="outlook-nav-btn-group">
+                <button class="outlook-nav-btn" id="rootOutlookPrevBtn" title="이전 이동"><i class="fa-solid fa-chevron-left"></i> <span>이전</span></button>
+                <button class="outlook-nav-btn" id="rootOutlookNextBtn" title="다음 이동"><span>다음</span> <i class="fa-solid fa-chevron-right"></i></button>
               </div>
               <h2 class="outlook-date-heading" id="rootOutlookDateTitle">2026년 8월</h2>
             </div>
@@ -251,16 +251,8 @@
             </div>
           </div>
 
-          <!-- 아웃룩 메인 캘린더 바디 -->
+          <!-- 아웃룩 메인 캘린더 바디 (방해/겹침 없이 100% 쾌적한 와이드 뷰) -->
           <div class="outlook-calendar-body-wrapper">
-            
-            <!-- 사이드 퀵 이동 탭 (스크린샷 동일 요소) -->
-            <button class="outlook-side-nav-tab left" id="outlookSidePrevTab" title="이전 달 이동">
-              <i class="fa-solid fa-chevron-left"></i><span>이전 달</span>
-            </button>
-            <button class="outlook-side-nav-tab right" id="outlookSideNextTab" title="다음 달 이동">
-              <span>다음 달</span><i class="fa-solid fa-chevron-right"></i>
-            </button>
 
             <!-- 1) 월간 뷰 (Month View - 스크린샷 100% 일치 디자인) -->
             <div class="outlook-root-panel active" id="rootOutlookMonthPanel"></div>
@@ -2904,7 +2896,7 @@
 
   <div class="toast-container" id="toastContainer"></div>
 
-  <script type="module" src="js/app.bundle.js?v=2.4.1"></script>
+  <script type="module" src="js/app.bundle.js?v=2.4.2"></script>
 
   <!-- ======================================================== -->
   <!-- 📅 아웃룩 일정 등록 및 수정 모달                             -->

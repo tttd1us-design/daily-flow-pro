@@ -2456,6 +2456,1210 @@
       },
       "ees": null,
       "commands": []
+    },
+    "2026-06-28": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-06-29": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-06-30": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-07-01": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-07-02": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-07-03": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-07-04": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-07-05": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-07-06": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-07-07": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-07-08": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-07-09": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-07-10": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-07-11": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-07-12": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-07-13": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-07-14": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-07-15": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-07-16": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-07-17": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-07-18": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-07-19": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-07-20": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-07-21": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-07-22": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-07-23": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-07-24": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
+    },
+    "2026-07-25": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": null,
+      "commands": []
     }
   },
   "decisions": [
