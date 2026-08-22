@@ -4,17 +4,17 @@
 
 :root {
   /* Dark Theme (Outlook / Fluent Dark Navy) */
-  --bg-primary: #0b111e;
-  --bg-secondary: #131b2e;
-  --bg-tertiary: #1c263d;
-  --bg-card: rgba(19, 27, 46, 0.92);
-  --bg-card-hover: rgba(28, 38, 61, 0.85);
-  --border-color: rgba(255, 255, 255, 0.09);
-  --border-focus: #0078d4;
+  --bg-primary: #0a0f1d;
+  --bg-secondary: #111827;
+  --bg-tertiary: #1e293b;
+  --bg-card: rgba(17, 24, 39, 0.94);
+  --bg-card-hover: rgba(30, 41, 59, 0.9);
+  --border-color: rgba(255, 255, 255, 0.11);
+  --border-focus: #38bdf8;
 
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text-primary: #ffffff;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
 
   /* Fluent / Outlook Blue Accent */
   --accent-primary: #0078d4;
@@ -3705,4 +3705,193 @@ body.mode-pro #simpleModeContainer { display: none !important; }
   height: 3px;
   border-radius: 50%;
   background: #f59e0b;
+}
+
+/* =========================================================================
+   ✨ 세련된 모던 디자인 & 폰트 가독성/크기 최적화 (Typography & Sophistication)
+   ========================================================================= */
+
+html {
+  font-size: 15.5px;
+  letter-spacing: -0.015em;
+}
+
+body {
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 카드 및 컨테이너 고품격 스타일링 */
+.card, .simple-card, .outlook-calendar-main-card, .outlook-app-wrapper {
+  background: var(--bg-card) !important;
+  border: 1px solid rgba(255, 255, 255, 0.11) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+  backdrop-filter: blur(16px);
+}
+
+/* 폼 입력창 및 텍스트에어리어 시원한 크기 & 가독성 향상 */
+.simple-input, .input-focus-hero, .simple-cat-select, .simple-memo-textarea, .date-input, select, input[type="text"] {
+  font-size: 0.96rem !important;
+  padding: 10px 14px !important;
+  border-radius: 9px !important;
+  line-height: 1.55 !important;
+  color: var(--text-primary) !important;
+  background: rgba(0, 0, 0, 0.35) !important;
+  border: 1px solid rgba(255, 255, 255, 0.13) !important;
+  transition: all 0.2s ease !important;
+}
+
+.simple-input:focus, .simple-textarea:focus, .simple-memo-textarea:focus, select:focus, input:focus {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.22) !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* To-Do 텍스트 가독성 */
+.simple-todo-item {
+  padding: 10px 12px !important;
+  border-radius: 10px !important;
+  margin-bottom: 7px !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  font-size: 0.95rem !important;
+}
+
+.simple-todo-item:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(56, 189, 248, 0.25) !important;
+}
+
+.simple-todo-text {
+  font-size: 0.96rem !important;
+  font-weight: 500 !important;
+  line-height: 1.6 !important;
+  color: var(--text-primary) !important;
+}
+
+.simple-todo-checkbox {
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 6px !important;
+  border: 2px solid rgba(255, 255, 255, 0.25) !important;
+}
+
+/* 10조 일기장 에디터 가독성 */
+.simple-journal-title-input {
+  font-size: 1.12rem !important;
+  font-weight: 700 !important;
+  padding: 12px 16px !important;
+}
+
+.simple-textarea {
+  font-size: 1.02rem !important;
+  line-height: 1.8 !important;
+  padding: 16px !important;
+  border-radius: 10px !important;
+  color: #f8fafc !important;
+}
+
+/* 아이디어 메모 카드 */
+.simple-memo-card {
+  padding: 14px !important;
+  border-radius: 10px !important;
+  margin-bottom: 10px !important;
+  font-size: 0.92rem !important;
+}
+
+.simple-memo-card-title {
+  font-size: 0.98rem !important;
+  font-weight: 700 !important;
+  margin-bottom: 6px !important;
+}
+
+.simple-memo-card-content {
+  font-size: 0.92rem !important;
+  line-height: 1.65 !important;
+  color: var(--text-secondary) !important;
+}
+
+/* 10조 명언 10선 */
+.simple-10quote-item {
+  padding: 10px 12px !important;
+  margin-bottom: 8px !important;
+  border-radius: 9px !important;
+}
+
+.simple-10quote-text {
+  font-size: 0.92rem !important;
+  line-height: 1.65 !important;
+  color: #f1f5f9 !important;
+}
+
+.simple-10quote-num {
+  font-size: 0.82rem !important;
+  min-width: 24px !important;
+  height: 24px !important;
+}
+
+/* 10조 5대 습관 */
+.simple-50s-habit-item {
+  padding: 10px 12px !important;
+  margin-bottom: 8px !important;
+  border-radius: 9px !important;
+}
+
+.simple-50s-habit-name {
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+}
+
+.simple-50s-habit-desc {
+  font-size: 0.82rem !important;
+  color: var(--text-muted) !important;
+}
+
+/* 아웃룩 캘린더 날짜 & 음력 표기 선명화 */
+.outlook-month-cell {
+  padding: 10px !important;
+  min-height: 115px !important;
+}
+
+.outlook-cell-date-num {
+  font-size: 1.02rem !important;
+  font-weight: 800 !important;
+}
+
+.lunar-label {
+  font-size: 0.8rem !important;
+  color: var(--text-secondary) !important;
+  opacity: 0.9 !important;
+}
+
+.outlook-event-badge {
+  font-size: 0.82rem !important;
+  padding: 4px 8px !important;
+  margin-bottom: 4px !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+}
+
+/* 버튼 크기 및 가독성 */
+.simple-btn, .btn {
+  font-size: 0.88rem !important;
+  padding: 8px 14px !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+}
+
+.btn-mode-toggle {
+  font-size: 0.92rem !important;
+  padding: 8px 16px !important;
+}
+
+/* 사이드바 메뉴 텍스트 */
+.nav-item {
+  font-size: 0.94rem !important;
+  padding: 11px 14px !important;
+  gap: 12px !important;
 }
