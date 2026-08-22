@@ -2255,6 +2255,32 @@ body.mode-pro #simpleModeContainer {
 .simple-todo-input-row {
   display: flex;
   gap: 6px;
+  align-items: center;
+}
+
+.simple-cat-select {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 8px 6px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #fbbf24;
+  outline: none;
+  cursor: pointer;
+  max-width: 110px;
+}
+
+.simple-cat-select:focus {
+  border-color: #f59e0b;
+}
+
+.simple-todo-cat-tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 6px;
+  white-space: nowrap;
 }
 
 .simple-todo-list {

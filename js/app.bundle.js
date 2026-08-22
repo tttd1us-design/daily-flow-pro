@@ -129,12 +129,12 @@ class GeminiApiClient {
 
 const geminiClient = new GeminiApiClient();
 
-const QUOTES_50S = [
-  "50대의 가장 큰 무기는 30년 직무 통찰력이다. 노동 소득을 영구 복리 자산 시스템으로 전환하라.",
-  "은퇴는 끝이 아니라, 남을 위해 일하던 시간을 나만의 10조 자산 시스템을 구축하는 시간으로 바꾸는 시작이다.",
-  "신체 건강과 맑은 정신이 무너지면 어떤 자산도 의미가 없다. 50대의 1순위 자산은 건강이다.",
-  "의미 없는 술자리와 인맥을 거절하는 용기가 하루 2시간의 독점적 딥워크 시간을 선물한다.",
-  "완벽주의를 버리고, 매일 지식과 경험을 1장의 도면이나 글로 기록하여 자본화하라."
+const QUOTES_TRILLION = [
+  "시간을 돈으로 바꾸지 말고, 4대 레버리지(자본, 시스템, 지식, 미디어)를 통해 영구 복리 자산 시스템을 구축하라.",
+  "10조 자산가의 하루는 단순한 노동이 아니라, 독점적 해자(Moat)를 파고 복리 시스템을 구축하는 시간이다.",
+  "신체 에너지와 맑은 정신이 무너지면 어떤 자본도 의미가 없다. 최고의 1순위 자산은 건강이다.",
+  "무의미한 술자리와 인맥을 거절하는 용기가 매일 2시간의 독점적 딥워크 복리 시간을 선물한다.",
+  "완벽주의를 버리고, 매일 지식과 직무 통찰을 1장의 도면이나 글로 기록하여 시스템 자본화하라."
 ];
 
 const QUOTES = [
@@ -3833,11 +3833,20 @@ class DailyFlowApp {
         todos.forEach(todo => {
           const item = document.createElement('div');
           item.className = `simple-todo-item ${todo.completed ? 'completed' : ''}`;
+          const catMap = {
+            career: { label: '💼 지식', color: 'rgba(99, 102, 241, 0.2)', text: '#818cf8' },
+            wealth: { label: '💰 자본', color: 'rgba(245, 158, 11, 0.2)', text: '#fbbf24' },
+            health: { label: '💪 건강', color: 'rgba(16, 185, 129, 0.2)', text: '#34d399' },
+            routine: { label: '⚡ 시스템', color: 'rgba(6, 182, 212, 0.2)', text: '#22d3ee' }
+          };
+          const cInfo = catMap[todo.category] || catMap.career;
+
           item.innerHTML = `
             <div class="simple-todo-left">
               <div class="simple-todo-checkbox">
                 <i class="fa-solid fa-check"></i>
               </div>
+              <span class="simple-todo-cat-tag" style="background:${cInfo.color}; color:${cInfo.text};">${cInfo.label}</span>
               <span class="simple-todo-text">${this.escapeHtml(todo.text)}</span>
             </div>
             <button class="simple-todo-del-btn" title="삭제"><i class="fa-solid fa-trash-can"></i></button>
@@ -3896,10 +3905,10 @@ class DailyFlowApp {
       memoInput.value = dayData.condition?.memo || dayData.quickMemo || '';
     }
 
-    // 5. 50대 10조 자산가 습관 & 인용구
+    // 5. 10조 자산가 복리 습관 & 격언
     const quote50sEl = document.getElementById('simple50sQuote');
     if (quote50sEl) {
-      const q = QUOTES_50S[Math.floor(Math.random() * QUOTES_50S.length)];
+      const q = QUOTES_TRILLION[Math.floor(Math.random() * QUOTES_TRILLION.length)];
       quote50sEl.textContent = `"${q}"`;
     }
     this.renderSimple50sHabits();
@@ -4012,9 +4021,9 @@ class DailyFlowApp {
     const contentEl = document.getElementById('simple50sCoachContent');
     if (!contentEl || !resultBox) return;
 
-    if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-cyan"></i> 50대 10조 전략 연산 중...';
+    if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-cyan"></i> 10조 최고전략 연산 중...';
     resultBox.style.display = 'block';
-    contentEl.innerHTML = '<div style="text-align:center; padding:18px;"><i class="fa-solid fa-spinner fa-spin text-cyan" style="font-size:1.4rem;"></i><p style="margin-top:8px; color:var(--text-secondary); font-weight:600;">50대 직장인의 체력, 30년 직무 노하우, 복리 자산 구조를 분석하여 오늘 밤 1% 행동 처방전을 작성 중입니다...</p></div>';
+    contentEl.innerHTML = '<div style="text-align:center; padding:18px;"><i class="fa-solid fa-spinner fa-spin text-cyan" style="font-size:1.4rem;"></i><p style="margin-top:8px; color:var(--text-secondary); font-weight:600;">10조 자산가 4대 레버리지(자본, 시스템, 지식, 미디어)와 오늘의 실행 데이터를 분석하여 1% 즉각 처방전을 작성 중입니다...</p></div>';
 
     const dayData = storage.getDayData(this.currentDate);
     const oneThing = dayData.oneThing || dayData.focus || '자립형 비즈니스 파이프라인 구축';
@@ -4022,30 +4031,30 @@ class DailyFlowApp {
     const doneHabits = Object.values(habits50s).filter(Boolean).length;
     const mood = dayData.mood || 'good';
 
-    const prompt = `[50대 직장인 ➔ 10조 자산가 실시간 최고전략 처방전]
+    const prompt = `[👑 10조 자산가 복리 경영 시스템 - 실시간 최고전략 처방전]
 - 기준 날짜: ${this.currentDate}
-- 사용자의 오늘의 One Thing: "${oneThing}"
-- 50대 10조 황금 습관 실천 현황: ${doneHabits}/5개 완료
+- 오늘의 단 하나의 결정적 목표 (One Thing): "${oneThing}"
+- 10조 자산가 5대 복리 황금 습관 달성 현황: ${doneHabits}/5개 완료
 - 현재 컨디션 및 무드: ${mood}
 
-당신은 50대 직장인을 정년 불안에서 해방시키고 글로벌 10조 자산가/지주사 오너로 도약시키는 최고전략고문 AI입니다.
-50대는 20대처럼 밤샘 노동을 할 수 없으므로, '체력 방어'와 '30년 직무 통찰의 자산화', '시스템/자본 레버리지'가 유일한 승리 공식입니다.
+당신은 사용자를 글로벌 10조 자산가/지주사 오너로 도약시키는 최고전략고문 AI입니다.
+10조 자산가로 도약하기 위한 유일한 승리 공식은 '신체 자산 방어', '독점적 지식의 자본화', '4대 레버리지(자본, 시스템, 지식, 미디어)를 통한 복리 구축'입니다.
 
-오늘 지친 50대 직장인이 오늘 밤 퇴근 후 의지력을 낭비하지 않고 즉각 실천할 수 있는 4단계 명쾌한 처방전을 작성해줘:
+사용자가 오늘 밤 퇴근 후 의지력을 낭비하지 않고 즉각 실천할 수 있는 4단계 명쾌하고 강력한 처방전을 작성해줘:
 
-1. 🛡️ **[오늘 밤 5분 체력 & 뇌 피로 회복 루틴]** (미온수, 스트레칭, 수면 시간 엄수)
-2. 💎 **[30년 직무 지식을 10조 자산으로 바꾸는 오늘 밤 30분 액션]** (도면 1장, 업무 매뉴얼, 비즈니스 아이디어 1페이지 집필)
-3. 🚀 **[내일 출근길 지하철/운전 중 실천할 1% 복리 생각 루틴]** (의미 없는 잡담 대신 자본 구조 분석)
-4. 🧭 **[50대 인생 2막을 깨우는 레이 달리오/찰리 멍거 급 핵심 한 줄 명언]**`;
+1. 🛡️ **[오늘 밤 5분 체력 & 뇌 피로 회복 루틴]** (미온수, 스트레칭, 수면 7시간 방어)
+2. 💎 **[독점 지식을 10조 복리 자산으로 바꿀 오늘 밤 30분 액션]** (비즈니스 도면 1장, SaaS 기획, 지식 자산 집필)
+3. 🚀 **[내일 출근길 실천할 1% 복리 사고 루틴]** (잡담 대신 자본 구조 및 M&A/투자 분석)
+4. 🧭 **[10조 자산가로 도약하기 위한 레이 달리오/워런 버핏 급 한 줄 원칙]**`;
 
     try {
       const response = await geminiClient.generateText(prompt);
       contentEl.innerHTML = this.parseMarkdown(response);
-      if (btn) btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> <span>오늘 밤 10조 행동 처방받기</span>';
-      this.showToast('50대 10조 자산가 맞춤 처방전이 발행되었습니다! 👑');
+      if (btn) btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> <span>⚡ 10조 자산가 1% 즉각 처방</span>';
+      this.showToast('10조 자산가 맞춤 처방전이 발행되었습니다! 👑');
     } catch (e) {
       contentEl.innerHTML = `<p style="color:var(--accent-danger);">처방전 생성 중 오류가 발생했습니다: ${e.message}</p>`;
-      if (btn) btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> <span>오늘 밤 10조 행동 처방받기</span>';
+      if (btn) btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> <span>⚡ 10조 자산가 1% 즉각 처방</span>';
     }
   }
 
@@ -4134,16 +4143,18 @@ class DailyFlowApp {
       if (!input) return;
       const text = input.value.trim();
       if (!text) return;
+      const catSelect = document.getElementById('simpleTodoCat');
+      const cat = catSelect ? catSelect.value : 'career';
       const currentDayData = storage.getDayData(this.currentDate);
       const currentTodos = currentDayData.todos || [];
-      currentTodos.push({ id: 't_' + Date.now(), text, category: 'career', completed: false });
+      currentTodos.push({ id: 't_' + Date.now(), text, category: cat, completed: false });
       storage.updateDayData(this.currentDate, { todos: currentTodos });
       input.value = '';
       this.renderSimpleMode();
       this.renderTodos();
       this.renderTabCalendar('dashboard');
       paintEES(this.currentDate);
-      this.showToast('과업이 추가되었습니다.');
+      this.showToast('10조 핵심 과업이 등록되었습니다! 🎯');
     };
     document.getElementById('simpleAddTodoBtn')?.addEventListener('click', addTodo);
     document.getElementById('simpleTodoInput')?.addEventListener('keydown', (e) => {
