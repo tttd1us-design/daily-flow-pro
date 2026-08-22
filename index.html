@@ -18,9 +18,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&family=Nanum+Myeongjo:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
-  <link rel="stylesheet" href="css/style.css?v=2.0.6">
-  <link rel="stylesheet" href="css/print.css?v=2.0.6">
-  <link rel="stylesheet" href="css/tt.css?v=2.0.6">
+  <link rel="stylesheet" href="css/style.css?v=2.0.7">
+  <link rel="stylesheet" href="css/print.css?v=2.0.7">
+  <link rel="stylesheet" href="css/tt.css?v=2.0.7">
 </head>
 <body>
   <div class="app-container" id="appContainer">
@@ -179,14 +179,131 @@
         </div>
 
         <div class="ribbon-right">
+          <!-- ⚡ 1초 모드 스위처 (Simple vs Pro) -->
+          <div class="mode-switcher-group" id="modeSwitcherGroup">
+            <button id="simpleModeBtn" class="btn btn-mode-toggle active" title="심플 모드: 핵심 기능에만 집중하는 가볍고 편안한 화면">
+              <i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> <span>심플 모드</span>
+            </button>
+            <button id="proModeBtn" class="btn btn-mode-toggle" title="프로 모드: 10조 자산가 OS 전체 종합 제어">
+              <i class="fa-solid fa-crown text-yellow"></i> <span>프로 모드</span>
+            </button>
+          </div>
+
           <button id="zenModeHeaderBtn" class="btn btn-zen-mode">
-            <i class="fa-solid fa-bolt text-yellow"></i> <span>딥 포커스 젠 모드</span>
+            <i class="fa-solid fa-bolt text-yellow"></i> <span>딥 포커스</span>
           </button>
           <div class="quote-banner" id="quoteBanner">
             <span class="quote-text">"완벽한 계획보다 1%의 즉각적 실행이 인생을 바꾼다."</span>
           </div>
         </div>
       </header>
+
+      <!-- ======================================================== -->
+      <!-- ⚡ 심플 & 이지 에디션 (Simple Flow View)                   -->
+      <!-- ======================================================== -->
+      <div id="simpleModeContainer" class="simple-mode-container">
+        <div class="simple-grid-layout">
+          
+          <!-- 1. 좌측 카드: 🎯 오늘의 One Thing & 핵심 To-Do -->
+          <div class="simple-card simple-card-tasks">
+            <div class="simple-card-header">
+              <div class="simple-header-title">
+                <i class="fa-solid fa-bullseye text-yellow"></i>
+                <span>오늘의 핵심 실행</span>
+              </div>
+              <span class="simple-badge" id="simpleTaskCountBadge">0/0 완료</span>
+            </div>
+
+            <!-- 👑 One Thing 입력 영역 -->
+            <div class="simple-onething-box">
+              <div class="simple-onething-label"><i class="fa-solid fa-crown text-yellow"></i> 오늘 단 하나의 결정적 목표 (One Thing)</div>
+              <div class="simple-onething-input-row">
+                <input type="text" id="simpleOneThingInput" class="simple-input" placeholder="오늘 반드시 끝낼 가장 중요한 1가지 과업...">
+                <button id="simpleSaveOneThingBtn" class="simple-btn simple-btn-primary" title="원씽 저장"><i class="fa-solid fa-check"></i></button>
+              </div>
+            </div>
+
+            <!-- To-Do 입력 & 리스트 -->
+            <div class="simple-todo-section">
+              <div class="simple-todo-input-row">
+                <input type="text" id="simpleTodoInput" class="simple-input" placeholder="+ 새로운 할 일 입력 후 Enter..." autocomplete="off">
+                <button id="simpleAddTodoBtn" class="simple-btn simple-btn-accent"><i class="fa-solid fa-plus"></i> 추가</button>
+              </div>
+              <div class="simple-todo-list" id="simpleTodoList">
+                <!-- 동적 렌더링 -->
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. 중앙 카드: ✍️ 초간편 일기 & 하루 회고 -->
+          <div class="simple-card simple-card-journal">
+            <div class="simple-card-header">
+              <div class="simple-header-title">
+                <i class="fa-solid fa-feather-pointed text-purple"></i>
+                <span>오늘의 일기 & 회고</span>
+              </div>
+              <div class="simple-mood-selector" id="simpleMoodSelector">
+                <button class="simple-mood-btn" data-mood="great" title="최고! 😆">😆</button>
+                <button class="simple-mood-btn" data-mood="good" title="좋음 😊">😊</button>
+                <button class="simple-mood-btn" data-mood="neutral" title="보통 😐">😐</button>
+                <button class="simple-mood-btn" data-mood="tired" title="피곤 🥱">🥱</button>
+                <button class="simple-mood-btn" data-mood="stressed" title="스트레스 😣">😣</button>
+              </div>
+            </div>
+
+            <div class="simple-journal-inputs">
+              <input type="text" id="simpleJournalTitle" class="simple-input simple-journal-title-input" placeholder="오늘 하루를 한 줄로 요약한다면? (일기 제목)">
+              <textarea id="simpleJournalContent" class="simple-textarea" placeholder="오늘 어떤 일이 있었나요? 감사한 일, 배운 점, 느낀 감정을 자유롭고 편안하게 적어보세요... (자동 저장됩니다)"></textarea>
+            </div>
+
+            <div class="simple-journal-footer">
+              <div class="simple-journal-stats">
+                <span id="simpleCharCount">0</span>자 작성됨
+              </div>
+              <div class="simple-journal-actions">
+                <button id="simpleAiJournalBtn" class="simple-btn simple-btn-secondary" title="오늘 활동 기반 AI 일기 자동 작성">
+                  <i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> AI 자동 작성
+                </button>
+                <button id="simpleSaveJournalBtn" class="simple-btn simple-btn-primary">
+                  <i class="fa-solid fa-floppy-disk"></i> 저장
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. 우측 카드: 📅 미니 캘린더 & 💡 퀵 메모 -->
+          <div class="simple-card simple-card-side">
+            
+            <!-- 미니 캘린더 위젯 -->
+            <div class="simple-cal-widget">
+              <div class="simple-cal-header">
+                <button class="simple-cal-nav" id="simpleCalPrev" title="이전 달"><i class="fa-solid fa-chevron-left"></i></button>
+                <div class="simple-cal-title" id="simpleCalTitle">2026년 8월</div>
+                <button class="simple-cal-nav" id="simpleCalNext" title="다음 달"><i class="fa-solid fa-chevron-right"></i></button>
+                <button class="simple-btn simple-btn-sm" id="simpleCalToday">오늘</button>
+              </div>
+              <div class="simple-cal-weekdays">
+                <span style="color:#f87171; font-weight:700;">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span style="color:#60a5fa; font-weight:700;">토</span>
+              </div>
+              <div class="simple-cal-grid" id="simpleCalGrid"></div>
+            </div>
+
+            <!-- 퀵 아이디어 메모장 -->
+            <div class="simple-memo-box">
+              <div class="simple-memo-header">
+                <div class="simple-header-title" style="font-size:0.85rem;">
+                  <i class="fa-solid fa-lightbulb text-yellow"></i>
+                  <span>아이디어 퀵 메모</span>
+                </div>
+                <button id="simpleSaveMemoBtn" class="simple-btn simple-btn-sm" title="메모 저장"><i class="fa-solid fa-check"></i> 저장</button>
+              </div>
+              <textarea id="simpleQuickMemo" class="simple-memo-textarea" placeholder="번뜩이는 생각이나 잊지 말아야 할 메모를 자유롭게 적으세요..."></textarea>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
 
       <!-- ======================================================== -->
       <!-- 1. 실행 커맨드 센터 (우측 캘린더 연동)                    -->
@@ -2407,6 +2524,6 @@
 
   <div class="toast-container" id="toastContainer"></div>
 
-  <script type="module" src="js/app.bundle.js?v=2.0.6"></script>
+  <script type="module" src="js/app.bundle.js?v=2.0.7"></script>
 </body>
 </html>

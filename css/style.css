@@ -1794,3 +1794,556 @@ body {
   .zen-timer-display { font-size: 3.2rem; }
   .zen-focus-title { font-size: 1.3rem; }
 }
+
+/* ======================================================== */
+/* ⚡ 심플 & 이지 에디션 (Simple Flow Mode) 전용 스타일      */
+/* ======================================================== */
+
+/* 1. 상단 모드 스위처 */
+.mode-switcher-group {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 2px;
+  border-radius: 20px;
+  gap: 2px;
+}
+
+.btn-mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  border-radius: 16px;
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-mode-toggle:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.btn-mode-toggle.active {
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
+}
+
+#proModeBtn.active {
+  background: linear-gradient(135deg, #d97706, #b45309);
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.35);
+}
+
+/* 2. 모드 전환 시 전역 레이아웃 제어 */
+body.mode-simple .sidebar {
+  display: none !important;
+}
+
+body.mode-simple .app-container {
+  grid-template-columns: 1fr !important;
+}
+
+body.mode-simple .tab-pane {
+  display: none !important;
+}
+
+body.mode-simple #simpleModeContainer {
+  display: block !important;
+}
+
+body.mode-pro #simpleModeContainer {
+  display: none !important;
+}
+
+/* 3. 심플 모드 컨테이너 & 3단 그리드 */
+.simple-mode-container {
+  display: none;
+  padding: 14px 18px 28px;
+  max-width: 1600px;
+  margin: 0 auto;
+  width: 100%;
+  animation: simpleFadeIn 0.25s ease forwards;
+}
+
+@keyframes simpleFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.simple-grid-layout {
+  display: grid;
+  grid-template-columns: 1.05fr 1.35fr 0.95fr;
+  gap: 16px;
+  align-items: start;
+}
+
+/* 4. 심플 카드 공통 */
+.simple-card {
+  background: linear-gradient(180deg, rgba(19, 27, 46, 0.88), rgba(11, 17, 30, 0.95));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.simple-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 10px;
+}
+
+.simple-header-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-primary);
+}
+
+.simple-badge {
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: rgba(59, 130, 246, 0.18);
+  color: #60a5fa;
+  font-weight: 700;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+/* 5. 🎯 One Thing & To-Do 리스트 */
+.simple-onething-box {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(30, 41, 59, 0.5));
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.simple-onething-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fbbf24;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.simple-onething-input-row {
+  display: flex;
+  gap: 6px;
+}
+
+.simple-input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.86rem;
+  color: var(--text-primary);
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.simple-input:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+}
+
+.simple-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.simple-btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+}
+
+.simple-btn-primary:hover {
+  background: linear-gradient(135deg, #60a5fa, #3b82f6);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+}
+
+.simple-btn-accent {
+  background: linear-gradient(135deg, #059669, #10b981);
+  color: white;
+}
+
+.simple-btn-accent:hover {
+  background: linear-gradient(135deg, #10b981, #34d399);
+}
+
+.simple-btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: var(--text-primary);
+}
+
+.simple-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.simple-btn-sm {
+  padding: 3px 8px;
+  font-size: 0.72rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
+  border-radius: 6px;
+}
+
+.simple-todo-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.simple-todo-input-row {
+  display: flex;
+  gap: 6px;
+}
+
+.simple-todo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 480px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.simple-todo-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.simple-todo-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.simple-todo-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  cursor: pointer;
+}
+
+.simple-todo-checkbox {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-size: 0.7rem;
+  color: transparent;
+}
+
+.simple-todo-item.completed .simple-todo-checkbox {
+  background: #10b981;
+  border-color: #10b981;
+  color: white;
+}
+
+.simple-todo-text {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  line-height: 1.4;
+  word-break: break-word;
+  transition: all 0.2s ease;
+}
+
+.simple-todo-item.completed .simple-todo-text {
+  text-decoration: line-through;
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+.simple-todo-del-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  font-size: 0.78rem;
+  opacity: 0.4;
+  transition: all 0.2s ease;
+}
+
+.simple-todo-item:hover .simple-todo-del-btn {
+  opacity: 1;
+}
+
+.simple-todo-del-btn:hover {
+  color: #f87171;
+}
+
+/* 6. ✍️ 초간편 일기 & 회고 에디터 */
+.simple-mood-selector {
+  display: flex;
+  gap: 6px;
+}
+
+.simple-mood-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 4px 6px;
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.simple-mood-btn:hover {
+  transform: scale(1.15);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.simple-mood-btn.active {
+  background: rgba(192, 132, 252, 0.25);
+  border-color: #c084fc;
+  box-shadow: 0 0 10px rgba(192, 132, 252, 0.4);
+}
+
+.simple-journal-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.simple-journal-title-input {
+  font-size: 0.96rem;
+  font-weight: 700;
+}
+
+.simple-textarea {
+  width: 100%;
+  min-height: 380px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 14px;
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: var(--text-primary);
+  resize: vertical;
+  outline: none;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.simple-textarea:focus {
+  border-color: #c084fc;
+  box-shadow: 0 0 0 2px rgba(192, 132, 252, 0.2);
+}
+
+.simple-journal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 10px;
+}
+
+.simple-journal-stats {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
+.simple-journal-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* 7. 📅 미니 캘린더 & 💡 퀵 메모 */
+.simple-card-side {
+  gap: 16px;
+}
+
+.simple-cal-widget {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.simple-cal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.simple-cal-title {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.simple-cal-nav {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  border-radius: 6px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.72rem;
+  transition: all 0.2s ease;
+}
+
+.simple-cal-nav:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.simple-cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.simple-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+
+.simple-cal-cell {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-size: 0.74rem;
+  cursor: pointer;
+  position: relative;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid transparent;
+  transition: all 0.18s ease;
+}
+
+.simple-cal-cell:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.simple-cal-cell.today {
+  border-color: #fbbf24;
+  color: #fbbf24;
+  font-weight: 800;
+}
+
+.simple-cal-cell.selected {
+  background: linear-gradient(135deg, #3b82f6, #6366f1) !important;
+  color: white !important;
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.5);
+}
+
+.simple-cal-cell.other-month {
+  opacity: 0.25;
+}
+
+.simple-cal-dots {
+  display: flex;
+  gap: 2px;
+  position: absolute;
+  bottom: 2px;
+}
+
+.simple-cal-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+}
+
+.simple-memo-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.simple-memo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.simple-memo-textarea {
+  width: 100%;
+  min-height: 180px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+  resize: vertical;
+  outline: none;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.simple-memo-textarea:focus {
+  border-color: #fbbf24;
+  box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.2);
+}
+
+/* 📱 반응형 (Mobile & Tablet) */
+@media (max-width: 1080px) {
+  .simple-grid-layout {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .simple-textarea {
+    min-height: 240px;
+  }
+}
+

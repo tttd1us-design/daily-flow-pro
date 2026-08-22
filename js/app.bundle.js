@@ -189,6 +189,8 @@ class DailyFlowApp {
     this.initElements();
     this.initSpeechRecognition();
     this.bindEvents();
+    this.initModeSwitcher();
+    this.bindSimpleModeEvents();
     this.startClock();
     this.showRandomQuote();
     this.updateGeminiStatusBadge();
@@ -3738,6 +3740,348 @@ class DailyFlowApp {
 
     this.renderAllTabCalendars();
     this.renderPrinciples();
+    this.renderSimpleMode();
+  }
+
+
+  // =========================================================================
+  // ⚡ 20. Simple Mode Engine (심플 & 이지 에디션)
+  // =========================================================================
+  initModeSwitcher() {
+    this.appMode = localStorage.getItem('daily_flow_mode') || 'simple';
+    
+    const simpleBtn = document.getElementById('simpleModeBtn');
+    const proBtn = document.getElementById('proModeBtn');
+
+    simpleBtn?.addEventListener('click', () => {
+      this.setAppMode('simple');
+      this.showToast('⚡ 심플 모드로 전환되었습니다. (핵심 기능 집중)');
+    });
+
+    proBtn?.addEventListener('click', () => {
+      this.setAppMode('pro');
+      this.showToast('👑 프로 모드로 전환되었습니다. (전체 OS 기능 활성화)');
+    });
+
+    this.setAppMode(this.appMode);
+  }
+
+  setAppMode(mode) {
+    this.appMode = mode;
+    localStorage.setItem('daily_flow_mode', mode);
+
+    document.body.classList.remove('mode-simple', 'mode-pro');
+    document.body.classList.add('mode-' + mode);
+
+    const simpleBtn = document.getElementById('simpleModeBtn');
+    const proBtn = document.getElementById('proModeBtn');
+    if (simpleBtn) simpleBtn.classList.toggle('active', mode === 'simple');
+    if (proBtn) proBtn.classList.toggle('active', mode === 'pro');
+
+    if (mode === 'simple') {
+      this.renderSimpleMode();
+    } else {
+      this.loadDate(this.currentDate);
+    }
+  }
+
+  renderSimpleMode() {
+    const dayData = storage.getDayData(this.currentDate);
+
+    // 1. One Thing
+    const oneThingInput = document.getElementById('simpleOneThingInput');
+    if (oneThingInput) {
+      oneThingInput.value = dayData.oneThing || dayData.focus || '';
+    }
+
+    // 2. To-Do List
+    const todoListEl = document.getElementById('simpleTodoList');
+    const badgeEl = document.getElementById('simpleTaskCountBadge');
+    if (todoListEl) {
+      todoListEl.innerHTML = '';
+      const todos = dayData.todos || [];
+      const completedCount = todos.filter(t => t.completed).length;
+
+      if (badgeEl) {
+        badgeEl.textContent = `${completedCount}/${todos.length} 완료`;
+        if (todos.length > 0 && completedCount === todos.length) {
+          badgeEl.style.background = 'rgba(16, 185, 129, 0.2)';
+          badgeEl.style.color = '#34d399';
+          badgeEl.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+        } else {
+          badgeEl.style.background = 'rgba(59, 130, 246, 0.18)';
+          badgeEl.style.color = '#60a5fa';
+          badgeEl.style.borderColor = 'rgba(59, 130, 246, 0.3)';
+        }
+      }
+
+      if (todos.length === 0) {
+        todoListEl.innerHTML = `
+          <div style="text-align:center; color:var(--text-muted); padding:24px 10px; font-size:0.8rem;">
+            등록된 할 일이 없습니다.<br>오늘의 첫 과업을 위에 입력해보세요! ✨
+          </div>
+        `;
+      } else {
+        todos.forEach(todo => {
+          const item = document.createElement('div');
+          item.className = `simple-todo-item ${todo.completed ? 'completed' : ''}`;
+          item.innerHTML = `
+            <div class="simple-todo-left">
+              <div class="simple-todo-checkbox">
+                <i class="fa-solid fa-check"></i>
+              </div>
+              <span class="simple-todo-text">${this.escapeHtml(todo.text)}</span>
+            </div>
+            <button class="simple-todo-del-btn" title="삭제"><i class="fa-solid fa-trash-can"></i></button>
+          `;
+
+          item.querySelector('.simple-todo-left')?.addEventListener('click', () => {
+            const currentDayData = storage.getDayData(this.currentDate);
+            const currentTodos = currentDayData.todos || [];
+            const target = currentTodos.find(t => t.id === todo.id);
+            if (target) target.completed = !target.completed;
+            storage.updateDayData(this.currentDate, { todos: currentTodos });
+            this.renderSimpleMode();
+            this.renderTodos();
+            this.renderTabCalendar('dashboard');
+            paintEES(this.currentDate);
+          });
+
+          item.querySelector('.simple-todo-del-btn')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const currentDayData = storage.getDayData(this.currentDate);
+            const currentTodos = (currentDayData.todos || []).filter(t => t.id !== todo.id);
+            storage.updateDayData(this.currentDate, { todos: currentTodos });
+            this.renderSimpleMode();
+            this.renderTodos();
+            this.renderTabCalendar('dashboard');
+            paintEES(this.currentDate);
+          });
+
+          todoListEl.appendChild(item);
+        });
+      }
+    }
+
+    // 3. Journal & Mood
+    const journalTitleInput = document.getElementById('simpleJournalTitle');
+    const journalContentInput = document.getElementById('simpleJournalContent');
+    const charCountEl = document.getElementById('simpleCharCount');
+    const moodBtns = document.querySelectorAll('#simpleMoodSelector .simple-mood-btn');
+
+    if (journalTitleInput) {
+      journalTitleInput.value = dayData.journal?.title || '';
+    }
+    if (journalContentInput) {
+      const content = dayData.journal?.content || '';
+      journalContentInput.value = content;
+      if (charCountEl) charCountEl.textContent = content.length.toLocaleString();
+    }
+
+    moodBtns.forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.mood === dayData.mood);
+    });
+
+    // 4. Quick Memo
+    const memoInput = document.getElementById('simpleQuickMemo');
+    if (memoInput) {
+      memoInput.value = dayData.condition?.memo || dayData.quickMemo || '';
+    }
+
+    // 5. Simple Mini-Calendar
+    this.renderSimpleMiniCalendar();
+  }
+
+  renderSimpleMiniCalendar() {
+    const gridEl = document.getElementById('simpleCalGrid');
+    const titleEl = document.getElementById('simpleCalTitle');
+    if (!gridEl || !titleEl) return;
+
+    const st = this.tabCalState.dashboard || { year: new Date().getFullYear(), month: new Date().getMonth() };
+    titleEl.textContent = `${st.year}년 ${st.month + 1}월`;
+    gridEl.innerHTML = '';
+
+    const first = new Date(st.year, st.month, 1);
+    const last = new Date(st.year, st.month + 1, 0);
+    const startDay = first.getDay();
+    const totalDays = last.getDate();
+
+    const prevLast = new Date(st.year, st.month, 0).getDate();
+    for (let i = startDay - 1; i >= 0; i--) {
+      const cell = document.createElement('div');
+      cell.className = 'simple-cal-cell other-month';
+      cell.innerHTML = `<span>${prevLast - i}</span>`;
+      gridEl.appendChild(cell);
+    }
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    const allDays = storage.data.days || {};
+
+    for (let d = 1; d <= totalDays; d++) {
+      const mStr = String(st.month + 1).padStart(2, '0');
+      const dStr = String(d).padStart(2, '0');
+      const fullDate = `${st.year}-${mStr}-${dStr}`;
+
+      const cell = document.createElement('div');
+      cell.className = 'simple-cal-cell';
+      if (fullDate === todayStr) cell.classList.add('today');
+      if (fullDate === this.currentDate) cell.classList.add('selected');
+
+      const dData = allDays[fullDate] || {};
+      const todos = dData.todos || [];
+      const done = todos.filter(t => t.completed).length;
+      const hasJournal = dData.journal && (dData.journal.title || dData.journal.content);
+
+      let dotsHtml = '';
+      if (todos.length > 0 && done === todos.length) {
+        dotsHtml += `<span class="simple-cal-dot" style="background:#10b981;" title="100% 완료"></span>`;
+      } else if (done > 0) {
+        dotsHtml += `<span class="simple-cal-dot" style="background:#f59e0b;" title="진행 중"></span>`;
+      }
+      if (hasJournal) {
+        dotsHtml += `<span class="simple-cal-dot" style="background:#c084fc;" title="일기"></span>`;
+      }
+
+      cell.innerHTML = `
+        <span>${d}</span>
+        <div class="simple-cal-dots">${dotsHtml}</div>
+      `;
+
+      cell.addEventListener('click', () => {
+        this.setDate(fullDate);
+      });
+
+      gridEl.appendChild(cell);
+    }
+  }
+
+  bindSimpleModeEvents() {
+    // 1. One Thing Save
+    const saveOneThing = () => {
+      const input = document.getElementById('simpleOneThingInput');
+      if (!input) return;
+      const val = input.value.trim();
+      storage.updateDayData(this.currentDate, { oneThing: val, focus: val });
+      if (this.focusInput) this.focusInput.value = val;
+      this.renderAllTabCalendars();
+      this.showToast('🎯 오늘의 One Thing이 저장되었습니다!');
+    };
+    document.getElementById('simpleSaveOneThingBtn')?.addEventListener('click', saveOneThing);
+    document.getElementById('simpleOneThingInput')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') saveOneThing();
+    });
+
+    // 2. Add To-Do
+    const addTodo = () => {
+      const input = document.getElementById('simpleTodoInput');
+      if (!input) return;
+      const text = input.value.trim();
+      if (!text) return;
+      const currentDayData = storage.getDayData(this.currentDate);
+      const currentTodos = currentDayData.todos || [];
+      currentTodos.push({ id: 't_' + Date.now(), text, category: 'career', completed: false });
+      storage.updateDayData(this.currentDate, { todos: currentTodos });
+      input.value = '';
+      this.renderSimpleMode();
+      this.renderTodos();
+      this.renderTabCalendar('dashboard');
+      paintEES(this.currentDate);
+      this.showToast('과업이 추가되었습니다.');
+    };
+    document.getElementById('simpleAddTodoBtn')?.addEventListener('click', addTodo);
+    document.getElementById('simpleTodoInput')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') addTodo();
+    });
+
+    // 3. Mood Selection
+    document.querySelectorAll('#simpleMoodSelector .simple-mood-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mood = btn.dataset.mood;
+        storage.updateDayData(this.currentDate, { mood });
+        document.querySelectorAll('#simpleMoodSelector .simple-mood-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.mood === mood);
+        });
+        this.highlightMood(mood);
+        this.renderJournalRightCalendar();
+        this.showToast(`오늘의 기분이 [${btn.title}]로 설정되었습니다.`);
+      });
+    });
+
+    // 4. Save Journal
+    const saveJournal = () => {
+      const title = document.getElementById('simpleJournalTitle')?.value || '';
+      const content = document.getElementById('simpleJournalContent')?.value || '';
+      const dayData = storage.getDayData(this.currentDate);
+      const existing = dayData.journal || {};
+      storage.updateDayData(this.currentDate, {
+        journal: { ...existing, title, content }
+      });
+      if (this.journalTitle) this.journalTitle.value = title;
+      if (this.journalContent) this.journalContent.value = content;
+      this.renderJournalRightCalendar();
+      this.showToast('일기가 안전하게 저장되었습니다! 💾');
+    };
+    document.getElementById('simpleSaveJournalBtn')?.addEventListener('click', saveJournal);
+
+    const journalContent = document.getElementById('simpleJournalContent');
+    if (journalContent) {
+      journalContent.addEventListener('input', () => {
+        const charCountEl = document.getElementById('simpleCharCount');
+        if (charCountEl) charCountEl.textContent = journalContent.value.length.toLocaleString();
+      });
+      journalContent.addEventListener('blur', () => {
+        saveJournal();
+      });
+    }
+
+    // 5. AI Journal Draft in Simple Mode
+    document.getElementById('simpleAiJournalBtn')?.addEventListener('click', async () => {
+      await this.generateAiJournalDraft();
+      const dayData = storage.getDayData(this.currentDate);
+      if (document.getElementById('simpleJournalContent')) {
+        document.getElementById('simpleJournalContent').value = dayData.journal?.content || this.journalContent?.value || '';
+        const charCountEl = document.getElementById('simpleCharCount');
+        if (charCountEl) charCountEl.textContent = (document.getElementById('simpleJournalContent').value.length).toLocaleString();
+      }
+    });
+
+    // 6. Save Quick Memo
+    const saveMemo = () => {
+      const val = document.getElementById('simpleQuickMemo')?.value || '';
+      const dayData = storage.getDayData(this.currentDate);
+      const cond = dayData.condition || {};
+      storage.updateDayData(this.currentDate, { condition: { ...cond, memo: val }, quickMemo: val });
+      if (this.quickMemoInput) this.quickMemoInput.value = val;
+      this.showToast('아이디어 메모가 저장되었습니다.');
+    };
+    document.getElementById('simpleSaveMemoBtn')?.addEventListener('click', saveMemo);
+    document.getElementById('simpleQuickMemo')?.addEventListener('blur', saveMemo);
+
+    // 7. Simple Mini-Calendar Nav
+    document.getElementById('simpleCalPrev')?.addEventListener('click', () => {
+      this.tabCalState.dashboard.month--;
+      if (this.tabCalState.dashboard.month < 0) {
+        this.tabCalState.dashboard.month = 11;
+        this.tabCalState.dashboard.year--;
+      }
+      this.renderSimpleMiniCalendar();
+    });
+
+    document.getElementById('simpleCalNext')?.addEventListener('click', () => {
+      this.tabCalState.dashboard.month++;
+      if (this.tabCalState.dashboard.month > 11) {
+        this.tabCalState.dashboard.month = 0;
+        this.tabCalState.dashboard.year++;
+      }
+      this.renderSimpleMiniCalendar();
+    });
+
+    document.getElementById('simpleCalToday')?.addEventListener('click', () => {
+      const now = new Date();
+      this.tabCalState.dashboard.year = now.getFullYear();
+      this.tabCalState.dashboard.month = now.getMonth();
+      this.renderSimpleMiniCalendar();
+    });
   }
 
   // ==========================================
