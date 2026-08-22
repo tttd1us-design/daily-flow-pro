@@ -4301,3 +4301,35 @@ body {
   min-height: 120px !important;
   padding: 8px 10px !important;
 }
+
+/* =========================================================================
+   📅 캘린더 날짜 클릭 인터랙션 & 일정 추가 피드백 (Click-to-Add Styling)
+   ========================================================================= */
+
+.outlook-month-cell {
+  cursor: pointer !important;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease !important;
+}
+
+.outlook-month-cell:hover {
+  background: rgba(56, 189, 248, 0.06) !important;
+  border-color: rgba(56, 189, 248, 0.35) !important;
+}
+
+.outlook-time-slot-cell {
+  cursor: pointer !important;
+  transition: background 0.15s ease !important;
+}
+
+.outlook-time-slot-cell:hover {
+  background: rgba(56, 189, 248, 0.08) !important;
+}
+
+[data-theme="light"] .outlook-month-cell:hover {
+  background: #f0f9ff !important;
+  border-color: #7dd3fc !important;
+}
+
+[data-theme="light"] .outlook-time-slot-cell:hover {
+  background: #f0f9ff !important;
+}

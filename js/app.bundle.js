@@ -6990,6 +6990,17 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
       </table>
     `;
 
+    container.querySelectorAll('.outlook-time-header-cell[data-date]').forEach(th => {
+      th.addEventListener('click', () => {
+        const date = th.dataset.date;
+        if (date) {
+          this.currentDate = date;
+          this.rootOutlookDate = date;
+          this.openOutlookEventModal(null, date);
+        }
+      });
+    });
+
     container.querySelectorAll('.outlook-time-slot-cell').forEach(slot => {
       slot.addEventListener('click', (e) => {
         if (e.target.closest('.outlook-event-badge')) return;
@@ -7835,7 +7846,7 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
       const colorCls = (isSun || holiday) ? 'col-sun' : isSat ? 'col-sat' : '';
 
       headerHtml += `
-        <th class="outlook-time-header-cell ${isToday ? 'today' : ''} ${colorCls}" style="${isToday ? 'background:#0078d4; color:#fff;' : ''}">
+        <th class="outlook-time-header-cell ${isToday ? 'today' : ''} ${colorCls}" data-date="${dStr}" style="cursor:pointer; ${isToday ? 'background:#0078d4; color:#fff;' : ''}" title="${dStr} 클릭하여 일정 추가">
           <div style="${isToday ? '' : isSun || holiday ? 'color:#ef4444;' : isSat ? 'color:#3b82f6;' : ''}">${dayLabels[idx]}</div>
           <div style="font-size:1.05rem; font-weight:800; margin-top:2px; ${isToday ? '' : isSun || holiday ? 'color:#ef4444;' : isSat ? 'color:#3b82f6;' : ''}">
             ${dObj.getDate()}일 ${holiday ? `<span class="holiday-badge">${holiday}</span>` : ''}
