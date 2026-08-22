@@ -3910,12 +3910,17 @@ class DailyFlowApp {
               </div>
               <span class="simple-todo-cat-tag" style="background:${cInfo.color}; color:${cInfo.text};">${cInfo.label}</span>
               ${priBadge}
-              <span class="simple-todo-text">${this.escapeHtml(todo.text)}</span>
+              <span class="simple-todo-text" title="더블클릭하여 수정">${this.escapeHtml(todo.text)}</span>
             </div>
-            <button class="simple-todo-del-btn" title="삭제"><i class="fa-solid fa-trash-can"></i></button>
+            <div style="display:flex; gap:2px;">
+              <button class="simple-todo-del-btn simple-todo-edit-btn" title="과업 수정"><i class="fa-solid fa-pen"></i></button>
+              <button class="simple-todo-del-btn" title="삭제"><i class="fa-solid fa-trash-can"></i></button>
+            </div>
           `;
 
-          item.querySelector('.simple-todo-left')?.addEventListener('click', () => {
+          // Toggle Complete
+          item.querySelector('.simple-todo-checkbox')?.addEventListener('click', (e) => {
+            e.stopPropagation();
             const currentDayData = storage.getDayData(this.currentDate);
             const currentTodos = currentDayData.todos || [];
             const target = currentTodos.find(t => t.id === todo.id);
@@ -3927,7 +3932,43 @@ class DailyFlowApp {
             paintEES(this.currentDate);
           });
 
-          item.querySelector('.simple-todo-del-btn')?.addEventListener('click', (e) => {
+          // Inline Edit function
+          const startInlineEdit = (e) => {
+            e.stopPropagation();
+            const textEl = item.querySelector('.simple-todo-text');
+            if (!textEl || textEl.querySelector('input')) return;
+            const originalText = todo.text;
+            textEl.innerHTML = `<input type="text" class="simple-todo-inline-edit" value="${this.escapeHtml(originalText)}" style="width:100%;">`;
+            const input = textEl.querySelector('input');
+            input.focus();
+            input.select();
+
+            const saveEdit = () => {
+              const newText = input.value.trim();
+              if (newText && newText !== originalText) {
+                todo.text = newText;
+                const currentDayData = storage.getDayData(this.currentDate);
+                const currentTodos = currentDayData.todos || [];
+                const target = currentTodos.find(t => t.id === todo.id);
+                if (target) target.text = newText;
+                storage.updateDayData(this.currentDate, { todos: currentTodos });
+                this.showToast('과업이 수정되었습니다! ✏️');
+              }
+              this.renderSimpleMode();
+              this.renderTodos();
+            };
+
+            input.addEventListener('keydown', (ev) => {
+              if (ev.key === 'Enter') saveEdit();
+              if (ev.key === 'Escape') this.renderSimpleMode();
+            });
+            input.addEventListener('blur', saveEdit);
+          };
+
+          item.querySelector('.simple-todo-text')?.addEventListener('dblclick', startInlineEdit);
+          item.querySelector('.simple-todo-edit-btn')?.addEventListener('click', startInlineEdit);
+
+          item.querySelector('.simple-todo-del-btn:not(.simple-todo-edit-btn)')?.addEventListener('click', (e) => {
             e.stopPropagation();
             const currentDayData = storage.getDayData(this.currentDate);
             const currentTodos = (currentDayData.todos || []).filter(t => t.id !== todo.id);
@@ -4067,6 +4108,7 @@ class DailyFlowApp {
         <div class="simple-memo-card-footer">
           <span>${memo.date || ''} ${memo.time || ''}</span>
           <div class="simple-memo-actions-group">
+            <button class="simple-memo-action-btn" data-action="edit" title="메모 수정"><i class="fa-solid fa-pen"></i></button>
             <button class="simple-memo-action-btn" data-action="push-todo" title="오늘의 To-Do로 등록"><i class="fa-solid fa-bolt text-cyan"></i> To-Do</button>
             <button class="simple-memo-action-btn" data-action="ai-scale" title="10조 AI 스케일업 기획"><i class="fa-solid fa-wand-magic-sparkles text-yellow"></i> AI기획</button>
             <button class="simple-memo-action-btn" data-action="delete" title="메모 삭제"><i class="fa-solid fa-trash-can text-rose"></i></button>
@@ -4079,6 +4121,35 @@ class DailyFlowApp {
         memo.pinned = !memo.pinned;
         storage.saveData();
         this.renderSimpleMemos();
+      });
+
+      card.querySelector('[data-action="edit"]')?.addEventListener('click', () => {
+        const contentEl = card.querySelector('.simple-memo-card-content');
+        if (!contentEl || card.querySelector('.simple-memo-inline-edit-box')) return;
+        card.innerHTML = `
+          <div class="simple-memo-inline-edit-box">
+            <input type="text" class="simple-input edit-memo-title" value="${this.escapeHtml(memo.title)}" placeholder="제목">
+            <textarea class="simple-memo-textarea edit-memo-content" style="min-height:90px;">${this.escapeHtml(memo.content)}</textarea>
+            <div style="display:flex; justify-content:flex-end; gap:6px; margin-top:4px;">
+              <button class="simple-btn simple-btn-sm" data-action="cancel-edit">취소</button>
+              <button class="simple-btn simple-btn-sm simple-btn-primary" data-action="save-edit"><i class="fa-solid fa-check"></i> 저장</button>
+            </div>
+          </div>
+        `;
+
+        card.querySelector('[data-action="cancel-edit"]')?.addEventListener('click', () => {
+          this.renderSimpleMemos();
+        });
+
+        card.querySelector('[data-action="save-edit"]')?.addEventListener('click', () => {
+          const newTitle = card.querySelector('.edit-memo-title')?.value.trim() || memo.title;
+          const newContent = card.querySelector('.edit-memo-content')?.value.trim() || memo.content;
+          memo.title = newTitle;
+          memo.content = newContent;
+          storage.saveData();
+          this.renderSimpleMemos();
+          this.showToast('아이디어 메모가 수정되었습니다! 💡');
+        });
       });
 
       card.querySelector('[data-action="push-todo"]')?.addEventListener('click', () => {
@@ -4860,6 +4931,13 @@ ${content}
       if (this.journalTitle) this.journalTitle.value = title;
       if (this.journalContent) this.journalContent.value = content;
       this.renderJournalRightCalendar();
+      const statusEl = document.getElementById('simpleJournalSaveStatus');
+      if (statusEl) {
+        statusEl.innerHTML = '<i class="fa-solid fa-circle-check text-emerald"></i> 저장 완료';
+        setTimeout(() => {
+          if (statusEl) statusEl.innerHTML = '<i class="fa-solid fa-cloud-check text-emerald"></i> 실시간 자동 저장됨';
+        }, 2000);
+      }
       this.showToast('일기가 안전하게 저장되었습니다! 💾');
     };
     document.getElementById('simpleSaveJournalBtn')?.addEventListener('click', saveJournal);
@@ -4889,6 +4967,21 @@ ${content}
         const tpl = btn.dataset.tpl;
         if (tpl) this.applySimpleJournalTemplate(tpl);
       });
+    });
+
+    // 4-0. Journal Focus / Fullscreen Mode
+    document.getElementById('simpleJournalFocusBtn')?.addEventListener('click', () => {
+      const card = document.querySelector('.simple-journal-wide-card');
+      const btn = document.getElementById('simpleJournalFocusBtn');
+      if (!card || !btn) return;
+      card.classList.toggle('fullscreen-mode');
+      if (card.classList.contains('fullscreen-mode')) {
+        btn.innerHTML = '<i class="fa-solid fa-compress"></i> 일반 모드';
+        btn.classList.add('simple-btn-accent');
+      } else {
+        btn.innerHTML = '<i class="fa-solid fa-expand"></i> 집중 모드';
+        btn.classList.remove('simple-btn-accent');
+      }
     });
 
     // 4-3. Extract To-Do from Journal

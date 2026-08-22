@@ -18,9 +18,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&family=Nanum+Myeongjo:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
-  <link rel="stylesheet" href="css/style.css?v=2.1.1">
-  <link rel="stylesheet" href="css/print.css?v=2.1.1">
-  <link rel="stylesheet" href="css/tt.css?v=2.1.1">
+  <link rel="stylesheet" href="css/style.css?v=2.1.2">
+  <link rel="stylesheet" href="css/print.css?v=2.1.2">
+  <link rel="stylesheet" href="css/tt.css?v=2.1.2">
 </head>
 <body>
   <div class="app-container" id="appContainer">
@@ -230,250 +230,271 @@
           <div id="simple50sCoachContent" class="simple-50s-coach-body"></div>
         </div>
 
-        <div class="simple-grid-layout">
+        <!-- 🏛️ 합리적 골든 레이아웃 (메인 집필 작업영역 68% + 우측 복리 위젯 32%) -->
+        <div class="simple-workspace-wrapper">
           
-          <!-- 1. [기둥 1] 🎯 10조 스마트 To-Do 리스트 & One Thing (To-Do Hub) -->
-          <div class="simple-card simple-card-tasks">
-            <div class="simple-card-header">
-              <div class="simple-header-title">
-                <i class="fa-solid fa-list-check text-cyan"></i>
-                <span>스마트 To-Do & One Thing</span>
-              </div>
-              <span class="simple-badge" id="simpleTaskCountBadge">0/0 완료</span>
-            </div>
-
-            <!-- 👑 One Thing 입력 영역 -->
-            <div class="simple-onething-box">
-              <div class="simple-onething-label"><i class="fa-solid fa-crown text-yellow"></i> 오늘 단 하나의 결정적 목표 (One Thing)</div>
-              <div class="simple-onething-input-row">
-                <input type="text" id="simpleOneThingInput" class="simple-input" placeholder="오늘 반드시 끝낼 가장 중요한 1가지 과업...">
-                <button id="simpleSaveOneThingBtn" class="simple-btn simple-btn-primary" title="원씽 저장"><i class="fa-solid fa-check"></i></button>
-              </div>
-            </div>
-
-            <!-- To-Do 입력 & 우선순위/카테고리 -->
-            <div class="simple-todo-section">
-              <div class="simple-todo-input-row">
-                <select id="simpleTodoCat" class="simple-cat-select" title="레버리지 카테고리">
-                  <option value="career">💼 지식</option>
-                  <option value="wealth">💰 자본</option>
-                  <option value="health">💪 건강</option>
-                  <option value="routine">⚡ 루틴</option>
-                </select>
-                <select id="simpleTodoPriority" class="simple-cat-select" title="우선순위" style="max-width:85px; color:#f59e0b;">
-                  <option value="high">⭐ 1순위</option>
-                  <option value="urgent">🔥 중요</option>
-                  <option value="normal" selected>📌 일반</option>
-                </select>
-                <input type="text" id="simpleTodoInput" class="simple-input" placeholder="+ 새로운 과업 입력 후 Enter..." autocomplete="off">
-                <button id="simpleAddTodoBtn" class="simple-btn simple-btn-accent" title="할 일 추가"><i class="fa-solid fa-plus"></i></button>
-              </div>
-
-              <!-- To-Do 필터 탭 -->
-              <div class="simple-todo-filter-bar" id="simpleTodoFilterBar">
-                <button class="simple-filter-btn active" data-filter="all">전체 (<span id="simpleTodoCountAll">0</span>)</button>
-                <button class="simple-filter-btn" data-filter="active">진행 중 (<span id="simpleTodoCountActive">0</span>)</button>
-                <button class="simple-filter-btn" data-filter="done">완료됨 (<span id="simpleTodoCountDone">0</span>)</button>
-              </div>
-
-              <div class="simple-todo-list" id="simpleTodoList">
-                <!-- 동적 렌더링 -->
-              </div>
-
-              <div class="simple-todo-actions-bar">
-                <button id="simpleClearCompletedTodosBtn" class="simple-btn simple-btn-sm" title="완료된 할 일 삭제"><i class="fa-solid fa-broom"></i> 완료 정리</button>
-                <button id="simpleRolloverTasksBtn" class="simple-btn simple-btn-sm" title="어제 미완료 과업 오늘로 가져오기"><i class="fa-solid fa-clock-rotate-left"></i> 어제 미완료 이월</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- 2. [기둥 2] ✍️ 10조 복리 일기장 & 결정 회고 (Journal Hub) -->
-          <div class="simple-card simple-card-journal">
-            <div class="simple-card-header">
-              <div class="simple-header-title">
-                <i class="fa-solid fa-book-bookmark text-purple"></i>
-                <span>10조 사유 & 결정 일기장</span>
-              </div>
-              <div class="simple-mood-selector" id="simpleMoodSelector">
-                <button class="simple-mood-btn" data-mood="great" title="최고! 😆">😆</button>
-                <button class="simple-mood-btn" data-mood="good" title="좋음 😊">😊</button>
-                <button class="simple-mood-btn" data-mood="neutral" title="보통 😐">😐</button>
-                <button class="simple-mood-btn" data-mood="tired" title="피곤 🥱">🥱</button>
-                <button class="simple-mood-btn" data-mood="stressed" title="스트레스 😣">😣</button>
-              </div>
-            </div>
-
-            <!-- 일기 빠른 템플릿 & 서식 도구바 -->
-            <div class="simple-journal-toolbar">
-              <div class="simple-journal-templates">
-                <button class="simple-tpl-btn" data-tpl="quick1min"><i class="fa-solid fa-bolt text-yellow"></i> 1분 회고</button>
-                <button class="simple-tpl-btn" data-tpl="trillion"><i class="fa-solid fa-crown text-yellow"></i> 10조 회고</button>
-                <button class="simple-tpl-btn" data-tpl="gratitude"><i class="fa-solid fa-heart text-rose"></i> 감사 일기</button>
-              </div>
-              <div class="simple-journal-format-btns">
-                <button class="simple-fmt-btn" data-cmd="bold" title="굵게"><b>B</b></button>
-                <button class="simple-fmt-btn" data-cmd="heading" title="소제목">H</button>
-                <button class="simple-fmt-btn" data-cmd="task" title="할 일 체크박스"><i class="fa-regular fa-square-check"></i></button>
-                <button class="simple-fmt-btn" data-cmd="quote" title="인용구"><i class="fa-solid fa-quote-left"></i></button>
-              </div>
-            </div>
-
-            <div class="simple-journal-inputs">
-              <input type="text" id="simpleJournalTitle" class="simple-input simple-journal-title-input" placeholder="오늘 하루의 결정과 배움을 한 줄로 요약한다면? (일기 제목)">
-              <textarea id="simpleJournalContent" class="simple-textarea" placeholder="오늘 어떤 의사결정과 배움이 있었나요? 10조 자산가 관점에서 하루를 통찰하고 기록해보세요... (자동 저장됩니다)"></textarea>
-            </div>
-
-            <div class="simple-journal-footer">
-              <div class="simple-journal-stats">
-                <span id="simpleCharCount">0</span>자 작성됨
-              </div>
-              <div class="simple-journal-actions">
-                <button id="simpleAiJournalBtn" class="simple-btn simple-btn-secondary" title="오늘 활동 기반 10조 회고 AI 자동 작성">
-                  <i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> AI 자동 작성
-                </button>
-                <button id="simpleExtractTodoFromJournalBtn" class="simple-btn simple-btn-secondary" title="일기에서 내일의 To-Do 3가지 자동 추출">
-                  <i class="fa-solid fa-bolt text-yellow"></i> To-Do 추출
-                </button>
-                <button id="simpleSaveJournalBtn" class="simple-btn simple-btn-primary">
-                  <i class="fa-solid fa-floppy-disk"></i> 저장
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- 3. [기둥 3] 💡 생각 & 10조 아이디어 메모장 (Idea Notepad Hub) -->
-          <div class="simple-card simple-card-ideas">
-            <div class="simple-card-header">
-              <div class="simple-header-title">
-                <i class="fa-solid fa-lightbulb text-yellow"></i>
-                <span>생각 & 10조 아이디어 메모장</span>
-              </div>
-              <span class="simple-badge" id="simpleMemoCountBadge">0개 아이디어</span>
-            </div>
-
-            <!-- 메모 빠른 입력 폼 -->
-            <div class="simple-memo-form-box">
-              <div class="simple-memo-form-row">
-                <select id="simpleMemoCategory" class="simple-cat-select" style="max-width:110px;">
-                  <option value="idea">💡 영감/아이디어</option>
-                  <option value="business">💼 비즈니스/SaaS</option>
-                  <option value="wealth">💰 자본/투자</option>
-                  <option value="misc">📝 자유 메모</option>
-                </select>
-                <input type="text" id="simpleMemoTitleInput" class="simple-input" placeholder="메모 제목 (예: AI 기반 부동산 자동화 SaaS)...">
-              </div>
-              <textarea id="simpleMemoContentInput" class="simple-memo-textarea" placeholder="번뜩이는 생각, 실행 아이디어, 전략 노트를 기록하세요..."></textarea>
-              <div style="display:flex; justify-content:flex-end; gap:6px;">
-                <button id="simpleAddMemoBtn" class="simple-btn simple-btn-accent"><i class="fa-solid fa-plus"></i> 메모 등록</button>
-              </div>
-            </div>
-
-            <!-- 메모 검색 & 리스트 -->
-            <div class="simple-memo-search-row">
-              <input type="text" id="simpleMemoSearchInput" class="simple-input" placeholder="🔍 아이디어 검색...">
-            </div>
-
-            <div class="simple-memo-cards-grid" id="simpleMemoCardsGrid">
-              <!-- 동적 렌더링 -->
-            </div>
-          </div>
-
-          <!-- 4. [기둥 4] 👑 10조 자산가 명언 10선 & 복리 습관 & 미니 캘린더 -->
-          <div class="simple-card simple-card-side">
+          <!-- 1. [메인 작업 영역] 좌측 68% (상단 2분할 To-Do & 아이디어 메모 + 하단 와이드 일기장) -->
+          <div class="simple-main-workspace">
             
-            <!-- 👑 10조 자산가 매일 명언 10선 위젯 -->
-            <div class="simple-side-quotes-section">
-              <div class="simple-side-sub-header">
-                <div class="simple-header-title" style="font-size:0.88rem;">
-                  <i class="fa-solid fa-crown text-yellow"></i>
-                  <span>오늘의 10조 명언 10선</span>
-                </div>
-                <div style="display:flex; gap:4px;">
-                  <button id="simpleRefresh10QuotesBtn" class="simple-btn simple-btn-sm" title="AI로 새로운 10대 명언 갱신"><i class="fa-solid fa-arrows-rotate"></i> 갱신</button>
-                  <button id="simpleOpenQuotesBackupBtn" class="simple-btn simple-btn-sm" title="누적 명언 백업 보관함 열기"><i class="fa-solid fa-box-archive text-yellow"></i> 백업</button>
-                </div>
-              </div>
-              <div class="simple-10quotes-list" id="simple10QuotesList">
-                <!-- 10개 명언 동적 렌더링 -->
-              </div>
-            </div>
-
-            <!-- 10조 5대 습관 섹션 -->
-            <div class="simple-side-habit-section" style="margin-top:12px; border-top:1px solid rgba(255,255,255,0.06); padding-top:12px;">
-              <div class="simple-side-sub-header">
-                <div class="simple-header-title" style="font-size:0.88rem;">
-                  <i class="fa-solid fa-fire text-amber"></i>
-                  <span>10조 5대 복리 습관</span>
-                </div>
-                <span class="simple-badge" id="simple50sHabitBadge">0/5 실천</span>
-              </div>
+            <!-- 상단 2분할: 스마트 To-Do & 아이디어 메모장 -->
+            <div class="simple-top-split-grid">
               
-              <div class="simple-habit-progress-wrap">
-                <div class="simple-habit-progress-bar">
-                  <div class="simple-habit-progress-fill" id="simple50sHabitProgressFill" style="width: 0%;"></div>
+              <!-- [좌측 상단 1] 🎯 10조 스마트 To-Do 리스트 & One Thing -->
+              <div class="simple-card simple-card-tasks">
+                <div class="simple-card-header">
+                  <div class="simple-header-title">
+                    <i class="fa-solid fa-list-check text-cyan"></i>
+                    <span>스마트 To-Do & One Thing</span>
+                  </div>
+                  <span class="simple-badge" id="simpleTaskCountBadge">0/0 완료</span>
+                </div>
+
+                <!-- 👑 One Thing 입력 영역 -->
+                <div class="simple-onething-box">
+                  <div class="simple-onething-label"><i class="fa-solid fa-crown text-yellow"></i> 오늘 단 하나의 결정적 목표 (One Thing)</div>
+                  <div class="simple-onething-input-row">
+                    <input type="text" id="simpleOneThingInput" class="simple-input" placeholder="오늘 반드시 끝낼 가장 중요한 1가지 과업...">
+                    <button id="simpleSaveOneThingBtn" class="simple-btn simple-btn-primary" title="원씽 저장"><i class="fa-solid fa-check"></i></button>
+                  </div>
+                </div>
+
+                <!-- To-Do 입력 & 우선순위/카테고리 -->
+                <div class="simple-todo-section">
+                  <div class="simple-todo-input-row">
+                    <select id="simpleTodoCat" class="simple-cat-select" title="레버리지 카테고리">
+                      <option value="career">💼 지식</option>
+                      <option value="wealth">💰 자본</option>
+                      <option value="health">💪 건강</option>
+                      <option value="routine">⚡ 루틴</option>
+                    </select>
+                    <select id="simpleTodoPriority" class="simple-cat-select" title="우선순위" style="max-width:85px; color:#f59e0b;">
+                      <option value="high">⭐ 1순위</option>
+                      <option value="urgent">🔥 중요</option>
+                      <option value="normal" selected>📌 일반</option>
+                    </select>
+                    <input type="text" id="simpleTodoInput" class="simple-input" placeholder="+ 새로운 과업 입력 후 Enter..." autocomplete="off">
+                    <button id="simpleAddTodoBtn" class="simple-btn simple-btn-accent" title="할 일 추가"><i class="fa-solid fa-plus"></i></button>
+                  </div>
+
+                  <!-- To-Do 필터 탭 -->
+                  <div class="simple-todo-filter-bar" id="simpleTodoFilterBar">
+                    <button class="simple-filter-btn active" data-filter="all">전체 (<span id="simpleTodoCountAll">0</span>)</button>
+                    <button class="simple-filter-btn" data-filter="active">진행 중 (<span id="simpleTodoCountActive">0</span>)</button>
+                    <button class="simple-filter-btn" data-filter="done">완료됨 (<span id="simpleTodoCountDone">0</span>)</button>
+                  </div>
+
+                  <div class="simple-todo-list" id="simpleTodoList" style="max-height:280px;">
+                    <!-- 동적 렌더링 -->
+                  </div>
+
+                  <div class="simple-todo-actions-bar">
+                    <button id="simpleClearCompletedTodosBtn" class="simple-btn simple-btn-sm" title="완료된 할 일 삭제"><i class="fa-solid fa-broom"></i> 완료 정리</button>
+                    <button id="simpleRolloverTasksBtn" class="simple-btn simple-btn-sm" title="어제 미완료 과업 오늘로 가져오기"><i class="fa-solid fa-clock-rotate-left"></i> 어제 미완료 이월</button>
+                  </div>
                 </div>
               </div>
 
-              <div class="simple-50s-habit-list" id="simple50sHabitList">
-                <div class="simple-50s-habit-item" data-habit="h_health">
-                  <div class="simple-50s-habit-check"><i class="fa-solid fa-check"></i></div>
-                  <div class="simple-50s-habit-info">
-                    <div class="simple-50s-habit-name">💪 신체 자산 방어</div>
-                    <div class="simple-50s-habit-desc">수면 7시간 & 미온수 & 40분 운동</div>
+              <!-- [좌측 상단 2] 💡 생각 & 10조 아이디어 메모장 -->
+              <div class="simple-card simple-card-ideas">
+                <div class="simple-card-header">
+                  <div class="simple-header-title">
+                    <i class="fa-solid fa-lightbulb text-yellow"></i>
+                    <span>생각 & 10조 아이디어 메모장</span>
                   </div>
-                  <span class="simple-50s-habit-streak" id="streak_h_health"><i class="fa-solid fa-fire"></i> 0일</span>
+                  <span class="simple-badge" id="simpleMemoCountBadge">0개 아이디어</span>
                 </div>
 
-                <div class="simple-50s-habit-item" data-habit="h_knowledge">
-                  <div class="simple-50s-habit-check"><i class="fa-solid fa-check"></i></div>
-                  <div class="simple-50s-habit-info">
-                    <div class="simple-50s-habit-name">🧠 지식의 자본화</div>
-                    <div class="simple-50s-habit-desc">직무 노하우 도면·도서 1쪽 집필</div>
+                <!-- 메모 빠른 입력 폼 -->
+                <div class="simple-memo-form-box">
+                  <div class="simple-memo-form-row">
+                    <select id="simpleMemoCategory" class="simple-cat-select" style="max-width:110px;">
+                      <option value="idea">💡 영감/아이디어</option>
+                      <option value="business">💼 비즈니스/SaaS</option>
+                      <option value="wealth">💰 자본/투자</option>
+                      <option value="misc">📝 자유 메모</option>
+                    </select>
+                    <input type="text" id="simpleMemoTitleInput" class="simple-input" placeholder="메모 제목 (예: AI 기반 SaaS 기획)...">
                   </div>
-                  <span class="simple-50s-habit-streak" id="streak_h_knowledge"><i class="fa-solid fa-fire"></i> 0일</span>
+                  <textarea id="simpleMemoContentInput" class="simple-memo-textarea" style="min-height:75px;" placeholder="번뜩이는 생각, 실행 아이디어, 전략 노트를 자유롭게 적으세요..."></textarea>
+                  <div style="display:flex; justify-content:flex-end; gap:6px;">
+                    <button id="simpleAddMemoBtn" class="simple-btn simple-btn-accent"><i class="fa-solid fa-plus"></i> 메모 등록</button>
+                  </div>
                 </div>
 
-                <div class="simple-50s-habit-item" data-habit="h_deepwork">
-                  <div class="simple-50s-habit-check"><i class="fa-solid fa-check"></i></div>
-                  <div class="simple-50s-habit-info">
-                    <div class="simple-50s-habit-name">⚡ 퇴근 후 1시간 딥워크</div>
-                    <div class="simple-50s-habit-desc">자립형 비즈니스·SaaS 구축</div>
-                  </div>
-                  <span class="simple-50s-habit-streak" id="streak_h_deepwork"><i class="fa-solid fa-fire"></i> 0일</span>
+                <!-- 메모 검색 & 리스트 -->
+                <div class="simple-memo-search-row">
+                  <input type="text" id="simpleMemoSearchInput" class="simple-input" placeholder="🔍 아이디어 검색...">
                 </div>
 
-                <div class="simple-50s-habit-item" data-habit="h_capital">
-                  <div class="simple-50s-habit-check"><i class="fa-solid fa-check"></i></div>
-                  <div class="simple-50s-habit-info">
-                    <div class="simple-50s-habit-name">💰 자본 & 레버리지 공부</div>
-                    <div class="simple-50s-habit-desc">글로벌 자산 배분 & 복리 구조 분석</div>
-                  </div>
-                  <span class="simple-50s-habit-streak" id="streak_h_capital"><i class="fa-solid fa-fire"></i> 0일</span>
+                <div class="simple-memo-cards-grid" id="simpleMemoCardsGrid" style="max-height:220px;">
+                  <!-- 동적 렌더링 -->
                 </div>
+              </div>
 
-                <div class="simple-50s-habit-item" data-habit="h_elimination">
-                  <div class="simple-50s-habit-check"><i class="fa-solid fa-check"></i></div>
-                  <div class="simple-50s-habit-info">
-                    <div class="simple-50s-habit-name">🚫 낭비 차단 & 거절의 미학</div>
-                    <div class="simple-50s-habit-desc">의미 없는 모임 거절 & 낭비 0원</div>
+            </div>
+
+            <!-- [좌측 하단: 와이드 전면 집필존] ✍️ 10조 복리 일기장 & 결정 회고 -->
+            <div class="simple-card simple-journal-wide-card">
+              <div class="simple-card-header">
+                <div class="simple-header-title">
+                  <i class="fa-solid fa-book-bookmark text-purple"></i>
+                  <span>10조 사유 & 결정 일기장</span>
+                  <span class="simple-save-status" id="simpleJournalSaveStatus"><i class="fa-solid fa-cloud-check text-emerald"></i> 실시간 자동 저장됨</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <div class="simple-mood-selector" id="simpleMoodSelector">
+                    <button class="simple-mood-btn" data-mood="great" title="최고! 😆">😆</button>
+                    <button class="simple-mood-btn" data-mood="good" title="좋음 😊">😊</button>
+                    <button class="simple-mood-btn" data-mood="neutral" title="보통 😐">😐</button>
+                    <button class="simple-mood-btn" data-mood="tired" title="피곤 🥱">🥱</button>
+                    <button class="simple-mood-btn" data-mood="stressed" title="스트레스 😣">😣</button>
                   </div>
-                  <span class="simple-50s-habit-streak" id="streak_h_elimination"><i class="fa-solid fa-fire"></i> 0일</span>
+                  <button id="simpleJournalFocusBtn" class="simple-btn simple-btn-secondary" title="⛶ 전체화면 집중 집필 모드"><i class="fa-solid fa-expand"></i> 집중 모드</button>
+                </div>
+              </div>
+
+              <!-- 일기 빠른 템플릿 & 서식 도구바 -->
+              <div class="simple-journal-toolbar">
+                <div class="simple-journal-templates">
+                  <button class="simple-tpl-btn" data-tpl="quick1min"><i class="fa-solid fa-bolt text-yellow"></i> 1분 회고</button>
+                  <button class="simple-tpl-btn" data-tpl="trillion"><i class="fa-solid fa-crown text-yellow"></i> 10조 회고</button>
+                  <button class="simple-tpl-btn" data-tpl="gratitude"><i class="fa-solid fa-heart text-rose"></i> 감사 일기</button>
+                </div>
+                <div class="simple-journal-format-btns">
+                  <button class="simple-fmt-btn" data-cmd="bold" title="굵게"><b>B</b></button>
+                  <button class="simple-fmt-btn" data-cmd="heading" title="소제목">H</button>
+                  <button class="simple-fmt-btn" data-cmd="task" title="할 일 체크박스"><i class="fa-regular fa-square-check"></i></button>
+                  <button class="simple-fmt-btn" data-cmd="quote" title="인용구"><i class="fa-solid fa-quote-left"></i></button>
+                </div>
+              </div>
+
+              <div class="simple-journal-inputs">
+                <input type="text" id="simpleJournalTitle" class="simple-input simple-journal-title-input" placeholder="오늘 하루의 결정과 배움을 한 줄로 요약한다면? (일기 제목)">
+                <textarea id="simpleJournalContent" class="simple-textarea" style="min-height:280px; font-size:0.95rem; line-height:1.75;" placeholder="오늘 어떤 의사결정과 배움이 있었나요? 10조 자산가 관점에서 하루를 통찰하고 기록해보세요... (자동 저장됩니다)"></textarea>
+              </div>
+
+              <div class="simple-journal-footer">
+                <div class="simple-journal-stats">
+                  <span id="simpleCharCount">0</span>자 작성됨
+                </div>
+                <div class="simple-journal-actions">
+                  <button id="simpleAiJournalBtn" class="simple-btn simple-btn-secondary" title="오늘 활동 기반 10조 회고 AI 자동 작성">
+                    <i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> AI 자동 작성
+                  </button>
+                  <button id="simpleExtractTodoFromJournalBtn" class="simple-btn simple-btn-secondary" title="일기에서 내일의 To-Do 3가지 자동 추출">
+                    <i class="fa-solid fa-bolt text-yellow"></i> To-Do 추출
+                  </button>
+                  <button id="simpleSaveJournalBtn" class="simple-btn simple-btn-primary">
+                    <i class="fa-solid fa-floppy-disk"></i> 저장
+                  </button>
                 </div>
               </div>
             </div>
 
-            <!-- 미니 캘린더 위젯 -->
-            <div class="simple-cal-widget" style="margin-top:12px; border-top:1px solid rgba(255,255,255,0.06); padding-top:12px;">
-              <div class="simple-cal-header">
-                <button class="simple-cal-nav" id="simpleCalPrev" title="이전 달"><i class="fa-solid fa-chevron-left"></i></button>
-                <div class="simple-cal-title" id="simpleCalTitle">2026년 8월</div>
-                <button class="simple-cal-nav" id="simpleCalNext" title="다음 달"><i class="fa-solid fa-chevron-right"></i></button>
-                <button class="simple-btn simple-btn-sm" id="simpleCalToday">오늘</button>
+          </div>
+
+          <!-- 2. [우측 복리 위젯 영역] 32% (명언 10선 + 5대 습관 + 미니 캘린더) -->
+          <div class="simple-right-sidebar-grid">
+            
+            <!-- [우측 1] 👑 오늘의 10조 명언 10선 위젯 -->
+            <div class="simple-card">
+              <div class="simple-side-quotes-section">
+                <div class="simple-side-sub-header">
+                  <div class="simple-header-title" style="font-size:0.88rem;">
+                    <i class="fa-solid fa-crown text-yellow"></i>
+                    <span>오늘의 10조 명언 10선</span>
+                  </div>
+                  <div style="display:flex; gap:4px;">
+                    <button id="simpleRefresh10QuotesBtn" class="simple-btn simple-btn-sm" title="AI로 새로운 10대 명언 갱신"><i class="fa-solid fa-arrows-rotate"></i> 갱신</button>
+                    <button id="simpleOpenQuotesBackupBtn" class="simple-btn simple-btn-sm" title="누적 명언 백업 보관함 열기"><i class="fa-solid fa-box-archive text-yellow"></i> 백업</button>
+                  </div>
+                </div>
+                <div class="simple-10quotes-list" id="simple10QuotesList" style="max-height:280px;">
+                  <!-- 10개 명언 동적 렌더링 -->
+                </div>
               </div>
-              <div class="simple-cal-weekdays">
-                <span style="color:#f87171; font-weight:700;">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span style="color:#60a5fa; font-weight:700;">토</span>
+            </div>
+
+            <!-- [우측 2] 🔥 10조 5대 복리 황금 습관 -->
+            <div class="simple-card">
+              <div class="simple-side-habit-section">
+                <div class="simple-side-sub-header">
+                  <div class="simple-header-title" style="font-size:0.88rem;">
+                    <i class="fa-solid fa-fire text-amber"></i>
+                    <span>10조 5대 복리 습관</span>
+                  </div>
+                  <span class="simple-badge" id="simple50sHabitBadge">0/5 실천</span>
+                </div>
+                
+                <div class="simple-habit-progress-wrap">
+                  <div class="simple-habit-progress-bar">
+                    <div class="simple-habit-progress-fill" id="simple50sHabitProgressFill" style="width: 0%;"></div>
+                  </div>
+                </div>
+
+                <div class="simple-50s-habit-list" id="simple50sHabitList">
+                  <div class="simple-50s-habit-item" data-habit="h_health">
+                    <div class="simple-50s-habit-check"><i class="fa-solid fa-check"></i></div>
+                    <div class="simple-50s-habit-info">
+                      <div class="simple-50s-habit-name">💪 신체 자산 방어</div>
+                      <div class="simple-50s-habit-desc">수면 7시간 & 미온수 & 40분 운동</div>
+                    </div>
+                    <span class="simple-50s-habit-streak" id="streak_h_health"><i class="fa-solid fa-fire"></i> 0일</span>
+                  </div>
+
+                  <div class="simple-50s-habit-item" data-habit="h_knowledge">
+                    <div class="simple-50s-habit-check"><i class="fa-solid fa-check"></i></div>
+                    <div class="simple-50s-habit-info">
+                      <div class="simple-50s-habit-name">🧠 지식의 자본화</div>
+                      <div class="simple-50s-habit-desc">직무 노하우 도면·도서 1쪽 집필</div>
+                    </div>
+                    <span class="simple-50s-habit-streak" id="streak_h_knowledge"><i class="fa-solid fa-fire"></i> 0일</span>
+                  </div>
+
+                  <div class="simple-50s-habit-item" data-habit="h_deepwork">
+                    <div class="simple-50s-habit-check"><i class="fa-solid fa-check"></i></div>
+                    <div class="simple-50s-habit-info">
+                      <div class="simple-50s-habit-name">⚡ 퇴근 후 1시간 딥워크</div>
+                      <div class="simple-50s-habit-desc">자립형 비즈니스·SaaS 구축</div>
+                    </div>
+                    <span class="simple-50s-habit-streak" id="streak_h_deepwork"><i class="fa-solid fa-fire"></i> 0일</span>
+                  </div>
+
+                  <div class="simple-50s-habit-item" data-habit="h_capital">
+                    <div class="simple-50s-habit-check"><i class="fa-solid fa-check"></i></div>
+                    <div class="simple-50s-habit-info">
+                      <div class="simple-50s-habit-name">💰 자본 & 레버리지 공부</div>
+                      <div class="simple-50s-habit-desc">글로벌 자산 배분 & 복리 구조 분석</div>
+                    </div>
+                    <span class="simple-50s-habit-streak" id="streak_h_capital"><i class="fa-solid fa-fire"></i> 0일</span>
+                  </div>
+
+                  <div class="simple-50s-habit-item" data-habit="h_elimination">
+                    <div class="simple-50s-habit-check"><i class="fa-solid fa-check"></i></div>
+                    <div class="simple-50s-habit-info">
+                      <div class="simple-50s-habit-name">🚫 낭비 차단 & 거절의 미학</div>
+                      <div class="simple-50s-habit-desc">의미 없는 모임 거절 & 낭비 0원</div>
+                    </div>
+                    <span class="simple-50s-habit-streak" id="streak_h_elimination"><i class="fa-solid fa-fire"></i> 0일</span>
+                  </div>
+                </div>
               </div>
-              <div class="simple-cal-grid" id="simpleCalGrid"></div>
+            </div>
+
+            <!-- [우측 3] 📅 10조 복리 미니 캘린더 -->
+            <div class="simple-card">
+              <div class="simple-cal-widget">
+                <div class="simple-cal-header">
+                  <button class="simple-cal-nav" id="simpleCalPrev" title="이전 달"><i class="fa-solid fa-chevron-left"></i></button>
+                  <div class="simple-cal-title" id="simpleCalTitle">2026년 8월</div>
+                  <button class="simple-cal-nav" id="simpleCalNext" title="다음 달"><i class="fa-solid fa-chevron-right"></i></button>
+                  <button class="simple-btn simple-btn-sm" id="simpleCalToday">오늘</button>
+                </div>
+                <div class="simple-cal-weekdays">
+                  <span style="color:#f87171; font-weight:700;">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span style="color:#60a5fa; font-weight:700;">토</span>
+                </div>
+                <div class="simple-cal-grid" id="simpleCalGrid"></div>
+              </div>
             </div>
 
           </div>
@@ -2729,6 +2750,6 @@
 
   <div class="toast-container" id="toastContainer"></div>
 
-  <script type="module" src="js/app.bundle.js?v=2.1.1"></script>
+  <script type="module" src="js/app.bundle.js?v=2.1.2"></script>
 </body>
 </html>

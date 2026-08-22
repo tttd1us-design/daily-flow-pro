@@ -2952,3 +2952,107 @@ body.mode-pro #simpleModeContainer {
 .quotes-backup-item:hover {
   background: rgba(255, 255, 255, 0.05);
 }
+
+/* =========================================================================
+   🏛️ 심플 모드 합리적 골든 레이아웃 (좌측 68% + 우측 32%)
+   ========================================================================= */
+.simple-workspace-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 1200px) {
+  .simple-workspace-wrapper {
+    grid-template-columns: 1fr;
+  }
+}
+
+.simple-main-workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.simple-top-split-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 860px) {
+  .simple-top-split-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.simple-journal-wide-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.simple-right-sidebar-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 실시간 자동 저장 뱃지 */
+.simple-save-status {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.12);
+  padding: 2px 8px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+/* To-Do 인라인 수정 */
+.simple-todo-inline-edit {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid #38bdf8;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  outline: none;
+}
+
+/* 메모 카드 인라인 수정 폼 */
+.simple-memo-inline-edit-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px dashed rgba(56, 189, 248, 0.4);
+  border-radius: 6px;
+}
+
+/* ⛶ 일기장 집중 집필 모드 풀스크린 */
+.simple-journal-wide-card.fullscreen-mode {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+  z-index: 99999;
+  background: #0f172a;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.85);
+  border: 1px solid rgba(192, 132, 252, 0.4);
+  overflow-y: auto;
+  padding: 24px 32px;
+}
+
+.simple-journal-wide-card.fullscreen-mode .simple-textarea {
+  min-height: 520px !important;
+  font-size: 1.05rem !important;
+}
