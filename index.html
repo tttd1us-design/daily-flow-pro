@@ -18,9 +18,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&family=Nanum+Myeongjo:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
-  <link rel="stylesheet" href="css/style.css?v=2.1.0">
-  <link rel="stylesheet" href="css/print.css?v=2.1.0">
-  <link rel="stylesheet" href="css/tt.css?v=2.1.0">
+  <link rel="stylesheet" href="css/style.css?v=2.1.1">
+  <link rel="stylesheet" href="css/print.css?v=2.1.1">
+  <link rel="stylesheet" href="css/tt.css?v=2.1.1">
 </head>
 <body>
   <div class="app-container" id="appContainer">
@@ -378,14 +378,31 @@
             </div>
           </div>
 
-          <!-- 4. [기둥 4] 👑 10조 5대 복리 황금 습관 & 미니 캘린더 -->
+          <!-- 4. [기둥 4] 👑 10조 자산가 명언 10선 & 복리 습관 & 미니 캘린더 -->
           <div class="simple-card simple-card-side">
             
-            <!-- 10조 5대 습관 섹션 -->
-            <div class="simple-side-habit-section">
+            <!-- 👑 10조 자산가 매일 명언 10선 위젯 -->
+            <div class="simple-side-quotes-section">
               <div class="simple-side-sub-header">
                 <div class="simple-header-title" style="font-size:0.88rem;">
                   <i class="fa-solid fa-crown text-yellow"></i>
+                  <span>오늘의 10조 명언 10선</span>
+                </div>
+                <div style="display:flex; gap:4px;">
+                  <button id="simpleRefresh10QuotesBtn" class="simple-btn simple-btn-sm" title="AI로 새로운 10대 명언 갱신"><i class="fa-solid fa-arrows-rotate"></i> 갱신</button>
+                  <button id="simpleOpenQuotesBackupBtn" class="simple-btn simple-btn-sm" title="누적 명언 백업 보관함 열기"><i class="fa-solid fa-box-archive text-yellow"></i> 백업</button>
+                </div>
+              </div>
+              <div class="simple-10quotes-list" id="simple10QuotesList">
+                <!-- 10개 명언 동적 렌더링 -->
+              </div>
+            </div>
+
+            <!-- 10조 5대 습관 섹션 -->
+            <div class="simple-side-habit-section" style="margin-top:12px; border-top:1px solid rgba(255,255,255,0.06); padding-top:12px;">
+              <div class="simple-side-sub-header">
+                <div class="simple-header-title" style="font-size:0.88rem;">
+                  <i class="fa-solid fa-fire text-amber"></i>
                   <span>10조 5대 복리 습관</span>
                 </div>
                 <span class="simple-badge" id="simple50sHabitBadge">0/5 실천</span>
@@ -2681,8 +2698,37 @@
     </div>
   </div>
 
+  <!-- 📜 10조 자산가 명언 영구 백업 보관함 모달 -->
+  <div class="modal" id="trillionQuotesBackupModal" style="display:none;">
+    <div class="modal-overlay" id="closeQuotesBackupOverlay"></div>
+    <div class="modal-content modal-lg" style="max-width:800px; max-height:85vh; display:flex; flex-direction:column; background:linear-gradient(180deg, #131b2e, #0b111e); border:1px solid rgba(245,158,11,0.3); border-radius:16px;">
+      <div class="modal-header" style="border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <i class="fa-solid fa-crown text-yellow" style="font-size:1.2rem;"></i>
+          <h3 style="margin:0; font-size:1.1rem; font-weight:800; color:var(--text-primary);">10조 자산가 명언 영구 백업 보관함 (Backup Archive)</h3>
+        </div>
+        <button class="modal-close" id="closeQuotesBackupModalBtn">&times;</button>
+      </div>
+      <div class="modal-body" style="padding:16px 20px; overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:12px;">
+        <div class="quotes-backup-controls" style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+          <div style="display:flex; gap:6px; flex:1; min-width:240px;">
+            <input type="text" id="quotesBackupSearch" class="simple-input" placeholder="🔍 백업된 명언 검색...">
+            <button id="quotesBackupFilterBookmark" class="simple-btn simple-btn-secondary" title="북마크만 모아보기"><i class="fa-solid fa-star text-yellow"></i> 북마크</button>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button id="exportQuotesBackupJsonBtn" class="simple-btn simple-btn-primary" title="JSON 백업 다운로드"><i class="fa-solid fa-file-code"></i> JSON 백업</button>
+            <button id="exportQuotesBackupMdBtn" class="simple-btn simple-btn-secondary" title="Markdown 백업 다운로드"><i class="fa-solid fa-file-lines"></i> MD 내보내기</button>
+          </div>
+        </div>
+        <div id="quotesBackupContainer" class="quotes-backup-container" style="display:flex; flex-direction:column; gap:16px; margin-top:8px;">
+          <!-- 날짜별 10개 명언 백업 아카이브 동적 렌더링 -->
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="toast-container" id="toastContainer"></div>
 
-  <script type="module" src="js/app.bundle.js?v=2.1.0"></script>
+  <script type="module" src="js/app.bundle.js?v=2.1.1"></script>
 </body>
 </html>

@@ -2823,3 +2823,132 @@ body.mode-pro #simpleModeContainer {
   }
 }
 
+
+/* =========================================================================
+   👑 오늘의 10조 명언 10선 및 백업 보관함 스타일
+   ========================================================================= */
+.simple-side-quotes-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.simple-10quotes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 380px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.simple-10quote-item {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.simple-10quote-item:hover {
+  background: rgba(245, 158, 11, 0.06);
+  border-color: rgba(245, 158, 11, 0.25);
+  transform: translateX(2px);
+}
+
+.simple-10quote-left {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.simple-10quote-num {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.15);
+  border-radius: 4px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.simple-10quote-text {
+  font-size: 0.78rem;
+  color: var(--text-primary);
+  line-height: 1.4;
+  word-break: keep-all;
+}
+
+.simple-10quote-actions {
+  display: flex;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.simple-10quote-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px 4px;
+  font-size: 0.72rem;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.simple-10quote-btn:hover {
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.15);
+}
+
+.simple-10quote-btn.bookmarked {
+  color: #fbbf24;
+}
+
+/* 백업 보관함 모달 리스트 */
+.quotes-backup-date-group {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quotes-backup-date-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 6px;
+  font-size: 0.86rem;
+  font-weight: 800;
+  color: #38bdf8;
+}
+
+.quotes-backup-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 6px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.quotes-backup-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}

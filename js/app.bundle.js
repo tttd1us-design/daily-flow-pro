@@ -129,13 +129,7 @@ class GeminiApiClient {
 
 const geminiClient = new GeminiApiClient();
 
-const QUOTES_TRILLION = [
-  "시간을 돈으로 바꾸지 말고, 4대 레버리지(자본, 시스템, 지식, 미디어)를 통해 영구 복리 자산 시스템을 구축하라.",
-  "10조 자산가의 하루는 단순한 노동이 아니라, 독점적 해자(Moat)를 파고 복리 시스템을 구축하는 시간이다.",
-  "신체 에너지와 맑은 정신이 무너지면 어떤 자본도 의미가 없다. 최고의 1순위 자산은 건강이다.",
-  "무의미한 술자리와 인맥을 거절하는 용기가 매일 2시간의 독점적 딥워크 복리 시간을 선물한다.",
-  "완벽주의를 버리고, 매일 지식과 직무 통찰을 1장의 도면이나 글로 기록하여 시스템 자본화하라."
-];
+
 
 const QUOTES = [
   "완벽한 계획보다 1%의 즉각적 실행이 인생을 바꾼다.",
@@ -149,6 +143,51 @@ const QUOTES = [
 // =========================================================================
 // 3. Main Application Controller (DailyFlowApp Pro)
 // =========================================================================
+
+// =========================================================================
+// 👑 10조 자산가 매일 명언 10선 마스터 풀 & 격언
+// =========================================================================
+const QUOTES_TRILLION = [
+  "시간을 돈으로 바꾸지 말고, 4대 레버리지(자본, 시스템, 지식, 미디어)를 통해 영구 복리 자산 시스템을 구축하라.",
+  "10조 자산가의 하루는 단순한 노동이 아니라, 독점적 해자(Moat)를 파고 복리 시스템을 구축하는 시간이다.",
+  "신체 에너지와 맑은 정신이 무너지면 어떤 자본도 의미가 없다. 최고의 1순위 자산은 건강이다.",
+  "무의미한 술자리와 인맥을 거절하는 용기가 매일 2시간의 독점적 딥워크 복리 시간을 선물한다.",
+  "완벽주의를 버리고, 매일 지식과 직무 통찰을 1장의 도면이나 글로 기록하여 시스템 자본화하라."
+];
+
+const MASTER_10_TRILLION_QUOTES_POOL = [
+  { cat: '자본', q: '시간을 돈으로 바꾸는 자는 평생 일해야 하지만, 시스템과 자본을 복리로 굴리는 자는 잠자는 동안에도 10조를 번다.' },
+  { cat: '자본', q: '현금은 산소와 같아서 쥐고 있으면 인플레이션에 증발한다. 독점적 해자를 지닌 현금흐름 자산으로 즉시 치환하라.' },
+  { cat: '자본', q: '10조 부의 법칙은 덧셈이 아닌 거듭제곱(복리)이다. 매일 1%의 자산 효율 개선이 10년 후 거대한 제국을 만든다.' },
+  { cat: '레버리지', q: '자신의 노동력을 레버리지하지 마라. 타인의 자본(OPM), 자동화된 코드(Code), 독점 지식(Knowledge), 미디어(Media)를 레버리지하라.' },
+  { cat: '레버리지', q: '한 번의 노력으로 수천만 명에게 복제되어 전달되는 지식 자산(SaaS, 도면, 저작물)을 매일 1줄이라도 구축하라.' },
+  { cat: '레버리지', q: '내가 없어도 24시간 365일 스스로 성장하는 비즈니스 시스템을 설계하는 것이 진정한 오너의 역할이다.' },
+  { cat: '해자', q: '경쟁하지 말고 독점하라. 타인이 쉽게 흉내 낼 수 없는 30년 직무 통찰과 네트워크 효과를 결합하라.' },
+  { cat: '해자', q: '고객에게 대체 불가능한 10배의 가치를 제공할 때, 가격 결정권과 영구적인 시장 지배력이 발생한다.' },
+  { cat: '해자', q: '위대한 비즈니스는 문제 해결의 크기에 비례한다. 10조의 가치를 창출하고 싶다면 1억 명의 고통을 해결하라.' },
+  { cat: '에너지', q: '신체 에너지와 맑은 뇌는 10조 자산의 뿌리다. 수면 7시간과 40분 운동은 타협할 수 없는 최고경영자의 책무다.' },
+  { cat: '에너지', q: '지친 상태에서의 의사결정은 수십억의 손실을 낳는다. 에너지가 가장 충만할 때 하루의 단 하나의 One Thing을 끝내라.' },
+  { cat: '에너지', q: '건강을 잃으면 10조도 무가치하다. 매일 마시는 미온수 500ml와 신체 방어가 복리의 영구 존속을 보장한다.' },
+  { cat: '시간', q: '내 목표와 무관한 모임, 잡담, 불필요한 감정 소모를 단칼에 거절하라. 거절의 크기가 곧 당신의 자산 규모다.' },
+  { cat: '시간', q: '가장 비싼 자원은 시간이다. 1시간당 수천만 원의 가치를 창출하는 딥워크 시간대에 잡무를 절대 허용하지 마라.' },
+  { cat: '시간', q: '단순하고 군더더기 없는 삶에서 폭발적인 부가 축적된다. 낭비를 0으로 만들고 본질에만 집중하라.' },
+  { cat: '투자', q: '하방 위험은 철저히 제한(0)하고 상방 이익은 무한대(10조)로 열려 있는 비대칭 베팅 기회만을 선별하라.' },
+  { cat: '투자', q: '워런 버핏의 제1원칙: 절대로 원금을 잃지 마라. 제2원칙: 제1원칙을 결코 잊지 마라.' },
+  { cat: '투자', q: '위기는 부의 대이동이다. 현금흐름과 인내심을 갖춘 자만이 시장의 공포를 10조 자산으로 바꾼다.' },
+  { cat: '사고', q: '감정으로 결정하고 논리로 합리화하지 마라. 철저한 데이터, 1차 원리 사고, 10단계 알고리즘으로 판단하라.' },
+  { cat: '사고', q: '실수를 두려워하지 말고, 실수에서 원칙(Principle)을 추출하지 못하는 것을 두려워하라.' },
+  { cat: '사고', q: '단기적인 이익에 일희일비하지 마라. 10조 자산가는 10년, 30년 후의 구조적 승리를 바라본다.' },
+  { cat: '학습', q: '매일 책 1장을 읽고 1페이지를 기록하는 것은 지식 은행에 복리 이자를 예금하는 것과 같다.' },
+  { cat: '학습', q: '당신이 평생 쌓은 경험과 노하우를 체계화하여 패키징하라. 그것이 바로 세상에서 가장 강력한 무형 자산이다.' },
+  { cat: '학습', q: '세상의 변화를 앞서 읽는 통찰력은 끊임없는 독서와 거인의 어깨 위에 올라설 때 완성된다.' },
+  { cat: '인재', q: '나보다 똑똑한 사람들을 모으고 그들이 마음껏 역량을 발휘할 수 있는 판(Platform)을 깔아주어라.' },
+  { cat: '인재', q: '신뢰할 수 없는 사람과의 거래는 0원이라도 하지 마라. 고결한 인성과 실력을 갖춘 소수 정예와 함께하라.' },
+  { cat: '인재', q: '명확한 보상과 시스템이 갖춰질 때 팀은 자율적으로 10조를 향해 달린다.' },
+  { cat: '철학', q: '내가 남길 유산(Legacy)은 단순한 돈이 아니라, 세상을 더 이롭게 만든 영구적인 가치와 시스템이다.' },
+  { cat: '철학', q: '시작은 미약했으나 복리의 마법을 믿고 묵묵히 걸어간 자만이 10조의 정상에서 세상을 조망한다.' },
+  { cat: '철학', q: '오늘 하루의 1% 행동이 당신을 10조 자산가의 반열에 올려놓는 결정적 한 걸음이다.' }
+];
+
 class DailyFlowApp {
   constructor() {
     this.currentDate = todayKST();
@@ -3932,6 +3971,7 @@ class DailyFlowApp {
       const q = QUOTES_TRILLION[Math.floor(Math.random() * QUOTES_TRILLION.length)];
       quote50sEl.textContent = `"${q}"`;
     }
+    this.renderSimple10Quotes();
     this.renderSimple50sHabits();
 
     // 6. Simple Mini-Calendar
@@ -3942,6 +3982,9 @@ class DailyFlowApp {
   // =========================================================================
   // 👑 50대 10조 자산가 5대 황금 습관 & AI 인생 코칭 엔진
   // =========================================================================
+
+
+
   // =========================================================================
   // 💡 생각 & 10조 아이디어 메모장 관리 엔진
   // =========================================================================
@@ -4262,6 +4305,264 @@ ${content}
     } finally {
       if (btn) btn.innerHTML = '<i class="fa-solid fa-bolt text-yellow"></i> To-Do 추출';
     }
+  }
+
+  // =========================================================================
+  // 👑 오늘의 10조 명언 10선 & 백업 아카이브 엔진
+  // =========================================================================
+  getDaily10TrillionQuotes(dateStr) {
+    storage.data.trillionQuotesBackup = storage.data.trillionQuotesBackup || {};
+    if (storage.data.trillionQuotesBackup[dateStr] && storage.data.trillionQuotesBackup[dateStr].length === 10) {
+      return storage.data.trillionQuotesBackup[dateStr];
+    }
+
+    // Generate deterministic yet daily varied 10 quotes based on date hash
+    let hash = 0;
+    for (let i = 0; i < dateStr.length; i++) {
+      hash = ((hash << 5) - hash) + dateStr.charCodeAt(i);
+      hash |= 0;
+    }
+    const absHash = Math.abs(hash);
+
+    const quotes = [];
+    const poolCopy = [...MASTER_10_TRILLION_QUOTES_POOL];
+    for (let i = 0; i < 10; i++) {
+      const idx = (absHash + i * 7) % poolCopy.length;
+      const item = poolCopy.splice(idx, 1)[0] || MASTER_10_TRILLION_QUOTES_POOL[i % MASTER_10_TRILLION_QUOTES_POOL.length];
+      quotes.push({
+        id: `q_${dateStr}_${i + 1}`,
+        num: i + 1,
+        cat: item.cat || '복리',
+        quote: item.q,
+        bookmarked: false
+      });
+    }
+
+    storage.data.trillionQuotesBackup[dateStr] = quotes;
+    storage.saveData();
+    return quotes;
+  }
+
+  renderSimple10Quotes() {
+    const listEl = document.getElementById('simple10QuotesList');
+    if (!listEl) return;
+
+    const quotes = this.getDaily10TrillionQuotes(this.currentDate);
+    listEl.innerHTML = '';
+
+    quotes.forEach((qItem, idx) => {
+      const item = document.createElement('div');
+      item.className = 'simple-10quote-item';
+      item.innerHTML = `
+        <div class="simple-10quote-left">
+          <span class="simple-10quote-num">${qItem.num || (idx + 1)}</span>
+          <div class="simple-10quote-text">${this.escapeHtml(qItem.quote)}</div>
+        </div>
+        <div class="simple-10quote-actions">
+          <button class="simple-10quote-btn ${qItem.bookmarked ? 'bookmarked' : ''}" data-action="bookmark" title="${qItem.bookmarked ? '북마크 해제' : '명언 북마크'}">
+            <i class="fa-solid fa-star ${qItem.bookmarked ? 'text-yellow' : ''}"></i>
+          </button>
+          <button class="simple-10quote-btn" data-action="copy" title="명언 복사">
+            <i class="fa-solid fa-copy"></i>
+          </button>
+        </div>
+      `;
+
+      item.querySelector('[data-action="bookmark"]')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        qItem.bookmarked = !qItem.bookmarked;
+        storage.saveData();
+        this.renderSimple10Quotes();
+        this.showToast(qItem.bookmarked ? '⭐ 명언이 북마크에 저장되었습니다!' : '북마크가 해제되었습니다.');
+      });
+
+      item.querySelector('[data-action="copy"]')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        navigator.clipboard.writeText(qItem.quote).then(() => {
+          this.showToast('📋 10조 명언이 클립보드에 복사되었습니다!');
+        });
+      });
+
+      listEl.appendChild(item);
+    });
+  }
+
+  async refreshDaily10QuotesAI() {
+    const btn = document.getElementById('simpleRefresh10QuotesBtn');
+    if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-yellow"></i> 갱신 중...';
+
+    const dayData = storage.getDayData(this.currentDate);
+    const oneThing = dayData.oneThing || dayData.focus || '10조 복리 자산 시스템 구축';
+
+    const prompt = `[👑 10조 자산가 도약을 위한 일일 마스터 명언 10선 생성]
+- 기준 날짜: ${this.currentDate}
+- 사용자의 오늘의 One Thing: "${oneThing}"
+
+사용자가 노동 소득을 넘어 글로벌 10조 자산가/지주사 오너로 도약할 수 있도록, 워런 버핏, 찰리 멍거, 레이 달리오, 나발 라비칸트, 피터 틸 급의 깊은 통찰력을 담은 10개의 핵심 명언을 작성해줘.
+10대 영역: 자본 복리, 4대 레버리지, 독점적 해자, 신체 에너지, 시간 가치, 비대칭 베팅, 멘탈 모델, 지식 자본화, 인재 위임, 영구 존속 철학.
+
+형식 (반드시 10개 번호 매김):
+1. [명언1]
+2. [명언2]
+...
+10. [명언10]`;
+
+    try {
+      const res = await geminiClient.generateText(prompt);
+      const lines = res.split('\n').filter(l => /^\d+\./.test(l.trim()));
+      
+      if (lines.length >= 8) {
+        const newQuotes = lines.slice(0, 10).map((l, i) => {
+          const text = l.replace(/^\d+\.\s*/, '').replace(/^[\*"]+|[\*"]+$/g, '').trim();
+          return {
+            id: `q_${this.currentDate}_ai_${i + 1}`,
+            num: i + 1,
+            cat: '10조 AI',
+            quote: text,
+            bookmarked: false
+          };
+        });
+
+        storage.data.trillionQuotesBackup = storage.data.trillionQuotesBackup || {};
+        storage.data.trillionQuotesBackup[this.currentDate] = newQuotes;
+        storage.saveData();
+        this.renderSimple10Quotes();
+        this.showToast('✨ 오늘의 10조 명언 10선이 AI로 새롭게 갱신되어 백업되었습니다! 👑');
+      } else {
+        this.showToast('명언 생성 결과를 파싱하지 못했습니다. 다시 시도해주세요.');
+      }
+    } catch (e) {
+      this.showToast(`AI 명언 갱신 실패: ${e.message}`);
+    } finally {
+      if (btn) btn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> 갱신';
+    }
+  }
+
+  openTrillionQuotesBackupModal() {
+    const modal = document.getElementById('trillionQuotesBackupModal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    this.quotesBackupFilterBookmarkOnly = false;
+    this.quotesBackupSearchQuery = '';
+    this.renderQuotesBackupList();
+  }
+
+  renderQuotesBackupList() {
+    const container = document.getElementById('quotesBackupContainer');
+    if (!container) return;
+
+    const backup = storage.data.trillionQuotesBackup || {};
+    const dates = Object.keys(backup).sort().reverse();
+
+    if (dates.length === 0) {
+      container.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted);">백업된 10조 명언이 없습니다.</div>';
+      return;
+    }
+
+    const q = (this.quotesBackupSearchQuery || '').toLowerCase().trim();
+    const onlyBookmarked = !!this.quotesBackupFilterBookmarkOnly;
+
+    container.innerHTML = '';
+    let totalRendered = 0;
+
+    dates.forEach(d => {
+      let qList = backup[d] || [];
+      if (onlyBookmarked) {
+        qList = qList.filter(item => item.bookmarked);
+      }
+      if (q) {
+        qList = qList.filter(item => (item.quote || '').toLowerCase().includes(q) || d.includes(q));
+      }
+
+      if (qList.length === 0) return;
+      totalRendered += qList.length;
+
+      const groupEl = document.createElement('div');
+      groupEl.className = 'quotes-backup-date-group';
+      groupEl.innerHTML = `
+        <div class="quotes-backup-date-header">
+          <span>📅 ${d} 10조 명언 (${qList.length}개)</span>
+          <button class="simple-btn simple-btn-sm" data-date="${d}" data-action="copy-all"><i class="fa-solid fa-copy"></i> 전체 복사</button>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          ${qList.map(item => `
+            <div class="quotes-backup-item">
+              <div style="display:flex; gap:8px; align-items:flex-start;">
+                <span class="simple-10quote-num" style="width:18px; height:18px; font-size:0.68rem;">${item.num || '•'}</span>
+                <span style="color:var(--text-primary);">${this.escapeHtml(item.quote)}</span>
+              </div>
+              <button class="simple-10quote-btn ${item.bookmarked ? 'bookmarked' : ''}" data-quote-id="${item.id}" data-date="${d}" data-action="toggle-bm">
+                <i class="fa-solid fa-star ${item.bookmarked ? 'text-yellow' : ''}"></i>
+              </button>
+            </div>
+          `).join('')}
+        </div>
+      `;
+
+      groupEl.querySelector('[data-action="copy-all"]')?.addEventListener('click', () => {
+        const text = qList.map(item => `${item.num}. ${item.quote}`).join('\n');
+        navigator.clipboard.writeText(`[📅 ${d} 10조 자산가 명언 10선]\n\n${text}`).then(() => {
+          this.showToast(`[${d}] 명언 전체가 클립보드에 복사되었습니다! 📋`);
+        });
+      });
+
+      groupEl.querySelectorAll('[data-action="toggle-bm"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const qId = btn.dataset.quoteId;
+          const targetDate = btn.dataset.date;
+          const targetItem = (backup[targetDate] || []).find(i => i.id === qId);
+          if (targetItem) {
+            targetItem.bookmarked = !targetItem.bookmarked;
+            storage.saveData();
+            this.renderQuotesBackupList();
+            this.renderSimple10Quotes();
+          }
+        });
+      });
+
+      container.appendChild(groupEl);
+    });
+
+    if (totalRendered === 0) {
+      container.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted);">검색 조건에 맞는 백업 명언이 없습니다.</div>';
+    }
+  }
+
+  exportQuotesBackupJSON() {
+    const backup = storage.data.trillionQuotesBackup || {};
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `trillion_quotes_backup_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    this.showToast('💾 10조 명언 백업 JSON 파일이 다운로드되었습니다!');
+  }
+
+  exportQuotesBackupMarkdown() {
+    const backup = storage.data.trillionQuotesBackup || {};
+    const dates = Object.keys(backup).sort().reverse();
+    let md = `# 👑 10조 자산가 매일 명언 영구 백업 보관함 (Archive)\n\n`;
+    md += `> 생성일시: ${new Date().toLocaleString('ko-KR')}\n\n---\n\n`;
+
+    dates.forEach(d => {
+      const list = backup[d] || [];
+      md += `### 📅 ${d} (10선)\n\n`;
+      list.forEach((item, idx) => {
+        md += `${item.num || (idx + 1)}. ${item.quote}${item.bookmarked ? ' ⭐' : ''}\n`;
+      });
+      md += `\n---\n\n`;
+    });
+
+    const blob = new Blob([md], { type: 'text/markdown;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `trillion_quotes_backup_${new Date().toISOString().split('T')[0]}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+    this.showToast('📄 10조 명언 백업 Markdown 파일이 다운로드되었습니다!');
   }
 
   renderSimple50sHabits() {
@@ -4665,6 +4966,37 @@ ${content}
     document.getElementById('simple50sCoachBtn')?.addEventListener('click', () => {
       this.run50sLifeCoach();
     });
+    // 10조 매일 명언 10선 이벤트 & 백업 모달
+    document.getElementById('simpleRefresh10QuotesBtn')?.addEventListener('click', () => {
+      this.refreshDaily10QuotesAI();
+    });
+    document.getElementById('simpleOpenQuotesBackupBtn')?.addEventListener('click', () => {
+      this.openTrillionQuotesBackupModal();
+    });
+    document.getElementById('closeQuotesBackupModalBtn')?.addEventListener('click', () => {
+      const modal = document.getElementById('trillionQuotesBackupModal');
+      if (modal) modal.style.display = 'none';
+    });
+    document.getElementById('closeQuotesBackupOverlay')?.addEventListener('click', () => {
+      const modal = document.getElementById('trillionQuotesBackupModal');
+      if (modal) modal.style.display = 'none';
+    });
+    document.getElementById('quotesBackupSearch')?.addEventListener('input', (e) => {
+      this.quotesBackupSearchQuery = e.target.value;
+      this.renderQuotesBackupList();
+    });
+    document.getElementById('quotesBackupFilterBookmark')?.addEventListener('click', (e) => {
+      this.quotesBackupFilterBookmarkOnly = !this.quotesBackupFilterBookmarkOnly;
+      e.currentTarget.classList.toggle('active', this.quotesBackupFilterBookmarkOnly);
+      this.renderQuotesBackupList();
+    });
+    document.getElementById('exportQuotesBackupJsonBtn')?.addEventListener('click', () => {
+      this.exportQuotesBackupJSON();
+    });
+    document.getElementById('exportQuotesBackupMdBtn')?.addEventListener('click', () => {
+      this.exportQuotesBackupMarkdown();
+    });
+
     document.getElementById('close50sCoachBoxBtn')?.addEventListener('click', () => {
       const box = document.getElementById('simple50sCoachResultBox');
       if (box) box.style.display = 'none';
