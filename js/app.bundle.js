@@ -6784,6 +6784,11 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
     });
 
     // Modal buttons
+        document.getElementById('outlookEventModal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'outlookEventModal') {
+        this.closeOutlookEventModal();
+      }
+    });
     document.getElementById('closeOutlookEventModalBtn')?.addEventListener('click', () => {
       this.closeOutlookEventModal();
     });
@@ -7230,11 +7235,13 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
     const deleteBtn = document.getElementById('deleteOutlookEventBtn');
     const modalTitle = document.getElementById('outlookEventModalTitle');
 
+    const defaultDate = prefillDate || this.rootOutlookDate || this.currentDate || new Date().toISOString().split('T')[0];
+
     if (event) {
       if (modalTitle) modalTitle.textContent = '일정 상세 및 수정';
       if (idInput) idInput.value = event.id;
       if (titleInput) titleInput.value = event.title;
-      if (dateInput) dateInput.value = prefillDate || this.outlookCurrentDate;
+      if (dateInput) dateInput.value = prefillDate || event.date || defaultDate;
       if (catSelect) catSelect.value = event.category || 'career';
       if (startInput) startInput.value = event.startTime || '09:00';
       if (endInput) endInput.value = event.endTime || '10:00';
@@ -7245,10 +7252,10 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
       if (modalTitle) modalTitle.textContent = '새 일정 등록';
       if (idInput) idInput.value = '';
       if (titleInput) titleInput.value = '';
-      if (dateInput) dateInput.value = prefillDate || this.outlookCurrentDate;
+      if (dateInput) dateInput.value = defaultDate;
       if (catSelect) catSelect.value = 'career';
-      const startH = prefillHour !== null ? String(prefillHour).padStart(2, '0') + ':00' : '09:00';
-      const endH = prefillHour !== null ? String(prefillHour + 1).padStart(2, '0') + ':00' : '10:00';
+      const startH = prefillHour !== null && prefillHour !== undefined ? String(prefillHour).padStart(2, '0') + ':00' : '09:00';
+      const endH = prefillHour !== null && prefillHour !== undefined ? String(Math.min(23, prefillHour + 1)).padStart(2, '0') + ':00' : '10:00';
       if (startInput) startInput.value = startH;
       if (endInput) endInput.value = endH;
       if (locInput) locInput.value = '';
@@ -7257,12 +7264,16 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
     }
 
     modal.style.display = 'flex';
-    titleInput?.focus();
+    modal.classList.add('active');
+    setTimeout(() => { titleInput?.focus(); }, 50);
   }
 
   closeOutlookEventModal() {
     const modal = document.getElementById('outlookEventModal');
-    if (modal) modal.style.display = 'none';
+    if (modal) {
+      modal.style.display = 'none';
+      modal.classList.remove('active');
+    }
   }
 
   saveOutlookEvent() {
@@ -7277,13 +7288,14 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
     const syncTodo = document.getElementById('outlookEventSyncTodo')?.checked;
 
     const title = titleInput?.value.trim();
-    const dateStr = dateInput?.value || this.outlookCurrentDate;
+    const dateStr = dateInput?.value || this.rootOutlookDate || this.currentDate || new Date().toISOString().split('T')[0];
     if (!title) {
-      alert('일정 제목을 입력해주세요!');
+      this.showToast('⚠️ 일정 제목을 입력해주세요!');
+      titleInput?.focus();
       return;
     }
 
-    const eventId = idInput?.value || 'evt_' + Date.now();
+    const eventId = idInput?.value || 'evt_' + Date.now() + Math.floor(Math.random() * 1000);
     const newEvent = {
       id: eventId,
       title: title,
@@ -7323,12 +7335,13 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
     }
 
     this.closeOutlookEventModal();
+    this.renderRootOutlookCalendar();
     this.renderOutlookSchedule();
     this.renderSimpleMode();
     this.renderTodos();
-    this.renderTabCalendar('dashboard');
+    this.renderAllTabCalendars();
     paintEES(dateStr);
-    this.showToast('일정이 안전하게 저장되고 전사 연동되었습니다! 📅✨');
+    this.showToast('📅 일정이 안전하게 등록·저장되었습니다!');
   }
 
   deleteOutlookEvent(id, dateStr) {
@@ -7336,9 +7349,11 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
     events = events.filter(e => e.id !== id);
     this.saveEventsForDate(dateStr, events);
     this.closeOutlookEventModal();
+    this.renderRootOutlookCalendar();
     this.renderOutlookSchedule();
     this.renderSimpleMode();
-    this.renderTabCalendar('dashboard');
+    this.renderTodos();
+    this.renderAllTabCalendars();
     paintEES(dateStr);
     this.showToast('일정이 삭제되었습니다.');
   }
