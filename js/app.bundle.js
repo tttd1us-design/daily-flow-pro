@@ -4021,7 +4021,7 @@ class DailyFlowApp {
 
 
   // =========================================================================
-  // 👑 50대 10조 자산가 5대 황금 습관 & AI 인생 코칭 엔진
+  // 👑 10조 자산가 5대 황금 습관 & AI 인생 코칭 엔진
   // =========================================================================
 
 
@@ -5047,7 +5047,7 @@ ${content}
       this.renderSimpleMiniCalendar();
     });
 
-    // 8. 50대 5대 황금 습관 클릭 이벤트
+    // 8. 10조 5대 황금 습관 클릭 이벤트
     document.querySelectorAll('.simple-50s-habit-item').forEach(item => {
       item.addEventListener('click', () => {
         const habitKey = item.dataset.habit;
@@ -5055,7 +5055,7 @@ ${content}
       });
     });
 
-    // 9. 50대 AI 인생 코치 버튼 & 닫기
+    // 9. 10조 AI 인생 코치 버튼 & 닫기
     document.getElementById('simple50sCoachBtn')?.addEventListener('click', () => {
       this.run50sLifeCoach();
     });

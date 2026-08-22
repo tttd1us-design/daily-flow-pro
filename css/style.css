@@ -1877,7 +1877,7 @@ body.mode-pro #simpleModeContainer {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* 50대 10조 자산가 모멘텀 히어로 바 */
+/* 10조 자산가 모멘텀 히어로 바 */
 .simple-50s-hero-bar {
   display: flex;
   justify-content: space-between;
@@ -1938,7 +1938,7 @@ body.mode-pro #simpleModeContainer {
   box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
 }
 
-/* 50대 AI 처방전 결과 박스 */
+/* 10조 자산가 AI 처방전 결과 박스 */
 .simple-50s-coach-box {
   background: linear-gradient(180deg, rgba(15, 23, 42, 0.95), rgba(8, 13, 26, 0.98));
   border: 1px solid rgba(14, 165, 233, 0.4);
@@ -2008,7 +2008,7 @@ body.mode-pro #simpleModeContainer {
   }
 }
 
-/* 50대 5대 황금 습관 스타일 */
+/* 10조 5대 황금 습관 스타일 */
 .simple-habit-progress-wrap {
   width: 100%;
 }
