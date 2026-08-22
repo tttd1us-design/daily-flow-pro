@@ -7485,15 +7485,35 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
     this.renderRootOutlookCalendar();
   }
 
-  getLunarText(year, month, day) {
-    const approxLunarDay = ((day + 18) % 29) + 1;
-    if (month === 8 && day === 15) return '추석';
-    if (month === 8 && day === 27) return '보름';
-    if (month === 8 && day === 12) return '그믐';
-    if (month === 8 && day === 13) return '칠석';
-    if (approxLunarDay === 15) return '보름';
-    if (approxLunarDay === 30 || approxLunarDay === 29) return '그믐';
-    return `(음)${approxLunarDay}`;
+  getHolidayName(year, month, day) {
+    // 1. 고정 양력 공휴일
+    if (month === 1 && day === 1) return '신정';
+    if (month === 3 && day === 1) return '삼일절';
+    if (month === 5 && day === 5) return '어린이날';
+    if (month === 6 && day === 6) return '현충일';
+    if (month === 8 && day === 15) return '광복절';
+    if (month === 10 && day === 3) return '개천절';
+    if (month === 10 && day === 9) return '한글날';
+    if (month === 12 && day === 25) return '성탄절';
+
+    // 2. 연도별 주요 음력 명절 및 대체공휴일 DB
+    const holidayKey = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const holidayDb = {
+      // 2025년
+      '2025-01-28': '설날연휴', '2025-01-29': '설날', '2025-01-30': '설날연휴',
+      '2025-03-03': '대체공휴일', '2025-05-05': '어린이날', '2025-05-06': '대체공휴일',
+      '2025-10-05': '추석연휴', '2025-10-06': '추석', '2025-10-07': '추석연휴', '2025-10-08': '대체공휴일',
+      // 2026년
+      '2026-02-16': '설날연휴', '2026-02-17': '설날', '2026-02-18': '설날연휴',
+      '2026-03-02': '대체공휴일', '2026-05-24': '부처님오신날', '2026-05-25': '대체공휴일',
+      '2026-09-24': '추석연휴', '2026-09-25': '추석', '2026-09-26': '추석연휴',
+      // 2027년
+      '2027-02-06': '설날연휴', '2027-02-07': '설날', '2027-02-08': '설날연휴', '2027-02-09': '대체공휴일',
+      '2027-05-13': '부처님오신날',
+      '2027-09-14': '추석연휴', '2027-09-15': '추석', '2027-09-16': '추석연휴'
+    };
+
+    return holidayDb[holidayKey] || null;
   }
 
   renderRootOutlookCalendar() {
@@ -7550,8 +7570,16 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
     const daysInPrevMonth = new Date(year, month, 0).getDate();
     const todayStr = new Date().toISOString().split('T')[0];
 
-    const dayHeaders = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
-    let theadHtml = dayHeaders.map(h => `<th class="outlook-month-col-header">${h}</th>`).join('');
+    const dayHeaders = [
+      { name: '일요일', cls: 'col-sun' },
+      { name: '월요일', cls: '' },
+      { name: '화요일', cls: '' },
+      { name: '수요일', cls: '' },
+      { name: '목요일', cls: '' },
+      { name: '금요일', cls: '' },
+      { name: '토요일', cls: 'col-sat' }
+    ];
+    let theadHtml = dayHeaders.map(h => `<th class="outlook-month-col-header ${h.cls}">${h.name}</th>`).join('');
 
     let gridRows = '<tr>';
     let cellCount = 0;
@@ -7562,14 +7590,20 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
     for (let i = firstDayIndex - 1; i >= 0; i--) {
       const dayNum = daysInPrevMonth - i;
       const dStr = `${prevMonthYear}-${String(prevMonthNum).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
-      const lunar = this.getLunarText(prevMonthYear, prevMonthNum, dayNum);
+      const dayOfWeek = cellCount % 7;
+      const isSun = dayOfWeek === 0;
+      const isSat = dayOfWeek === 6;
+      const holiday = this.getHolidayName(prevMonthYear, prevMonthNum, dayNum);
+      const isHoliday = !!holiday;
       const events = this.getEventsForDate(dStr);
 
+      const colorCls = isSun ? 'is-sun' : isSat ? 'is-sat' : isHoliday ? 'is-holiday' : '';
+
       gridRows += `
-        <td class="outlook-month-cell other-month" data-date="${dStr}">
+        <td class="outlook-month-cell other-month ${colorCls}" data-date="${dStr}">
           <div class="outlook-cell-header-line">
             <span class="outlook-cell-date-num">${prevMonthNum}월 ${dayNum}일</span>
-            <span class="lunar-label">· ${lunar}</span>
+            ${holiday ? `<span class="holiday-badge">${holiday}</span>` : ''}
           </div>
           <div class="outlook-cell-events-box">${this.renderOutlookCellBadges(events)}</div>
         </td>
@@ -7584,14 +7618,22 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
       }
       const dStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
       const isToday = dStr === todayStr;
-      const lunar = this.getLunarText(year, month + 1, d);
+      const dayOfWeek = cellCount % 7;
+      const isSun = dayOfWeek === 0;
+      const isSat = dayOfWeek === 6;
+      const holiday = this.getHolidayName(year, month + 1, d);
+      const isHoliday = !!holiday;
       const events = this.getEventsForDate(dStr);
 
+      let colorCls = '';
+      if (isSun || isHoliday) colorCls = 'is-sun';
+      else if (isSat) colorCls = 'is-sat';
+
       gridRows += `
-        <td class="outlook-month-cell ${isToday ? 'today-cell' : ''}" data-date="${dStr}">
+        <td class="outlook-month-cell ${isToday ? 'today-cell' : ''} ${colorCls}" data-date="${dStr}">
           <div class="outlook-cell-header-line">
             <span class="outlook-cell-date-num">${d}일</span>
-            <span class="lunar-label">· ${lunar}</span>
+            ${holiday ? `<span class="holiday-badge">${holiday}</span>` : ''}
           </div>
           <div class="outlook-cell-events-box">${this.renderOutlookCellBadges(events)}</div>
         </td>
@@ -7608,14 +7650,19 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
         gridRows += '</tr><tr>';
       }
       const dStr = `${nextMonthYear}-${String(nextMonthNum).padStart(2, '0')}-${String(nextDayNum).padStart(2, '0')}`;
-      const lunar = this.getLunarText(nextMonthYear, nextMonthNum, nextDayNum);
+      const dayOfWeek = cellCount % 7;
+      const isSun = dayOfWeek === 0;
+      const isSat = dayOfWeek === 6;
+      const holiday = this.getHolidayName(nextMonthYear, nextMonthNum, nextDayNum);
       const events = this.getEventsForDate(dStr);
 
+      const colorCls = isSun ? 'is-sun' : isSat ? 'is-sat' : holiday ? 'is-holiday' : '';
+
       gridRows += `
-        <td class="outlook-month-cell other-month" data-date="${dStr}">
+        <td class="outlook-month-cell other-month ${colorCls}" data-date="${dStr}">
           <div class="outlook-cell-header-line">
             <span class="outlook-cell-date-num">${nextMonthNum}월 ${nextDayNum}일</span>
-            <span class="lunar-label">· ${lunar}</span>
+            ${holiday ? `<span class="holiday-badge">${holiday}</span>` : ''}
           </div>
           <div class="outlook-cell-events-box">${this.renderOutlookCellBadges(events)}</div>
         </td>
@@ -7749,11 +7796,17 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
     weekDates.forEach((dStr, idx) => {
       const dObj = new Date(dStr);
       const isToday = dStr === todayStr;
-      const lunar = this.getLunarText(dObj.getFullYear(), dObj.getMonth() + 1, dObj.getDate());
+      const isSun = idx === 0;
+      const isSat = idx === 6;
+      const holiday = this.getHolidayName(dObj.getFullYear(), dObj.getMonth() + 1, dObj.getDate());
+      const colorCls = (isSun || holiday) ? 'col-sun' : isSat ? 'col-sat' : '';
+
       headerHtml += `
-        <th class="outlook-time-header-cell ${isToday ? 'today' : ''}" style="${isToday ? 'background:#0078d4; color:#fff;' : ''}">
-          <div>${dayLabels[idx]}</div>
-          <div style="font-size:1.05rem; font-weight:800; margin-top:2px;">${dObj.getDate()}일 <span style="font-size:0.7rem; font-weight:normal; opacity:0.85;">· ${lunar}</span></div>
+        <th class="outlook-time-header-cell ${isToday ? 'today' : ''} ${colorCls}" style="${isToday ? 'background:#0078d4; color:#fff;' : ''}">
+          <div style="${isToday ? '' : isSun || holiday ? 'color:#ef4444;' : isSat ? 'color:#3b82f6;' : ''}">${dayLabels[idx]}</div>
+          <div style="font-size:1.05rem; font-weight:800; margin-top:2px; ${isToday ? '' : isSun || holiday ? 'color:#ef4444;' : isSat ? 'color:#3b82f6;' : ''}">
+            ${dObj.getDate()}일 ${holiday ? `<span class="holiday-badge">${holiday}</span>` : ''}
+          </div>
         </th>
       `;
     });
@@ -7853,9 +7906,12 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
         const isToday = dStr === todayStr;
         const events = this.getEventsForDate(dStr);
         const hasEvent = events.length > 0;
+        const dayOfWeek = cellCount % 7;
+        const holiday = this.getHolidayName(year, m + 1, d);
+        const colorCls = (dayOfWeek === 0 || holiday) ? 'is-sun' : (dayOfWeek === 6) ? 'is-sat' : '';
 
         tableHtml += `
-          <td class="${isToday ? 'today-mini' : ''} ${hasEvent ? 'has-event' : ''}" data-date="${dStr}" title="${dStr} (${events.length}건 일정)">
+          <td class="${isToday ? 'today-mini' : ''} ${hasEvent ? 'has-event' : ''} ${colorCls}" data-date="${dStr}" title="${dStr}${holiday ? ' (' + holiday + ')' : ''} (${events.length}건 일정)">
             ${d}
           </td>
         `;
