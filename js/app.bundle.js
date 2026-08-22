@@ -3818,9 +3818,11 @@ class DailyFlowApp {
       });
     }
 
+    this.rootOutlookDate = dateStr;
     this.renderAllTabCalendars();
     this.renderPrinciples();
-    this.renderSimpleMode();
+    if (this.appMode === 'simple') this.renderSimpleMode();
+    if (this.appMode === 'calendar') this.renderRootOutlookCalendar();
   }
 
 
