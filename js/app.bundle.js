@@ -129,6 +129,14 @@ class GeminiApiClient {
 
 const geminiClient = new GeminiApiClient();
 
+const QUOTES_50S = [
+  "50대의 가장 큰 무기는 30년 직무 통찰력이다. 노동 소득을 영구 복리 자산 시스템으로 전환하라.",
+  "은퇴는 끝이 아니라, 남을 위해 일하던 시간을 나만의 10조 자산 시스템을 구축하는 시간으로 바꾸는 시작이다.",
+  "신체 건강과 맑은 정신이 무너지면 어떤 자산도 의미가 없다. 50대의 1순위 자산은 건강이다.",
+  "의미 없는 술자리와 인맥을 거절하는 용기가 하루 2시간의 독점적 딥워크 시간을 선물한다.",
+  "완벽주의를 버리고, 매일 지식과 경험을 1장의 도면이나 글로 기록하여 자본화하라."
+];
+
 const QUOTES = [
   "완벽한 계획보다 1%의 즉각적 실행이 인생을 바꾼다.",
   "생각을 행동으로 바꾸지 않는 한 어떤 지식도 힘이 되지 못한다.",
@@ -3888,8 +3896,157 @@ class DailyFlowApp {
       memoInput.value = dayData.condition?.memo || dayData.quickMemo || '';
     }
 
-    // 5. Simple Mini-Calendar
+    // 5. 50대 10조 자산가 습관 & 인용구
+    const quote50sEl = document.getElementById('simple50sQuote');
+    if (quote50sEl) {
+      const q = QUOTES_50S[Math.floor(Math.random() * QUOTES_50S.length)];
+      quote50sEl.textContent = `"${q}"`;
+    }
+    this.renderSimple50sHabits();
+
+    // 6. Simple Mini-Calendar
     this.renderSimpleMiniCalendar();
+  }
+
+
+  // =========================================================================
+  // 👑 50대 10조 자산가 5대 황금 습관 & AI 인생 코칭 엔진
+  // =========================================================================
+  renderSimple50sHabits() {
+    const dayData = storage.getDayData(this.currentDate);
+    const habits50s = dayData.habits50s || {};
+    const habitKeys = ['h_health', 'h_knowledge', 'h_deepwork', 'h_capital', 'h_elimination'];
+    
+    let doneCount = 0;
+    habitKeys.forEach(k => {
+      const isDone = !!habits50s[k];
+      if (isDone) doneCount++;
+
+      const itemEl = document.querySelector(`.simple-50s-habit-item[data-habit="${k}"]`);
+      if (itemEl) {
+        itemEl.classList.toggle('done', isDone);
+      }
+
+      // Calculate streak
+      const streak = this.calc50sHabitStreak(k);
+      const streakEl = document.getElementById(`streak_${k}`);
+      if (streakEl) {
+        streakEl.innerHTML = `<i class="fa-solid fa-fire"></i> ${streak}일`;
+        if (streak > 0) {
+          streakEl.style.color = '#f59e0b';
+          streakEl.style.background = 'rgba(245, 158, 11, 0.2)';
+        } else {
+          streakEl.style.color = 'var(--text-muted)';
+          streakEl.style.background = 'rgba(255, 255, 255, 0.05)';
+        }
+      }
+    });
+
+    const badgeEl = document.getElementById('simple50sHabitBadge');
+    const fillEl = document.getElementById('simple50sHabitProgressFill');
+    const pct = Math.round((doneCount / habitKeys.length) * 100);
+
+    if (badgeEl) {
+      badgeEl.textContent = `${doneCount}/5 실천 (${pct}%)`;
+      if (doneCount === 5) {
+        badgeEl.style.background = 'rgba(16, 185, 129, 0.2)';
+        badgeEl.style.color = '#34d399';
+        badgeEl.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+      } else {
+        badgeEl.style.background = 'rgba(245, 158, 11, 0.18)';
+        badgeEl.style.color = '#fbbf24';
+        badgeEl.style.borderColor = 'rgba(245, 158, 11, 0.3)';
+      }
+    }
+    if (fillEl) {
+      fillEl.style.width = `${pct}%`;
+    }
+  }
+
+  calc50sHabitStreak(habitKey) {
+    let streak = 0;
+    let curr = new Date(this.currentDate);
+    const todayData = storage.getDayData(this.currentDate);
+    if (!todayData.habits50s || !todayData.habits50s[habitKey]) {
+      curr.setDate(curr.getDate() - 1);
+    }
+    const allDays = storage.data.days || {};
+    for (let i = 0; i < 365; i++) {
+      const dStr = curr.toISOString().split('T')[0];
+      const dData = allDays[dStr];
+      if (dData && dData.habits50s && dData.habits50s[habitKey]) {
+        streak++;
+        curr.setDate(curr.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+    return streak;
+  }
+
+  toggle50sHabit(habitKey) {
+    const dayData = storage.getDayData(this.currentDate);
+    dayData.habits50s = dayData.habits50s || {};
+    dayData.habits50s[habitKey] = !dayData.habits50s[habitKey];
+    storage.updateDayData(this.currentDate, { habits50s: dayData.habits50s });
+    this.renderSimple50sHabits();
+    this.renderTabCalendar('dashboard');
+    paintEES(this.currentDate);
+    const habitNames = {
+      h_health: '💪 신체 자산 방어',
+      h_knowledge: '🧠 지식의 자본화',
+      h_deepwork: '⚡ 퇴근 후 1시간 딥워크',
+      h_capital: '💰 자본 & 레버리지 공부',
+      h_elimination: '🚫 낭비 차단 & 거절의 미학'
+    };
+    if (dayData.habits50s[habitKey]) {
+      this.showToast(`✨ [${habitNames[habitKey]}] 10조 습관을 실천하셨습니다! 🔥`);
+    } else {
+      this.showToast(`[${habitNames[habitKey]}] 습관 체크가 해제되었습니다.`);
+    }
+  }
+
+  async run50sLifeCoach() {
+    const btn = document.getElementById('simple50sCoachBtn');
+    const resultBox = document.getElementById('simple50sCoachResultBox');
+    const contentEl = document.getElementById('simple50sCoachContent');
+    if (!contentEl || !resultBox) return;
+
+    if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-cyan"></i> 50대 10조 전략 연산 중...';
+    resultBox.style.display = 'block';
+    contentEl.innerHTML = '<div style="text-align:center; padding:18px;"><i class="fa-solid fa-spinner fa-spin text-cyan" style="font-size:1.4rem;"></i><p style="margin-top:8px; color:var(--text-secondary); font-weight:600;">50대 직장인의 체력, 30년 직무 노하우, 복리 자산 구조를 분석하여 오늘 밤 1% 행동 처방전을 작성 중입니다...</p></div>';
+
+    const dayData = storage.getDayData(this.currentDate);
+    const oneThing = dayData.oneThing || dayData.focus || '자립형 비즈니스 파이프라인 구축';
+    const habits50s = dayData.habits50s || {};
+    const doneHabits = Object.values(habits50s).filter(Boolean).length;
+    const mood = dayData.mood || 'good';
+
+    const prompt = `[50대 직장인 ➔ 10조 자산가 실시간 최고전략 처방전]
+- 기준 날짜: ${this.currentDate}
+- 사용자의 오늘의 One Thing: "${oneThing}"
+- 50대 10조 황금 습관 실천 현황: ${doneHabits}/5개 완료
+- 현재 컨디션 및 무드: ${mood}
+
+당신은 50대 직장인을 정년 불안에서 해방시키고 글로벌 10조 자산가/지주사 오너로 도약시키는 최고전략고문 AI입니다.
+50대는 20대처럼 밤샘 노동을 할 수 없으므로, '체력 방어'와 '30년 직무 통찰의 자산화', '시스템/자본 레버리지'가 유일한 승리 공식입니다.
+
+오늘 지친 50대 직장인이 오늘 밤 퇴근 후 의지력을 낭비하지 않고 즉각 실천할 수 있는 4단계 명쾌한 처방전을 작성해줘:
+
+1. 🛡️ **[오늘 밤 5분 체력 & 뇌 피로 회복 루틴]** (미온수, 스트레칭, 수면 시간 엄수)
+2. 💎 **[30년 직무 지식을 10조 자산으로 바꾸는 오늘 밤 30분 액션]** (도면 1장, 업무 매뉴얼, 비즈니스 아이디어 1페이지 집필)
+3. 🚀 **[내일 출근길 지하철/운전 중 실천할 1% 복리 생각 루틴]** (의미 없는 잡담 대신 자본 구조 분석)
+4. 🧭 **[50대 인생 2막을 깨우는 레이 달리오/찰리 멍거 급 핵심 한 줄 명언]**`;
+
+    try {
+      const response = await geminiClient.generateText(prompt);
+      contentEl.innerHTML = this.parseMarkdown(response);
+      if (btn) btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> <span>오늘 밤 10조 행동 처방받기</span>';
+      this.showToast('50대 10조 자산가 맞춤 처방전이 발행되었습니다! 👑');
+    } catch (e) {
+      contentEl.innerHTML = `<p style="color:var(--accent-danger);">처방전 생성 중 오류가 발생했습니다: ${e.message}</p>`;
+      if (btn) btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> <span>오늘 밤 10조 행동 처방받기</span>';
+    }
   }
 
   renderSimpleMiniCalendar() {
@@ -4081,6 +4238,23 @@ class DailyFlowApp {
       this.tabCalState.dashboard.year = now.getFullYear();
       this.tabCalState.dashboard.month = now.getMonth();
       this.renderSimpleMiniCalendar();
+    });
+
+    // 8. 50대 5대 황금 습관 클릭 이벤트
+    document.querySelectorAll('.simple-50s-habit-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const habitKey = item.dataset.habit;
+        if (habitKey) this.toggle50sHabit(habitKey);
+      });
+    });
+
+    // 9. 50대 AI 인생 코치 버튼 & 닫기
+    document.getElementById('simple50sCoachBtn')?.addEventListener('click', () => {
+      this.run50sLifeCoach();
+    });
+    document.getElementById('close50sCoachBoxBtn')?.addEventListener('click', () => {
+      const box = document.getElementById('simple50sCoachResultBox');
+      if (box) box.style.display = 'none';
     });
   }
 

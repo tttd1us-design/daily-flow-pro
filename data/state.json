@@ -950,6 +950,204 @@
           "why": "저작 축 최저"
         }
       ]
+    },
+    "2026-08-23": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": {
+        "date": "2026-08-23",
+        "authoring": 0,
+        "capital": 0,
+        "transition": 20,
+        "decision": 9,
+        "total": 29,
+        "grade": "D",
+        "color": "#f43f5e",
+        "raw": {
+          "chars": 0,
+          "contacts": 0,
+          "dealMoves": 0,
+          "billableH": 0,
+          "logged": 0,
+          "reviewRate": 60
+        }
+      },
+      "commands": [
+        {
+          "block": "05:30–07:00",
+          "min": 90,
+          "engineId": "E1",
+          "type": "write",
+          "entityId": "bk_1",
+          "text": "『건축사가 읽는 돈의 도면』 Ch.1 「도면에는 가격표가 붙어 있다」 3,600자",
+          "why": "기상 직후는 아무도 요구하지 않는 유일한 시간"
+        },
+        {
+          "block": "20:00–20:50",
+          "min": 50,
+          "engineId": "E1",
+          "type": "write",
+          "text": "집필 보충 블록 — 부족분 채우기",
+          "why": "저작 축 최저"
+        }
+      ]
+    },
+    "2026-08-21": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": {
+        "date": "2026-08-21",
+        "authoring": 0,
+        "capital": 0,
+        "transition": 20,
+        "decision": 9,
+        "total": 29,
+        "grade": "D",
+        "color": "#f43f5e",
+        "raw": {
+          "chars": 0,
+          "contacts": 0,
+          "dealMoves": 0,
+          "billableH": 0,
+          "logged": 0,
+          "reviewRate": 60
+        }
+      },
+      "commands": []
+    },
+    "2026-08-22": {
+      "focus": "",
+      "mood": null,
+      "condition": {
+        "water": 0,
+        "energy": 50,
+        "sleep": 7,
+        "sleepMin": 420,
+        "workout": false,
+        "memo": "",
+        "isRecoveryDay": false
+      },
+      "todos": [],
+      "deepwork": [],
+      "timeBlocks": [],
+      "habits": {},
+      "study": {
+        "topic": "",
+        "goalHours": 2,
+        "actualHours": 0,
+        "til": "",
+        "notes": "",
+        "photos": []
+      },
+      "eveningRoutine": {
+        "goal": "",
+        "actualHours": 0,
+        "focusRate": 100,
+        "review": "",
+        "todayTasks": [],
+        "tomorrowTasks": []
+      },
+      "journal": {
+        "title": "",
+        "content": "",
+        "tags": [],
+        "photos": [],
+        "photoIds": [],
+        "updatedAt": null
+      },
+      "ees": {
+        "date": "2026-08-22",
+        "authoring": 0,
+        "capital": 0,
+        "transition": 20,
+        "decision": 9,
+        "total": 29,
+        "grade": "D",
+        "color": "#f43f5e",
+        "raw": {
+          "chars": 0,
+          "contacts": 0,
+          "dealMoves": 0,
+          "billableH": 0,
+          "logged": 0,
+          "reviewRate": 60
+        }
+      },
+      "commands": []
     }
   },
   "decisions": [
