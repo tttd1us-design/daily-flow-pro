@@ -3895,3 +3895,218 @@ body {
   padding: 11px 14px !important;
   gap: 12px !important;
 }
+
+/* =========================================================================
+   🌓 바탕 테마 스위처 캡슐 (검정/흰색 모드 전환)
+   ========================================================================= */
+
+.theme-switcher-pill {
+  display: flex;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 3px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  gap: 2px;
+}
+
+.theme-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.theme-pill-btn:hover {
+  color: var(--text-primary);
+}
+
+.theme-pill-btn.active {
+  background: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+}
+
+/* =========================================================================
+   ☀️ 완벽한 라이트 모드 (흰색 바탕 테마) 고대비 스타일링
+   ========================================================================= */
+
+[data-theme="light"] {
+  --bg-primary: #f1f5f9;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f8fafc;
+  --border-color: #e2e8f0;
+  --border-focus: #0284c7;
+
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+}
+
+[data-theme="light"] body {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .sidebar {
+  background-color: #ffffff !important;
+  border-right-color: #e2e8f0 !important;
+}
+
+[data-theme="light"] .outlook-ribbon-header {
+  background-color: #ffffff !important;
+  border-bottom-color: #e2e8f0 !important;
+}
+
+[data-theme="light"] .card,
+[data-theme="light"] .simple-card,
+[data-theme="light"] .outlook-app-wrapper,
+[data-theme="light"] .outlook-calendar-main-card,
+[data-theme="light"] .modal-dialog {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-theme="light"] .outlook-app-toolbar,
+[data-theme="light"] .outlook-toolbar {
+  background: #f8fafc !important;
+  border-bottom-color: #e2e8f0 !important;
+}
+
+[data-theme="light"] .outlook-month-col-header,
+[data-theme="light"] .outlook-time-header-cell {
+  background: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+  color: #1e293b !important;
+}
+
+[data-theme="light"] .outlook-month-cell {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+[data-theme="light"] .outlook-month-cell:hover {
+  background: #f8fafc !important;
+}
+
+[data-theme="light"] .outlook-month-cell.other-month {
+  background: #f8fafc !important;
+  opacity: 0.7 !important;
+}
+
+[data-theme="light"] .outlook-month-cell.today-cell {
+  background: #0078d4 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .outlook-cell-date-num {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .outlook-month-cell.today-cell .outlook-cell-date-num,
+[data-theme="light"] .outlook-month-cell.today-cell .lunar-label {
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .simple-input,
+[data-theme="light"] .input-focus-hero,
+[data-theme="light"] .simple-cat-select,
+[data-theme="light"] .simple-textarea,
+[data-theme="light"] .simple-memo-textarea,
+[data-theme="light"] input,
+[data-theme="light"] select,
+[data-theme="light"] textarea {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .simple-todo-item {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+[data-theme="light"] .simple-todo-text {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .simple-memo-card {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+[data-theme="light"] .simple-memo-card-title {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .simple-memo-card-content {
+  color: #334155 !important;
+}
+
+[data-theme="light"] .simple-10quote-item {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+[data-theme="light"] .simple-10quote-text {
+  color: #1e293b !important;
+}
+
+[data-theme="light"] .simple-50s-habit-item {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+[data-theme="light"] .simple-50s-habit-name {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .simple-sub-navbar {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+[data-theme="light"] .outlook-side-nav-tab {
+  background: rgba(16, 185, 129, 0.1) !important;
+  border-color: #10b981 !important;
+  color: #047857 !important;
+}
+
+[data-theme="light"] .mode-switcher-group,
+[data-theme="light"] .theme-switcher-pill,
+[data-theme="light"] .outlook-view-switch-tabs,
+[data-theme="light"] .outlook-view-switch-group {
+  background: #e2e8f0 !important;
+  border-color: #cbd5e1 !important;
+}
+
+[data-theme="light"] .theme-pill-btn {
+  color: #475569 !important;
+}
+
+[data-theme="light"] .theme-pill-btn.active {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12) !important;
+}
+
+[data-theme="light"] .outlook-tab-btn,
+[data-theme="light"] .outlook-view-btn {
+  color: #475569 !important;
+}
+
+[data-theme="light"] .outlook-tab-btn.active,
+[data-theme="light"] .outlook-view-btn.active {
+  background: #0078d4 !important;
+  color: #ffffff !important;
+}

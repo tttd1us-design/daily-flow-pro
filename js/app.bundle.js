@@ -253,8 +253,39 @@ class DailyFlowApp {
   }
 
   initTheme() {
-    const saved = storage.data.settings.theme || 'dark';
-    document.documentElement.setAttribute('data-theme', saved);
+    const saved = storage.data.settings?.theme || localStorage.getItem('daily_flow_theme') || 'dark';
+    this.setTheme(saved, false);
+
+    document.getElementById('themeBtnDark')?.addEventListener('click', () => {
+      this.setTheme('dark');
+    });
+    document.getElementById('themeBtnLight')?.addEventListener('click', () => {
+      this.setTheme('light');
+    });
+  }
+
+  setTheme(theme, showToast = true) {
+    const validTheme = theme === 'light' ? 'light' : 'dark';
+    storage.data.settings = storage.data.settings || {};
+    storage.data.settings.theme = validTheme;
+    storage.saveData();
+    try { localStorage.setItem('daily_flow_theme', validTheme); } catch(e) {}
+
+    document.documentElement.setAttribute('data-theme', validTheme);
+
+    const btnDark = document.getElementById('themeBtnDark');
+    const btnLight = document.getElementById('themeBtnLight');
+    if (btnDark) btnDark.classList.toggle('active', validTheme === 'dark');
+    if (btnLight) btnLight.classList.toggle('active', validTheme === 'light');
+
+    const icon = document.getElementById('themeIcon');
+    if (icon) {
+      icon.className = validTheme === 'dark' ? 'fa-solid fa-moon' : 'fa-solid fa-sun text-amber';
+    }
+
+    if (showToast) {
+      this.showToast(validTheme === 'dark' ? '🌙 검정(다크) 테마로 전환되었습니다.' : '☀️ 흰색(라이트) 테마로 전환되었습니다.');
+    }
   }
 
   initElements() {

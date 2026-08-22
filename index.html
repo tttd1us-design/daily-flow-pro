@@ -18,9 +18,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&family=Nanum+Myeongjo:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
-  <link rel="stylesheet" href="css/style.css?v=2.3.1">
-  <link rel="stylesheet" href="css/print.css?v=2.3.1">
-  <link rel="stylesheet" href="css/tt.css?v=2.3.1">
+  <link rel="stylesheet" href="css/style.css?v=2.4.0">
+  <link rel="stylesheet" href="css/print.css?v=2.4.0">
+  <link rel="stylesheet" href="css/tt.css?v=2.4.0">
 </head>
 <body>
   <div class="app-container" id="appContainer">
@@ -189,6 +189,16 @@
             </button>
             <button id="proModeBtn" class="btn btn-mode-toggle" title="프로 모드: 10조 자산가 복리 경영 시스템 12대 탭 종합 제어">
               <i class="fa-solid fa-crown text-yellow"></i> <span>프로 모드</span>
+            </button>
+          </div>
+
+          <!-- 🌓 바탕색 테마 전환 스위처 (검정 / 흰색) -->
+          <div class="theme-switcher-pill" id="themeSwitcherPill" title="바탕 테마 전환 (검정/흰색)">
+            <button class="theme-pill-btn active" id="themeBtnDark" data-theme="dark" title="검정 (다크 모드)">
+              <i class="fa-solid fa-moon"></i> <span>검정</span>
+            </button>
+            <button class="theme-pill-btn" id="themeBtnLight" data-theme="light" title="흰색 (라이트 모드)">
+              <i class="fa-solid fa-sun text-amber"></i> <span>흰색</span>
             </button>
           </div>
 
@@ -2894,7 +2904,7 @@
 
   <div class="toast-container" id="toastContainer"></div>
 
-  <script type="module" src="js/app.bundle.js?v=2.3.0"></script>
+  <script type="module" src="js/app.bundle.js?v=2.4.0"></script>
 
   <!-- ======================================================== -->
   <!-- 📅 아웃룩 일정 등록 및 수정 모달                             -->
