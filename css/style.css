@@ -3380,3 +3380,329 @@ body.mode-pro #simpleModeContainer {
   border-color: rgba(59, 130, 246, 0.3);
   background: rgba(255, 255, 255, 0.03);
 }
+
+/* =========================================================================
+   👑 최상위 3대 모드 제어 (일정표 / 심플 모드 / 프로 모드)
+   ========================================================================= */
+
+body.mode-calendar #calendarModeContainer { display: block !important; }
+body.mode-calendar #simpleModeContainer { display: none !important; }
+body.mode-calendar .tab-pane { display: none !important; }
+
+body.mode-simple #calendarModeContainer { display: none !important; }
+body.mode-simple #simpleModeContainer { display: block !important; }
+body.mode-simple .tab-pane { display: none !important; }
+
+body.mode-pro #calendarModeContainer { display: none !important; }
+body.mode-pro #simpleModeContainer { display: none !important; }
+
+/* =========================================================================
+   📅 아웃룩 원본 스타일 일정표 (Outlook Authentic Design System)
+   ========================================================================= */
+
+.calendar-mode-container {
+  display: block;
+  padding: 0 4px 20px 4px;
+}
+
+.outlook-app-wrapper {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 120px);
+}
+
+.outlook-app-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 20px;
+  background: rgba(15, 23, 42, 0.85);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.outlook-toolbar-left, .outlook-toolbar-center, .outlook-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.outlook-btn-primary {
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.outlook-btn-primary:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.outlook-arrow-group {
+  display: flex;
+  gap: 2px;
+}
+
+.outlook-date-heading {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 0 8px;
+}
+
+.outlook-view-switch-tabs {
+  display: flex;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.outlook-tab-btn {
+  padding: 6px 16px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.outlook-tab-btn:hover {
+  color: var(--text-primary);
+}
+
+.outlook-tab-btn.active {
+  background: #0078d4;
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 2px 10px rgba(0, 120, 212, 0.4);
+}
+
+/* 캘린더 바디 래퍼 & 사이드 네비게이션 탭 */
+.outlook-calendar-body-wrapper {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.outlook-side-nav-tab {
+  position: absolute;
+  top: 40%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #34d399;
+  padding: 12px 6px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  letter-spacing: 2px;
+}
+
+.outlook-side-nav-tab.left {
+  left: 6px;
+}
+
+.outlook-side-nav-tab.right {
+  right: 6px;
+}
+
+.outlook-side-nav-tab:hover {
+  background: rgba(16, 185, 129, 0.25);
+  border-color: #34d399;
+  transform: translateY(-50%) scale(1.05);
+}
+
+/* -------------------------------------------------------------------------
+   1. 아웃룩 월간 뷰 테이블 (Month View)
+   ------------------------------------------------------------------------- */
+.outlook-month-full-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  flex: 1;
+  height: 100%;
+  min-height: 620px;
+}
+
+.outlook-month-col-header {
+  padding: 10px 8px;
+  text-align: left;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.outlook-month-cell {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  height: 110px;
+  vertical-align: top;
+  padding: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  position: relative;
+}
+
+.outlook-month-cell:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.outlook-month-cell.other-month {
+  opacity: 0.45;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+/* 아웃룩 블루 오늘 하이라이트 */
+.outlook-month-cell.today-cell {
+  background: #0078d4 !important;
+  color: #ffffff !important;
+  border-color: #0078d4 !important;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.outlook-month-cell.today-cell .outlook-cell-date-num,
+.outlook-month-cell.today-cell .lunar-label {
+  color: #ffffff !important;
+}
+
+.outlook-cell-header-line {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.outlook-cell-date-num {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.lunar-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: normal;
+}
+
+.outlook-cell-events-box {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* -------------------------------------------------------------------------
+   2. 아웃룩 연간 뷰 (12개월 매트릭스 그리드)
+   ------------------------------------------------------------------------- */
+.outlook-year-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  padding: 20px;
+}
+
+@media (max-width: 1100px) {
+  .outlook-year-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .outlook-year-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.outlook-year-month-card {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.outlook-year-month-card:hover {
+  border-color: rgba(59, 130, 246, 0.4);
+  background: rgba(59, 130, 246, 0.08);
+  transform: translateY(-2px);
+}
+
+.outlook-year-month-title {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.outlook-mini-month-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+  font-size: 0.68rem;
+}
+
+.outlook-mini-month-table th {
+  color: var(--text-muted);
+  padding: 3px 0;
+}
+
+.outlook-mini-month-table td {
+  padding: 4px 0;
+  color: var(--text-secondary);
+  border-radius: 4px;
+}
+
+.outlook-mini-month-table td.today-mini {
+  background: #0078d4;
+  color: #fff;
+  font-weight: 800;
+}
+
+.outlook-mini-month-table td.has-event {
+  font-weight: 800;
+  color: #38bdf8;
+  position: relative;
+}
+
+.outlook-mini-month-table td.has-event::after {
+  content: '';
+  position: absolute;
+  bottom: 1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #f59e0b;
+}

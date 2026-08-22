@@ -239,6 +239,7 @@ class DailyFlowApp {
     this.initModeSwitcher();
     this.bindSimpleModeEvents();
     this.initOutlookSchedule();
+    this.initRootOutlookCalendar();
     this.startClock();
     this.showRandomQuote();
     this.updateGeminiStatusBadge();
@@ -3815,18 +3816,22 @@ class DailyFlowApp {
   }
 
   setAppMode(mode) {
-    this.appMode = mode;
-    localStorage.setItem('daily_flow_mode', mode);
+    this.appMode = mode || 'calendar';
+    try { localStorage.setItem('daily_flow_mode', this.appMode); } catch (e) {}
 
-    document.body.classList.remove('mode-simple', 'mode-pro');
-    document.body.classList.add('mode-' + mode);
+    document.body.classList.remove('mode-calendar', 'mode-simple', 'mode-pro');
+    document.body.classList.add('mode-' + this.appMode);
 
+    const calBtn = document.getElementById('calendarModeBtn');
     const simpleBtn = document.getElementById('simpleModeBtn');
     const proBtn = document.getElementById('proModeBtn');
-    if (simpleBtn) simpleBtn.classList.toggle('active', mode === 'simple');
-    if (proBtn) proBtn.classList.toggle('active', mode === 'pro');
+    if (calBtn) calBtn.classList.toggle('active', this.appMode === 'calendar');
+    if (simpleBtn) simpleBtn.classList.toggle('active', this.appMode === 'simple');
+    if (proBtn) proBtn.classList.toggle('active', this.appMode === 'pro');
 
-    if (mode === 'simple') {
+    if (this.appMode === 'calendar') {
+      this.renderRootOutlookCalendar();
+    } else if (this.appMode === 'simple') {
       this.renderSimpleMode();
     } else {
       this.loadDate(this.currentDate);
@@ -7369,6 +7374,494 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
     this.renderSimpleMode();
     this.renderTodos();
     this.showToast(`${extractedCount}개의 일정이 오늘의 To-Do로 연동 등록되었습니다! 📋✨`);
+  }
+
+  // =========================================================================
+  // 📅 아웃룩 원본 독립 캘린더 엔진 (일일 / 주간 / 월간 / 연간 4대 뷰)
+  // =========================================================================
+  initRootOutlookCalendar() {
+    this.rootOutlookViewMode = 'month'; // Default: Month View (matching screenshot)
+    this.rootOutlookDate = this.currentDate || new Date().toISOString().split('T')[0];
+
+    // Top Mode Switcher buttons
+    document.getElementById('calendarModeBtn')?.addEventListener('click', () => {
+      this.setAppMode('calendar');
+      this.showToast('📅 아웃룩 스마트 일정표 모드로 전환되었습니다.');
+    });
+    document.getElementById('simpleModeBtn')?.addEventListener('click', () => {
+      this.setAppMode('simple');
+      this.showToast('⚡ 심플 모드로 전환되었습니다.');
+    });
+    document.getElementById('proModeBtn')?.addEventListener('click', () => {
+      this.setAppMode('pro');
+      this.showToast('👑 프로 모드로 전환되었습니다.');
+    });
+
+    // View switch tabs (Day / Week / Month / Year)
+    document.querySelectorAll('#rootOutlookViewTabs .outlook-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#rootOutlookViewTabs .outlook-tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.rootOutlookViewMode = btn.dataset.view;
+        this.renderRootOutlookCalendar();
+      });
+    });
+
+    // Navigation buttons
+    document.getElementById('rootOutlookTodayBtn')?.addEventListener('click', () => {
+      this.rootOutlookDate = new Date().toISOString().split('T')[0];
+      this.renderRootOutlookCalendar();
+    });
+    document.getElementById('rootOutlookPrevBtn')?.addEventListener('click', () => {
+      this.navigateRootOutlookDate(-1);
+    });
+    document.getElementById('rootOutlookNextBtn')?.addEventListener('click', () => {
+      this.navigateRootOutlookDate(1);
+    });
+    document.getElementById('outlookSidePrevTab')?.addEventListener('click', () => {
+      this.navigateRootOutlookDate(-1);
+    });
+    document.getElementById('outlookSideNextTab')?.addEventListener('click', () => {
+      this.navigateRootOutlookDate(1);
+    });
+
+    // Action buttons
+    document.getElementById('rootOutlookAddEventBtn')?.addEventListener('click', () => {
+      this.openOutlookEventModal(null, this.rootOutlookDate);
+    });
+    document.getElementById('rootOutlookSyncTodoBtn')?.addEventListener('click', () => {
+      this.syncTodosToOutlookSchedule();
+    });
+    document.getElementById('rootOutlookExtractTodoBtn')?.addEventListener('click', () => {
+      this.syncOutlookEventsToTodos();
+    });
+  }
+
+  navigateRootOutlookDate(direction) {
+    const cur = new Date(this.rootOutlookDate);
+    if (this.rootOutlookViewMode === 'day') {
+      cur.setDate(cur.getDate() + direction);
+    } else if (this.rootOutlookViewMode === 'week') {
+      cur.setDate(cur.getDate() + (direction * 7));
+    } else if (this.rootOutlookViewMode === 'month') {
+      cur.setMonth(cur.getMonth() + direction);
+    } else if (this.rootOutlookViewMode === 'year') {
+      cur.setFullYear(cur.getFullYear() + direction);
+    }
+    this.rootOutlookDate = cur.toISOString().split('T')[0];
+    this.renderRootOutlookCalendar();
+  }
+
+  getLunarText(year, month, day) {
+    const approxLunarDay = ((day + 18) % 29) + 1;
+    if (month === 8 && day === 15) return '추석';
+    if (month === 8 && day === 27) return '보름';
+    if (month === 8 && day === 12) return '그믐';
+    if (month === 8 && day === 13) return '칠석';
+    if (approxLunarDay === 15) return '보름';
+    if (approxLunarDay === 30 || approxLunarDay === 29) return '그믐';
+    return `(음)${approxLunarDay}`;
+  }
+
+  renderRootOutlookCalendar() {
+    const cur = new Date(this.rootOutlookDate);
+    const year = cur.getFullYear();
+    const month = cur.getMonth() + 1;
+    const date = cur.getDate();
+    const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+
+    const titleEl = document.getElementById('rootOutlookDateTitle');
+    if (titleEl) {
+      if (this.rootOutlookViewMode === 'day') {
+        titleEl.textContent = `${year}년 ${month}월 ${date}일 (${dayNames[cur.getDay()]})`;
+      } else if (this.rootOutlookViewMode === 'week') {
+        const startOfWeek = new Date(cur);
+        const day = cur.getDay();
+        const diff = cur.getDate() - day; // Sunday start like Outlook
+        startOfWeek.setDate(diff);
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6);
+        titleEl.textContent = `${startOfWeek.getFullYear()}년 ${startOfWeek.getMonth() + 1}월 ${startOfWeek.getDate()}일 ~ ${endOfWeek.getMonth() + 1}월 ${endOfWeek.getDate()}일 (주간)`;
+      } else if (this.rootOutlookViewMode === 'month') {
+        titleEl.textContent = `${year}년 ${month}월`;
+      } else {
+        titleEl.textContent = `${year}년 (연간 캘린더)`;
+      }
+    }
+
+    // Hide all root panels
+    document.querySelectorAll('.outlook-root-panel').forEach(p => p.style.display = 'none');
+
+    if (this.rootOutlookViewMode === 'month') {
+      const p = document.getElementById('rootOutlookMonthPanel');
+      if (p) { p.style.display = 'block'; this.renderRootOutlookMonthView(p); }
+    } else if (this.rootOutlookViewMode === 'day') {
+      const p = document.getElementById('rootOutlookDayPanel');
+      if (p) { p.style.display = 'block'; this.renderRootOutlookDayView(p); }
+    } else if (this.rootOutlookViewMode === 'week') {
+      const p = document.getElementById('rootOutlookWeekPanel');
+      if (p) { p.style.display = 'block'; this.renderRootOutlookWeekView(p); }
+    } else if (this.rootOutlookViewMode === 'year') {
+      const p = document.getElementById('rootOutlookYearPanel');
+      if (p) { p.style.display = 'block'; this.renderRootOutlookYearView(p); }
+    }
+  }
+
+  renderRootOutlookMonthView(container) {
+    const cur = new Date(this.rootOutlookDate);
+    const year = cur.getFullYear();
+    const month = cur.getMonth();
+
+    const firstDayIndex = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const daysInPrevMonth = new Date(year, month, 0).getDate();
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    const dayHeaders = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+    let theadHtml = dayHeaders.map(h => `<th class="outlook-month-col-header">${h}</th>`).join('');
+
+    let gridRows = '<tr>';
+    let cellCount = 0;
+
+    // Previous month padding days
+    const prevMonthNum = month === 0 ? 12 : month;
+    const prevMonthYear = month === 0 ? year - 1 : year;
+    for (let i = firstDayIndex - 1; i >= 0; i--) {
+      const dayNum = daysInPrevMonth - i;
+      const dStr = `${prevMonthYear}-${String(prevMonthNum).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
+      const lunar = this.getLunarText(prevMonthYear, prevMonthNum, dayNum);
+      const events = this.getEventsForDate(dStr);
+
+      gridRows += `
+        <td class="outlook-month-cell other-month" data-date="${dStr}">
+          <div class="outlook-cell-header-line">
+            <span class="outlook-cell-date-num">${prevMonthNum}월 ${dayNum}일</span>
+            <span class="lunar-label">· ${lunar}</span>
+          </div>
+          <div class="outlook-cell-events-box">${this.renderOutlookCellBadges(events)}</div>
+        </td>
+      `;
+      cellCount++;
+    }
+
+    // Current month days
+    for (let d = 1; d <= daysInMonth; d++) {
+      if (cellCount > 0 && cellCount % 7 === 0) {
+        gridRows += '</tr><tr>';
+      }
+      const dStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      const isToday = dStr === todayStr;
+      const lunar = this.getLunarText(year, month + 1, d);
+      const events = this.getEventsForDate(dStr);
+
+      gridRows += `
+        <td class="outlook-month-cell ${isToday ? 'today-cell' : ''}" data-date="${dStr}">
+          <div class="outlook-cell-header-line">
+            <span class="outlook-cell-date-num">${d}일</span>
+            <span class="lunar-label">· ${lunar}</span>
+          </div>
+          <div class="outlook-cell-events-box">${this.renderOutlookCellBadges(events)}</div>
+        </td>
+      `;
+      cellCount++;
+    }
+
+    // Next month padding days
+    const nextMonthNum = month === 11 ? 1 : month + 2;
+    const nextMonthYear = month === 11 ? year + 1 : year;
+    let nextDayNum = 1;
+    while (cellCount % 7 !== 0 || cellCount < 35) {
+      if (cellCount > 0 && cellCount % 7 === 0) {
+        gridRows += '</tr><tr>';
+      }
+      const dStr = `${nextMonthYear}-${String(nextMonthNum).padStart(2, '0')}-${String(nextDayNum).padStart(2, '0')}`;
+      const lunar = this.getLunarText(nextMonthYear, nextMonthNum, nextDayNum);
+      const events = this.getEventsForDate(dStr);
+
+      gridRows += `
+        <td class="outlook-month-cell other-month" data-date="${dStr}">
+          <div class="outlook-cell-header-line">
+            <span class="outlook-cell-date-num">${nextMonthNum}월 ${nextDayNum}일</span>
+            <span class="lunar-label">· ${lunar}</span>
+          </div>
+          <div class="outlook-cell-events-box">${this.renderOutlookCellBadges(events)}</div>
+        </td>
+      `;
+      nextDayNum++;
+      cellCount++;
+    }
+    gridRows += '</tr>';
+
+    container.innerHTML = `
+      <table class="outlook-month-full-table">
+        <thead><tr>${theadHtml}</tr></thead>
+        <tbody>${gridRows}</tbody>
+      </table>
+    `;
+
+    container.querySelectorAll('.outlook-month-cell').forEach(cell => {
+      cell.addEventListener('click', (e) => {
+        if (e.target.closest('.outlook-event-badge')) return;
+        const date = cell.dataset.date;
+        this.openOutlookEventModal(null, date);
+      });
+    });
+
+    container.querySelectorAll('.outlook-event-badge').forEach(badge => {
+      badge.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = badge.dataset.eventId;
+        const date = badge.dataset.eventDate;
+        const events = this.getEventsForDate(date);
+        const target = events.find(ev => ev.id === id);
+        if (target) this.openOutlookEventModal(target, date);
+      });
+    });
+  }
+
+  renderOutlookCellBadges(events) {
+    if (!events || events.length === 0) return '';
+    let html = '';
+    events.slice(0, 3).forEach(e => {
+      html += `
+        <div class="outlook-event-badge cat-${e.category || 'career'}" data-event-id="${e.id}" title="${this.escapeHtml(e.title)} (${e.startTime}~${e.endTime})">
+          ${this.escapeHtml(e.startTime || '')} ${this.escapeHtml(e.title)}
+        </div>
+      `;
+    });
+    if (events.length > 3) {
+      html += `<div style="font-size:0.68rem; color:rgba(255,255,255,0.7); text-align:right;">+${events.length - 3}건 더보기</div>`;
+    }
+    return html;
+  }
+
+  renderRootOutlookDayView(container) {
+    const dStr = this.rootOutlookDate;
+    const events = this.getEventsForDate(dStr);
+
+    let rowsHtml = '';
+    for (let h = 0; h <= 23; h++) {
+      const hourStr = String(h).padStart(2, '0') + ':00';
+      const cellEvents = events.filter(e => {
+        const startH = parseInt((e.startTime || '00').split(':')[0], 10);
+        return startH === h;
+      });
+
+      let eventsHtml = '';
+      cellEvents.forEach(e => {
+        eventsHtml += `
+          <div class="outlook-event-badge cat-${e.category || 'career'}" data-event-id="${e.id}" data-event-date="${dStr}" style="padding:8px 12px; font-size:0.85rem; margin-bottom:6px;" title="${this.escapeHtml(e.title)}">
+            <div style="font-weight:800;">${this.escapeHtml(e.startTime)} ~ ${this.escapeHtml(e.endTime)} &nbsp; ${this.escapeHtml(e.title)}</div>
+            ${e.location ? `<div style="font-size:0.75rem; opacity:0.85; margin-top:2px;">📍 ${this.escapeHtml(e.location)}</div>` : ''}
+            ${e.notes ? `<div style="font-size:0.75rem; opacity:0.8; margin-top:2px;">📝 ${this.escapeHtml(e.notes)}</div>` : ''}
+          </div>
+        `;
+      });
+
+      rowsHtml += `
+        <tr>
+          <td class="outlook-time-col-axis" style="width:80px; font-size:0.8rem;">${hourStr}</td>
+          <td class="outlook-time-slot-cell" data-date="${dStr}" data-hour="${h}" style="min-height:60px; padding:4px;">
+            ${eventsHtml}
+          </td>
+        </tr>
+      `;
+    }
+
+    container.innerHTML = `
+      <table class="outlook-time-grid-table">
+        <tbody>${rowsHtml}</tbody>
+      </table>
+    `;
+
+    container.querySelectorAll('.outlook-time-slot-cell').forEach(slot => {
+      slot.addEventListener('click', (e) => {
+        if (e.target.closest('.outlook-event-badge')) return;
+        const date = slot.dataset.date;
+        const hour = parseInt(slot.dataset.hour, 10);
+        this.openOutlookEventModal(null, date, hour);
+      });
+    });
+
+    container.querySelectorAll('.outlook-event-badge').forEach(badge => {
+      badge.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = badge.dataset.eventId;
+        const date = badge.dataset.eventDate;
+        const evs = this.getEventsForDate(date);
+        const target = evs.find(ev => ev.id === id);
+        if (target) this.openOutlookEventModal(target, date);
+      });
+    });
+  }
+
+  renderRootOutlookWeekView(container) {
+    const cur = new Date(this.rootOutlookDate);
+    const day = cur.getDay();
+    const diff = cur.getDate() - day; // Sunday start
+    const startOfWeek = new Date(cur);
+    startOfWeek.setDate(diff);
+
+    const weekDates = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(startOfWeek);
+      d.setDate(startOfWeek.getDate() + i);
+      weekDates.push(d.toISOString().split('T')[0]);
+    }
+
+    const dayLabels = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    let headerHtml = `<th style="width:70px; background:rgba(15,23,42,0.85); border:1px solid rgba(255,255,255,0.08); padding:10px; font-size:0.8rem; color:var(--text-muted);">시간</th>`;
+    weekDates.forEach((dStr, idx) => {
+      const dObj = new Date(dStr);
+      const isToday = dStr === todayStr;
+      const lunar = this.getLunarText(dObj.getFullYear(), dObj.getMonth() + 1, dObj.getDate());
+      headerHtml += `
+        <th class="outlook-time-header-cell ${isToday ? 'today' : ''}" style="${isToday ? 'background:#0078d4; color:#fff;' : ''}">
+          <div>${dayLabels[idx]}</div>
+          <div style="font-size:1.05rem; font-weight:800; margin-top:2px;">${dObj.getDate()}일 <span style="font-size:0.7rem; font-weight:normal; opacity:0.85;">· ${lunar}</span></div>
+        </th>
+      `;
+    });
+
+    let rowsHtml = '';
+    for (let h = 0; h <= 23; h++) {
+      const hourStr = String(h).padStart(2, '0') + ':00';
+      rowsHtml += `<tr>`;
+      rowsHtml += `<td class="outlook-time-col-axis">${hourStr}</td>`;
+
+      weekDates.forEach(dStr => {
+        const events = this.getEventsForDate(dStr);
+        const cellEvents = events.filter(e => {
+          const startH = parseInt((e.startTime || '00').split(':')[0], 10);
+          return startH === h;
+        });
+
+        let eventsHtml = '';
+        cellEvents.forEach(e => {
+          eventsHtml += `
+            <div class="outlook-event-badge cat-${e.category || 'career'}" data-event-id="${e.id}" data-event-date="${dStr}" title="${this.escapeHtml(e.title)} (${e.startTime}~${e.endTime})">
+              ${this.escapeHtml(e.startTime)} ${this.escapeHtml(e.title)}
+            </div>
+          `;
+        });
+
+        rowsHtml += `
+          <td class="outlook-time-slot-cell" data-date="${dStr}" data-hour="${h}">
+            ${eventsHtml}
+          </td>
+        `;
+      });
+      rowsHtml += `</tr>`;
+    }
+
+    container.innerHTML = `
+      <table class="outlook-time-grid-table">
+        <thead><tr>${headerHtml}</tr></thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>
+    `;
+
+    container.querySelectorAll('.outlook-time-slot-cell').forEach(slot => {
+      slot.addEventListener('click', (e) => {
+        if (e.target.closest('.outlook-event-badge')) return;
+        const date = slot.dataset.date;
+        const hour = parseInt(slot.dataset.hour, 10);
+        this.openOutlookEventModal(null, date, hour);
+      });
+    });
+
+    container.querySelectorAll('.outlook-event-badge').forEach(badge => {
+      badge.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = badge.dataset.eventId;
+        const date = badge.dataset.eventDate;
+        const events = this.getEventsForDate(date);
+        const target = events.find(ev => ev.id === id);
+        if (target) this.openOutlookEventModal(target, date);
+      });
+    });
+  }
+
+  renderRootOutlookYearView(container) {
+    const cur = new Date(this.rootOutlookDate);
+    const year = cur.getFullYear();
+    const todayStr = new Date().toISOString().split('T')[0];
+    const monthNames = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
+
+    let cardsHtml = '';
+
+    for (let m = 0; m < 12; m++) {
+      const firstDay = new Date(year, m, 1).getDay();
+      const daysInMonth = new Date(year, m + 1, 0).getDate();
+
+      let tableHtml = `
+        <table class="outlook-mini-month-table">
+          <thead>
+            <tr>
+              <th style="color:#f87171;">일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th style="color:#60a5fa;">토</th>
+            </tr>
+          </thead>
+          <tbody><tr>
+      `;
+
+      let cellCount = 0;
+      for (let i = 0; i < firstDay; i++) {
+        tableHtml += '<td></td>';
+        cellCount++;
+      }
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        if (cellCount > 0 && cellCount % 7 === 0) {
+          tableHtml += '</tr><tr>';
+        }
+        const dStr = `${year}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const isToday = dStr === todayStr;
+        const events = this.getEventsForDate(dStr);
+        const hasEvent = events.length > 0;
+
+        tableHtml += `
+          <td class="${isToday ? 'today-mini' : ''} ${hasEvent ? 'has-event' : ''}" data-date="${dStr}" title="${dStr} (${events.length}건 일정)">
+            ${d}
+          </td>
+        `;
+        cellCount++;
+      }
+
+      while (cellCount % 7 !== 0) {
+        tableHtml += '<td></td>';
+        cellCount++;
+      }
+      tableHtml += '</tr></tbody></table>';
+
+      cardsHtml += `
+        <div class="outlook-year-month-card" data-month="${m}">
+          <div class="outlook-year-month-title">${year}년 ${monthNames[m]}</div>
+          ${tableHtml}
+        </div>
+      `;
+    }
+
+    container.innerHTML = `<div class="outlook-year-grid">${cardsHtml}</div>`;
+
+    container.querySelectorAll('.outlook-year-month-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        const td = e.target.closest('td[data-date]');
+        if (td && td.dataset.date) {
+          this.rootOutlookDate = td.dataset.date;
+          this.rootOutlookViewMode = 'day';
+        } else {
+          const m = parseInt(card.dataset.month, 10);
+          this.rootOutlookDate = `${year}-${String(m + 1).padStart(2, '0')}-01`;
+          this.rootOutlookViewMode = 'month';
+        }
+        document.querySelectorAll('#rootOutlookViewTabs .outlook-tab-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.view === this.rootOutlookViewMode);
+        });
+        this.renderRootOutlookCalendar();
+      });
+    });
   }
 
 }

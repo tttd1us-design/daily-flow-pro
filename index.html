@@ -18,9 +18,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&family=Nanum+Myeongjo:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
-  <link rel="stylesheet" href="css/style.css?v=2.2.0">
-  <link rel="stylesheet" href="css/print.css?v=2.2.0">
-  <link rel="stylesheet" href="css/tt.css?v=2.2.0">
+  <link rel="stylesheet" href="css/style.css?v=2.3.0">
+  <link rel="stylesheet" href="css/print.css?v=2.3.0">
+  <link rel="stylesheet" href="css/tt.css?v=2.3.0">
 </head>
 <body>
   <div class="app-container" id="appContainer">
@@ -179,12 +179,15 @@
         </div>
 
         <div class="ribbon-right">
-          <!-- ⚡ 1초 모드 스위처 (Simple vs Pro) -->
+          <!-- ⚡ 최상위 3대 모드 스위처 (일정표 / 심플 모드 / 프로 모드) -->
           <div class="mode-switcher-group" id="modeSwitcherGroup">
-            <button id="simpleModeBtn" class="btn btn-mode-toggle active" title="심플 모드: 핵심 기능에만 집중하는 가볍고 편안한 화면">
-              <i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> <span>심플 모드</span>
+            <button id="calendarModeBtn" class="btn btn-mode-toggle active" title="아웃룩 일정표: 일일/주간/월간/연간 종합 일정 관리">
+              <i class="fa-solid fa-calendar-days text-cyan"></i> <span>일정표</span>
             </button>
-            <button id="proModeBtn" class="btn btn-mode-toggle" title="프로 모드: 10조 자산가 OS 전체 종합 제어">
+            <button id="simpleModeBtn" class="btn btn-mode-toggle" title="심플 모드: 10조 데일리 허브 (One Thing, To-Do, 일기, 메모, 10조 명언)">
+              <i class="fa-solid fa-wand-magic-sparkles text-yellow"></i> <span>심플 모드</span>
+            </button>
+            <button id="proModeBtn" class="btn btn-mode-toggle" title="프로 모드: 10조 자산가 복리 경영 시스템 12대 탭 종합 제어">
               <i class="fa-solid fa-crown text-yellow"></i> <span>프로 모드</span>
             </button>
           </div>
@@ -197,6 +200,75 @@
           </div>
         </div>
       </header>
+
+            <!-- ======================================================== -->
+      <!-- 📅 1. 아웃룩 스마트 일정표 모드 (일일 / 주간 / 월간 / 연간)      -->
+      <!-- ======================================================== -->
+      <div id="calendarModeContainer" class="calendar-mode-container">
+        
+        <div class="outlook-app-wrapper">
+          
+          <!-- 아웃룩 상단 리본 & 툴바 -->
+          <div class="outlook-app-toolbar">
+            <div class="outlook-toolbar-left">
+              <button class="outlook-btn-primary" id="rootOutlookTodayBtn">오늘</button>
+              <div class="outlook-arrow-group">
+                <button class="outlook-nav-btn" id="rootOutlookPrevBtn" title="이전 (일/주/월/년)"><i class="fa-solid fa-chevron-left"></i></button>
+                <button class="outlook-nav-btn" id="rootOutlookNextBtn" title="다음 (일/주/월/년)"><i class="fa-solid fa-chevron-right"></i></button>
+              </div>
+              <h2 class="outlook-date-heading" id="rootOutlookDateTitle">2026년 8월</h2>
+            </div>
+
+            <div class="outlook-toolbar-center">
+              <div class="outlook-view-switch-tabs" id="rootOutlookViewTabs">
+                <button class="outlook-tab-btn" data-view="day"><i class="fa-solid fa-calendar-day"></i> 일 (Day)</button>
+                <button class="outlook-tab-btn" data-view="week"><i class="fa-solid fa-calendar-week"></i> 주 (Week)</button>
+                <button class="outlook-tab-btn active" data-view="month"><i class="fa-solid fa-calendar"></i> 월 (Month)</button>
+                <button class="outlook-tab-btn" data-view="year"><i class="fa-solid fa-calendar-days"></i> 년 (Year)</button>
+              </div>
+            </div>
+
+            <div class="outlook-toolbar-right">
+              <button class="simple-btn simple-btn-sm" id="rootOutlookSyncTodoBtn" title="오늘의 To-Do를 일정표로 자동 시간 배정">
+                <i class="fa-solid fa-bolt text-yellow"></i> To-Do ➔ 일정 배정
+              </button>
+              <button class="simple-btn simple-btn-sm" id="rootOutlookExtractTodoBtn" title="일정표의 일정을 오늘의 To-Do로 추출">
+                <i class="fa-solid fa-list-check text-cyan"></i> 일정 ➔ To-Do 추출
+              </button>
+              <button class="simple-btn simple-btn-accent" id="rootOutlookAddEventBtn">
+                <i class="fa-solid fa-plus"></i> 새 일정 등록
+              </button>
+            </div>
+          </div>
+
+          <!-- 아웃룩 메인 캘린더 바디 -->
+          <div class="outlook-calendar-body-wrapper">
+            
+            <!-- 사이드 퀵 이동 탭 (스크린샷 동일 요소) -->
+            <button class="outlook-side-nav-tab left" id="outlookSidePrevTab" title="이전 달 이동">
+              <i class="fa-solid fa-chevron-left"></i><span>이전 달</span>
+            </button>
+            <button class="outlook-side-nav-tab right" id="outlookSideNextTab" title="다음 달 이동">
+              <span>다음 달</span><i class="fa-solid fa-chevron-right"></i>
+            </button>
+
+            <!-- 1) 월간 뷰 (Month View - 스크린샷 100% 일치 디자인) -->
+            <div class="outlook-root-panel active" id="rootOutlookMonthPanel"></div>
+
+            <!-- 2) 일일 뷰 (Day View) -->
+            <div class="outlook-root-panel" id="rootOutlookDayPanel" style="display:none;"></div>
+
+            <!-- 3) 주간 뷰 (Week View) -->
+            <div class="outlook-root-panel" id="rootOutlookWeekPanel" style="display:none;"></div>
+
+            <!-- 4) 연간 뷰 (Year View - 12개월 매트릭스) -->
+            <div class="outlook-root-panel" id="rootOutlookYearPanel" style="display:none;"></div>
+
+          </div>
+
+        </div>
+
+      </div>
 
       <!-- ======================================================== -->
       <!-- ⚡ 심플 & 이지 에디션 (👑 10조 자산가 복리 경영 시스템)         -->
@@ -2822,7 +2894,7 @@
 
   <div class="toast-container" id="toastContainer"></div>
 
-  <script type="module" src="js/app.bundle.js?v=2.2.0"></script>
+  <script type="module" src="js/app.bundle.js?v=2.3.0"></script>
 
   <!-- ======================================================== -->
   <!-- 📅 아웃룩 일정 등록 및 수정 모달                             -->
