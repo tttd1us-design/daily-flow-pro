@@ -651,9 +651,32 @@
                   <i class="fa-solid fa-list-check text-cyan"></i> 일정 ➔ To-Do 추출
                 </button>
                 <button class="simple-btn simple-btn-accent" id="outlookAddNewEventBtn">
-                  <i class="fa-solid fa-plus"></i> 새 일정 등록
+                  <i class="fa-solid fa-plus"></i> 상세 등록
                 </button>
               </div>
+            </div>
+
+            <!-- ⚡ 아웃룩 스타일 초간단 1초 퀵 일정 등록 바 (Outlook Quick Event Bar) -->
+            <div class="outlook-quick-add-bar" id="outlookQuickAddBar">
+              <div class="quick-add-date-badge">
+                <i class="fa-solid fa-calendar-day text-cyan"></i>
+                <input type="date" id="outlookQuickEventDate" class="quick-add-date-input" title="일정 날짜 선택">
+              </div>
+              <div class="quick-add-input-wrap">
+                <input type="text" id="outlookQuickEventTitle" placeholder="✍️ 일정 내용을 간단히 입력하세요 (예: 14:00 투자 미팅, 16:30 딥워크)... Enter로 즉시 저장" class="quick-add-input">
+                <button type="button" id="outlookQuickVoiceBtn" class="stt-mic-btn" title="말로 쓰는 30분 음성 입력"><i class="fa-solid fa-microphone"></i></button>
+              </div>
+              <select id="outlookQuickEventCat" class="quick-add-cat-select" title="카테고리">
+                <option value="career">💼 커리어</option>
+                <option value="wealth">💰 10조/재정</option>
+                <option value="deepwork">⚡ 딥워크</option>
+                <option value="meeting">👥 미팅</option>
+                <option value="health">💪 건강</option>
+                <option value="routine">🔄 루틴</option>
+              </select>
+              <button id="outlookQuickSubmitBtn" class="btn btn-primary btn-sm" title="일정 저장 (Enter)">
+                <i class="fa-solid fa-check"></i> 저장
+              </button>
             </div>
 
             <!-- 아웃룩 뷰 컨테이너 -->
@@ -2455,11 +2478,16 @@
       <section class="tab-pane" id="pane-calendar">
         <div class="calendar-page-grid">
           <div class="card calendar-card">
-            <div class="card-header">
+            <div class="card-header" style="flex-wrap:wrap; gap:10px;">
               <div class="calendar-header-controls">
                 <button id="calPrevMonth" class="icon-btn"><i class="fa-solid fa-chevron-left"></i></button>
                 <h3 id="calendarMonthTitle">2026년 8월</h3>
                 <button id="calNextMonth" class="icon-btn"><i class="fa-solid fa-chevron-right"></i></button>
+              </div>
+              <div class="outlook-quick-add-bar" style="flex:1; margin:0;" id="fullCalendarQuickAddBar">
+                <input type="text" id="fullCalQuickTitle" placeholder="✍️ 날짜 선택 후 일정 간단 입력 (예: 15:00 파트너십 미팅)... Enter 저장" class="quick-add-input">
+                <button type="button" id="fullCalQuickVoiceBtn" class="stt-mic-btn" title="30분 음성 입력"><i class="fa-solid fa-microphone"></i></button>
+                <button id="fullCalQuickSubmitBtn" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> 등록</button>
               </div>
               <button id="calTodayBtn" class="btn btn-secondary btn-sm">이번 달</button>
             </div>

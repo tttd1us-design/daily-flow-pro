@@ -5284,3 +5284,112 @@ body {
   background: #dc2626;
   transform: scale(1.05);
 }
+
+/* =========================================================================
+   ⚡ 아웃룩 스타일 초간단 1초 퀵 일정 등록 바 (Outlook Quick Event Bar)
+   ========================================================================= */
+.outlook-quick-add-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(12px);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.quick-add-date-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  flex-shrink: 0;
+}
+
+.quick-add-date-input {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 700;
+  outline: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.quick-add-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+}
+
+.quick-add-input-wrap:focus-within {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 10px rgba(37, 99, 235, 0.35);
+}
+
+.quick-add-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1.05rem;
+  font-weight: 500;
+  outline: none;
+  padding: 6px 0;
+  min-width: 0;
+}
+
+.quick-add-input::placeholder {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.quick-add-cat-select {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  padding: 8px 12px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.quick-add-cat-select:focus {
+  border-color: var(--accent-primary);
+}
+
+/* 캘린더 날짜 셀 호버 시 빠른 입력 유도 피드백 */
+.outlook-month-cell {
+  position: relative;
+  transition: all 0.15s ease;
+}
+
+.outlook-month-cell:hover {
+  background: rgba(37, 99, 235, 0.08) !important;
+  border-color: rgba(56, 189, 248, 0.4) !important;
+}
+
+.outlook-month-cell.highlight-quick-target {
+  background: rgba(37, 99, 235, 0.2) !important;
+  border-color: #38bdf8 !important;
+  box-shadow: inset 0 0 12px rgba(56, 189, 248, 0.3);
+}

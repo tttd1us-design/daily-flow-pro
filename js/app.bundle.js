@@ -7584,6 +7584,81 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
       this.navigateRootOutlookDate(1);
     });
 
+    // ⚡ 아웃룩 스타일 초간단 1초 퀵 일정 등록 바 이벤트 바인딩
+    const quickTitleInput = document.getElementById('outlookQuickEventTitle');
+    const quickDateInput = document.getElementById('outlookQuickEventDate');
+    const quickCatSelect = document.getElementById('outlookQuickEventCat');
+    const quickSubmitBtn = document.getElementById('outlookQuickSubmitBtn');
+    const quickVoiceBtn = document.getElementById('outlookQuickVoiceBtn');
+
+    if (quickDateInput) {
+      quickDateInput.value = this.rootOutlookDate || this.currentDate || new Date().toISOString().split('T')[0];
+      quickDateInput.addEventListener('change', (e) => {
+        this.rootOutlookDate = e.target.value;
+        this.renderRootOutlookCalendar();
+      });
+    }
+
+    const handleQuickSubmit = () => {
+      const title = quickTitleInput?.value.trim();
+      const date = quickDateInput?.value || this.rootOutlookDate;
+      const cat = quickCatSelect?.value || 'career';
+      if (title) {
+        this.addQuickOutlookEvent(title, date, cat);
+        if (quickTitleInput) quickTitleInput.value = '';
+      } else {
+        this.showToast('⚠️ 등록할 일정 내용을 입력해주세요!');
+        quickTitleInput?.focus();
+      }
+    };
+
+    if (quickSubmitBtn) {
+      quickSubmitBtn.addEventListener('click', handleQuickSubmit);
+    }
+    if (quickTitleInput) {
+      quickTitleInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          handleQuickSubmit();
+        }
+      });
+    }
+    if (quickVoiceBtn && window.speechMaster) {
+      quickVoiceBtn.addEventListener('click', () => {
+        window.speechMaster.start(quickTitleInput, quickVoiceBtn);
+      });
+    }
+
+    // 전체 통합 캘린더 (pane-calendar) 상단 퀵 바 연동
+    const fullCalTitleInput = document.getElementById('fullCalQuickTitle');
+    const fullCalSubmitBtn = document.getElementById('fullCalQuickSubmitBtn');
+    const fullCalVoiceBtn = document.getElementById('fullCalQuickVoiceBtn');
+
+    const handleFullCalSubmit = () => {
+      const title = fullCalTitleInput?.value.trim();
+      if (title) {
+        this.addQuickOutlookEvent(title, this.currentDate, 'career');
+        if (fullCalTitleInput) fullCalTitleInput.value = '';
+      }
+    };
+
+    if (fullCalSubmitBtn) {
+      fullCalSubmitBtn.addEventListener('click', handleFullCalSubmit);
+    }
+    if (fullCalTitleInput) {
+      fullCalTitleInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          handleFullCalSubmit();
+        }
+      });
+    }
+    if (fullCalVoiceBtn && window.speechMaster) {
+      fullCalVoiceBtn.addEventListener('click', () => {
+        window.speechMaster.start(fullCalTitleInput, fullCalVoiceBtn);
+      });
+    }
+
     // Action buttons
     document.getElementById('rootOutlookAddEventBtn')?.addEventListener('click', () => {
       this.openOutlookEventModal(null, this.rootOutlookDate);
@@ -7594,6 +7669,88 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
     document.getElementById('rootOutlookExtractTodoBtn')?.addEventListener('click', () => {
       this.syncOutlookEventsToTodos();
     });
+  }
+
+  // ⚡ 아웃룩 스타일 초간단 1초 퀵 일정 등록 및 자동 시간/카테고리 스마트 파싱
+  addQuickOutlookEvent(rawTitle, targetDate = null, customCat = null) {
+    if (!rawTitle || !rawTitle.trim()) {
+      this.showToast('⚠️ 일정 내용을 입력해주세요!');
+      return;
+    }
+
+    const dateStr = targetDate || this.rootOutlookDate || this.currentDate || new Date().toISOString().split('T')[0];
+    let title = rawTitle.trim();
+    let startTime = '09:00';
+    let endTime = '10:00';
+    let category = customCat || 'career';
+
+    // 1. 시간 자동 파싱 (예: 14:00, 14시, 오후 2시, 9:30 등)
+    const timeRegex24 = /(\b(?:[01]?[0-9]|2[0-3]):[0-5][0-9]\b)/;
+    const timeMatch24 = title.match(timeRegex24);
+    if (timeMatch24) {
+      startTime = timeMatch24[1];
+      const [h, m] = startTime.split(':').map(Number);
+      endTime = `${String(Math.min(23, h + 1)).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+    } else {
+      const timeRegexKr = /(오전|오후)?\s*(\d{1,2})시(?:\s*(\d{1,2})분)?/;
+      const krMatch = title.match(timeRegexKr);
+      if (krMatch) {
+        let h = parseInt(krMatch[2], 10);
+        const m = krMatch[3] ? parseInt(krMatch[3], 10) : 0;
+        if (krMatch[1] === '오후' && h < 12) h += 12;
+        else if (krMatch[1] === '오전' && h === 12) h = 0;
+        startTime = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+        endTime = `${String(Math.min(23, h + 1)).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+      }
+    }
+
+    // 2. 카테고리 자동 스마트 태깅
+    if (!customCat || customCat === 'career') {
+      if (/투자|10조|재정|자산|자본|주식|부동산|IR|매출|돈/i.test(title)) category = 'wealth';
+      else if (/미팅|회의|통화|면담|접견|인터뷰|상담/i.test(title)) category = 'meeting';
+      else if (/운동|헬스|러닝|병원|수면|건강|식사/i.test(title)) category = 'health';
+      else if (/딥워크|코딩|개발|기획|집필|설계|몰입/i.test(title)) category = 'deepwork';
+      else if (/루틴|청소|정리|출근|퇴근|휴식/i.test(title)) category = 'routine';
+    }
+
+    const eventId = 'evt_' + Date.now() + Math.floor(Math.random() * 1000);
+    const newEvent = {
+      id: eventId,
+      title: title,
+      category: category,
+      startTime: startTime,
+      endTime: endTime,
+      location: '',
+      notes: '',
+      createdAt: new Date().toISOString()
+    };
+
+    const events = this.getEventsForDate(dateStr);
+    events.push(newEvent);
+    events.sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
+    this.saveEventsForDate(dateStr, events);
+
+    // 3. 오늘의 To-Do 자동 연동 생성
+    const dayData = storage.getDayData(dateStr);
+    const todos = dayData.todos || [];
+    if (!todos.find(t => t.text.includes(title))) {
+      todos.push({
+        id: 'todo_' + eventId,
+        text: `[${startTime}] ${title}`,
+        category: category,
+        priority: 'normal',
+        completed: false,
+        createdAt: new Date().toISOString()
+      });
+      storage.updateDayData(dateStr, { todos });
+    }
+
+    // 4. 전 시스템 실시간 리렌더링
+    this.renderRootOutlookCalendar();
+    this.renderOutlookSchedule();
+    this.renderCalendar();
+    this.renderTodos();
+    this.showToast(`📅 [${dateStr}] "${title}" 일정이 아웃룩 일정표와 To-Do에 즉시 저장·연동되었습니다! ⚡✨`);
   }
 
   navigateRootOutlookDate(direction) {
@@ -7806,7 +7963,7 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
       </table>
     `;
 
-    // Click on day cell or quick add button opens modal
+    // Click on day cell or quick add button focuses 1-sec quick event bar
     container.querySelectorAll('.outlook-month-cell').forEach(cell => {
       cell.addEventListener('click', (e) => {
         if (e.target.closest('.outlook-event-badge') || e.target.closest('.outlook-cell-quick-add-btn')) return;
@@ -7815,6 +7972,25 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
         this.rootOutlookDate = date;
         if (this.datePicker) this.datePicker.value = date;
         this.updateHeaderDate();
+
+        // Highlight selected cell
+        container.querySelectorAll('.outlook-month-cell').forEach(c => c.classList.remove('highlight-quick-target'));
+        cell.classList.add('highlight-quick-target');
+
+        // Sync and focus Quick Add Bar
+        const qDateInput = document.getElementById('outlookQuickEventDate');
+        const qTitleInput = document.getElementById('outlookQuickEventTitle');
+        if (qDateInput) qDateInput.value = date;
+        if (qTitleInput) {
+          qTitleInput.placeholder = `✍️ [${date}] 일정 내용 입력 후 Enter로 즉시 저장...`;
+          qTitleInput.focus();
+        }
+      });
+
+      // Double click opens full detail modal if needed
+      cell.addEventListener('dblclick', (e) => {
+        if (e.target.closest('.outlook-event-badge')) return;
+        const date = cell.dataset.date;
         this.openOutlookEventModal(null, date);
       });
     });
@@ -7827,7 +8003,20 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
         this.rootOutlookDate = date;
         if (this.datePicker) this.datePicker.value = date;
         this.updateHeaderDate();
-        this.openOutlookEventModal(null, date);
+
+        const parentCell = btn.closest('.outlook-month-cell');
+        if (parentCell) {
+          container.querySelectorAll('.outlook-month-cell').forEach(c => c.classList.remove('highlight-quick-target'));
+          parentCell.classList.add('highlight-quick-target');
+        }
+
+        const qDateInput = document.getElementById('outlookQuickEventDate');
+        const qTitleInput = document.getElementById('outlookQuickEventTitle');
+        if (qDateInput) qDateInput.value = date;
+        if (qTitleInput) {
+          qTitleInput.placeholder = `✍️ [${date}] 일정 내용 입력 후 Enter로 즉시 저장...`;
+          qTitleInput.focus();
+        }
       });
     });
 
