@@ -2733,7 +2733,7 @@ class DailyFlowApp {
       }
 
       if (hasFocus) {
-        dotHtml += `<span style="font-size:0.62rem; color:var(--accent-gold); line-height:1;" title="북극성 미션">👑</span>`;
+        dotHtml += `<span style="font-size:0.92rem; color:var(--accent-gold); line-height:1;" title="북극성 미션">👑</span>`;
       }
       if (hasJournal) {
         dotHtml += `<span class="dash-cal-dot journal" title="일기"></span>`;
@@ -2769,7 +2769,7 @@ class DailyFlowApp {
 
       if (monthKeys.length === 0) {
         listEl.innerHTML = `
-          <div style="text-align:center; color:var(--text-muted); padding:24px 10px; font-size:0.75rem;">
+          <div style="text-align:center; color:var(--text-muted); padding:24px 10px; font-size:0.96rem;">
             <i class="fa-solid fa-calendar-plus" style="font-size:1.5rem; margin-bottom:6px; opacity:0.5;"></i>
             <p>이달에 작성된 실행 기록이 없습니다.<br>오늘의 첫 북극성 미션과 To-Do를 시작해보세요! 🚀</p>
           </div>
@@ -2801,7 +2801,7 @@ class DailyFlowApp {
               <i class="fa-regular fa-calendar" style="color:var(--accent-primary);"></i>
               ${dayNum}일 (${dayOfWeek}) ${mood}
             </span>
-            <span class="badge ${rate === 100 && total > 0 ? 'badge-success' : (rate >= 50 ? 'badge-warning' : 'badge-secondary')}" style="font-size:0.68rem; padding:1px 5px;">
+            <span class="badge ${rate === 100 && total > 0 ? 'badge-success' : (rate >= 50 ? 'badge-warning' : 'badge-secondary')}" style="font-size:0.92rem; padding:1px 5px;">
               ${done}/${total} 완료 (${rate}%)
             </span>
           </div>
@@ -3000,7 +3000,7 @@ class DailyFlowApp {
         cardHtml = `
           <div class="dash-feed-top">
             <span class="dash-feed-date"><i class="fa-solid fa-crown text-yellow"></i> ${dayNum}일 (${dayOfWeek})</span>
-            <span class="badge ${pct === 100 ? 'badge-primary' : 'badge-warning'}" style="font-size:0.68rem; padding:1px 5px;">${done}/${todos.length} 완료</span>
+            <span class="badge ${pct === 100 ? 'badge-primary' : 'badge-warning'}" style="font-size:0.92rem; padding:1px 5px;">${done}/${todos.length} 완료</span>
           </div>
           <div class="dash-feed-focus" style="color:var(--text-primary); margin-top:2px;">${this.escapeHtml(todos[0].text)}</div>
           <div class="dash-feed-progress-bar"><div class="dash-feed-progress-fill" style="width:${pct}%;"></div></div>
@@ -3011,10 +3011,10 @@ class DailyFlowApp {
         cardHtml = `
           <div class="dash-feed-top">
             <span class="dash-feed-date"><i class="fa-solid fa-lightbulb text-yellow"></i> ${dayNum}일 (${dayOfWeek})</span>
-            <span class="badge badge-warning" style="font-size:0.68rem; padding:1px 5px;">${dayMemos.length}개</span>
+            <span class="badge badge-warning" style="font-size:0.92rem; padding:1px 5px;">${dayMemos.length}개</span>
           </div>
           <div class="dash-feed-focus" style="color:var(--text-primary); margin-top:2px;">${this.escapeHtml(dayMemos[0].title)}</div>
-          <div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">${this.escapeHtml((dayMemos[0].content || '').substring(0, 50))}</div>
+          <div style="font-size:0.92rem; color:var(--text-muted); margin-top:2px;">${this.escapeHtml((dayMemos[0].content || '').substring(0, 50))}</div>
         `;
       } else if (target === 'evening') {
         const er = day.eveningRoutine || {};
@@ -3025,7 +3025,7 @@ class DailyFlowApp {
         cardHtml = `
           <div class="dash-feed-top">
             <span class="dash-feed-date"><i class="fa-solid fa-moon text-purple"></i> ${dayNum}일 (${dayOfWeek})</span>
-            <span class="badge badge-primary" style="font-size:0.68rem; padding:1px 5px;">${er.actualHours || 2.0}h (${pct}%)</span>
+            <span class="badge badge-primary" style="font-size:0.92rem; padding:1px 5px;">${er.actualHours || 2.0}h (${pct}%)</span>
           </div>
           <div class="dash-feed-focus" style="color:var(--text-primary); margin-top:2px;">${this.escapeHtml(er.goal || tasks[0]?.text || '야간 몰입 루틴')}</div>
           <div class="dash-feed-progress-bar"><div class="dash-feed-progress-fill" style="width:${pct}%;"></div></div>
@@ -3038,7 +3038,7 @@ class DailyFlowApp {
         cardHtml = `
           <div class="dash-feed-top">
             <span class="dash-feed-date"><i class="fa-solid fa-chart-line text-blue"></i> ${dayNum}일 (${dayOfWeek})</span>
-            <span class="badge ${pct === 100 ? 'badge-primary' : 'badge-warning'}" style="font-size:0.68rem; padding:1px 5px;">${done}/${todos.length} (${pct}%)</span>
+            <span class="badge ${pct === 100 ? 'badge-primary' : 'badge-warning'}" style="font-size:0.92rem; padding:1px 5px;">${done}/${todos.length} (${pct}%)</span>
           </div>
           <div class="dash-feed-focus" style="color:var(--text-primary); margin-top:2px;">${this.escapeHtml(day.focus || '일일 결산 완료')}</div>
           <div class="dash-feed-progress-bar"><div class="dash-feed-progress-fill" style="width:${pct}%;"></div></div>
@@ -3050,17 +3050,17 @@ class DailyFlowApp {
         cardHtml = `
           <div class="dash-feed-top">
             <span class="dash-feed-date"><i class="fa-solid fa-book-open text-yellow"></i> ${dayNum}일 (${dayOfWeek})</span>
-            <span class="badge badge-primary" style="font-size:0.68rem; padding:1px 5px;">${study.actualHours || 1.0}h ${photoCount > 0 ? `📷 ${photoCount}` : ''}</span>
+            <span class="badge badge-primary" style="font-size:0.92rem; padding:1px 5px;">${study.actualHours || 1.0}h ${photoCount > 0 ? `📷 ${photoCount}` : ''}</span>
           </div>
           <div class="dash-feed-focus" style="color:var(--text-primary); margin-top:2px;">${this.escapeHtml(study.topic || '학습 아카이브')}</div>
-          <div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">${this.escapeHtml((study.til || study.notes || '').substring(0, 50))}</div>
+          <div style="font-size:0.92rem; color:var(--text-muted); margin-top:2px;">${this.escapeHtml((study.til || study.notes || '').substring(0, 50))}</div>
         `;
       } else if (target === 'ai') {
         if (!day.focus && (!day.todos || day.todos.length === 0)) return;
         cardHtml = `
           <div class="dash-feed-top">
             <span class="dash-feed-date"><i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> ${dayNum}일 (${dayOfWeek})</span>
-            <span class="badge" style="background:rgba(6,182,212,0.2); color:#22d3ee; font-size:0.68rem; padding:1px 5px;">AI 지침</span>
+            <span class="badge" style="background:rgba(6,182,212,0.2); color:#22d3ee; font-size:0.92rem; padding:1px 5px;">AI 지침</span>
           </div>
           <div class="dash-feed-focus" style="color:var(--text-primary); margin-top:2px;">${this.escapeHtml(day.focus || '코칭 실행')}</div>
         `;
@@ -3070,7 +3070,7 @@ class DailyFlowApp {
         cardHtml = `
           <div class="dash-feed-top">
             <span class="dash-feed-date"><i class="fa-solid fa-bullseye text-pink"></i> ${dayNum}일 (${dayOfWeek})</span>
-            <span class="badge badge-danger" style="font-size:0.68rem; padding:1px 5px;">D-Day</span>
+            <span class="badge badge-danger" style="font-size:0.92rem; padding:1px 5px;">D-Day</span>
           </div>
           <div class="dash-feed-focus" style="color:var(--text-primary); margin-top:2px;">${this.escapeHtml(goals[0].title)}</div>
           <div class="dash-feed-progress-bar"><div class="dash-feed-progress-fill" style="width:${goals[0].progress || 0}%;"></div></div>
@@ -3080,7 +3080,7 @@ class DailyFlowApp {
         cardHtml = `
           <div class="dash-feed-top">
             <span class="dash-feed-date"><i class="fa-solid fa-gem text-amber"></i> ${dayNum}일 (${dayOfWeek})</span>
-            <span class="badge badge-warning" style="font-size:0.68rem; padding:1px 5px;">원칙</span>
+            <span class="badge badge-warning" style="font-size:0.92rem; padding:1px 5px;">원칙</span>
           </div>
           <div class="dash-feed-focus" style="color:var(--text-primary); margin-top:2px;">${this.escapeHtml(day.journal.title)}</div>
         `;
@@ -3098,7 +3098,7 @@ class DailyFlowApp {
 
     if (renderedCount === 0) {
       listEl.innerHTML = `
-        <div style="text-align:center; color: var(--text-muted); padding: 20px 10px; font-size: 0.76rem;">
+        <div style="text-align:center; color: var(--text-muted); padding: 20px 10px; font-size:0.96rem;">
           <i class="fa-regular fa-calendar-check" style="font-size:1.4rem; opacity:0.4; margin-bottom:4px;"></i>
           <p>이달에 기록된 실천 데이터가 없습니다.<br>오늘의 실천을 기록해보세요! 🚀</p>
         </div>
@@ -3179,7 +3179,7 @@ class DailyFlowApp {
 
         ${actionsHtml ? `
           <div class="goal-actions-list">
-            <div style="font-size:0.75rem; font-weight:700; color:var(--text-secondary); margin-bottom:4px;">
+            <div style="font-size:0.96rem; font-weight:700; color:var(--text-secondary); margin-bottom:4px;">
               <i class="fa-solid fa-stairs"></i> 구체적 실행 액션 (Action Steps)
             </div>
             ${actionsHtml}
@@ -4021,7 +4021,7 @@ class DailyFlowApp {
 
         <div class="keep-card-labels">
           ${labelBadge}
-          <span style="font-size:0.75rem; color:var(--text-muted);"><i class="fa-regular fa-clock"></i> ${m.date || '오늘'}</span>
+          <span style="font-size:0.96rem; color:var(--text-muted);"><i class="fa-regular fa-clock"></i> ${m.date || '오늘'}</span>
         </div>
 
         <div class="keep-card-footer">
@@ -4963,7 +4963,7 @@ ${content}
           ${qList.map(item => `
             <div class="quotes-backup-item">
               <div style="display:flex; gap:8px; align-items:flex-start;">
-                <span class="simple-10quote-num" style="width:18px; height:18px; font-size:0.68rem;">${item.num || '•'}</span>
+                <span class="simple-10quote-num" style="width:18px; height:18px; font-size:0.92rem;">${item.num || '•'}</span>
                 <span style="color:var(--text-primary);">${this.escapeHtml(item.quote)}</span>
               </div>
               <button class="simple-10quote-btn ${item.bookmarked ? 'bookmarked' : ''}" data-quote-id="${item.id}" data-date="${d}" data-action="toggle-bm">
@@ -5582,7 +5582,7 @@ ${content}
       }
 
       if (todayTasks.length === 0) {
-        this.eveningTodayList.innerHTML = `<li style="color:var(--text-muted); padding:16px; text-align:center; font-size:0.82rem;">오늘 저녁 할 일이 없습니다. [AI 저녁 루틴 설계] 또는 직접 추가해보세요!</li>`;
+        this.eveningTodayList.innerHTML = `<li style="color:var(--text-muted); padding:16px; text-align:center; font-size:0.96rem;">오늘 저녁 할 일이 없습니다. [AI 저녁 루틴 설계] 또는 직접 추가해보세요!</li>`;
       } else {
         todayTasks.forEach(task => {
           const li = document.createElement('li');
@@ -5620,7 +5620,7 @@ ${content}
       const tomorrowTasks = er.tomorrowTasks || [];
 
       if (tomorrowTasks.length === 0) {
-        this.eveningTomorrowList.innerHTML = `<li style="color:var(--text-muted); padding:16px; text-align:center; font-size:0.82rem;">내일 저녁 계획이 비어 있습니다. 잠들기 전 1순위 행동을 미리 적어두세요!</li>`;
+        this.eveningTomorrowList.innerHTML = `<li style="color:var(--text-muted); padding:16px; text-align:center; font-size:0.96rem;">내일 저녁 계획이 비어 있습니다. 잠들기 전 1순위 행동을 미리 적어두세요!</li>`;
       } else {
         tomorrowTasks.forEach(task => {
           const li = document.createElement('li');
@@ -5673,7 +5673,7 @@ ${content}
       const nodesContainer = row.querySelector(`#treeNodes_${tier.key}`);
       
       if (tier.list.length === 0) {
-        nodesContainer.innerHTML = `<span style="color:var(--text-muted); font-size:0.75rem; padding:6px;">등록된 목표가 없습니다.</span>`;
+        nodesContainer.innerHTML = `<span style="color:var(--text-muted); font-size:0.96rem; padding:6px;">등록된 목표가 없습니다.</span>`;
       } else {
         tier.list.forEach(goal => {
           const node = document.createElement('div');
@@ -5682,7 +5682,7 @@ ${content}
           node.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <span class="category-tag category-${goal.pillar || 'career'}">${goal.pillar || '커리어'}</span>
-              <span style="font-size:0.68rem; font-weight:700; color:var(--text-secondary);">${goal.progress || 0}%</span>
+              <span style="font-size:0.92rem; font-weight:700; color:var(--text-secondary);">${goal.progress || 0}%</span>
             </div>
             <div class="tree-node-title" style="${isDone ? 'text-decoration:line-through; opacity:0.6;' : ''}">${this.escapeHtml(goal.title)}</div>
             <div class="tree-node-kr"><i class="fa-solid fa-key"></i> ${this.escapeHtml(goal.keyResult || '지표 달성')}</div>
@@ -5800,7 +5800,7 @@ ${content}
     gridEl.innerHTML = '';
 
     if (list.length === 0) {
-      gridEl.innerHTML = `<div style="grid-column: 1 / -1; color: var(--text-muted); padding: 14px; font-size: 0.78rem; text-align: center;">등록된 목표가 없습니다. 위 인라인 입력창에서 바로 입력 후 Enter를 누르세요!</div>`;
+      gridEl.innerHTML = `<div style="grid-column: 1 / -1; color: var(--text-muted); padding: 14px; font-size:0.96rem; text-align: center;">등록된 목표가 없습니다. 위 인라인 입력창에서 바로 입력 후 Enter를 누르세요!</div>`;
       return;
     }
 
@@ -5956,7 +5956,7 @@ ${content}
     this.todoProgressBadge.textContent = `${completed} / ${total} 완료 (${rate}%)`;
 
     if (todos.length === 0) {
-      this.todoList.innerHTML = `<li style="text-align:center; color: var(--text-muted); padding: 18px; font-size: 0.85rem;">등록된 실행 액션이 없습니다. [Gemini 코칭] 또는 [+ 할 일 추가]로 하루를 설계하세요!</li>`;
+      this.todoList.innerHTML = `<li style="text-align:center; color: var(--text-muted); padding: 18px; font-size:1.02rem;">등록된 실행 액션이 없습니다. [Gemini 코칭] 또는 [+ 할 일 추가]로 하루를 설계하세요!</li>`;
       return;
     }
 
@@ -6003,7 +6003,7 @@ ${content}
     this.zenTodoList.innerHTML = '';
 
     if (todos.length === 0) {
-      this.zenTodoList.innerHTML = `<li style="color: var(--text-muted); font-size: 0.85rem;">실행할 To-Do가 없습니다.</li>`;
+      this.zenTodoList.innerHTML = `<li style="color: var(--text-muted); font-size:1.02rem;">실행할 To-Do가 없습니다.</li>`;
       return;
     }
 
@@ -6108,7 +6108,7 @@ ${content}
     this.timeBlockList.innerHTML = '';
 
     if (blocks.length === 0) {
-      this.timeBlockList.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 18px; font-size: 0.85rem;">등록된 일정이 없습니다. [+ 일정 추가]로 시간대별 타임블록을 배치하세요!</div>`;
+      this.timeBlockList.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 18px; font-size:1.02rem;">등록된 일정이 없습니다. [+ 일정 추가]로 시간대별 타임블록을 배치하세요!</div>`;
       return;
     }
 
@@ -6179,7 +6179,7 @@ ${content}
     this.studyPhotoGallery.innerHTML = '';
 
     if (photos.length === 0) {
-      this.studyPhotoGallery.innerHTML = `<div style="grid-column: 1 / -1; font-size: 0.78rem; color: var(--text-muted); padding: 6px;">첨부된 학습 이미지가 없습니다. IndexedDB 무제한 저장소에 강의 캡처나 필기를 보관하세요!</div>`;
+      this.studyPhotoGallery.innerHTML = `<div style="grid-column: 1 / -1; font-size:0.96rem; color: var(--text-muted); padding: 6px;">첨부된 학습 이미지가 없습니다. IndexedDB 무제한 저장소에 강의 캡처나 필기를 보관하세요!</div>`;
       return;
     }
 
@@ -6596,8 +6596,8 @@ ${content}
       cell.title = tooltip;
 
       let badgesHtml = '';
-      if (mood) badgesHtml += `<span style="font-size:0.75rem; line-height:1;">${mood}</span>`;
-      else if (hasJournal) badgesHtml += `<span style="font-size:0.75rem; line-height:1;">📝</span>`;
+      if (mood) badgesHtml += `<span style="font-size:0.96rem; line-height:1;">${mood}</span>`;
+      else if (hasJournal) badgesHtml += `<span style="font-size:0.96rem; line-height:1;">📝</span>`;
       if (photoCount > 0) badgesHtml += `<span class="dash-cal-dot" style="background:#38bdf8;" title="사진 포함"></span>`;
 
       cell.innerHTML = `
@@ -6626,7 +6626,7 @@ ${content}
 
       if (monthJournals.length === 0) {
         listEl.innerHTML = `
-          <div style="text-align:center; color: var(--text-muted); padding: 24px 10px; font-size: 0.78rem;">
+          <div style="text-align:center; color: var(--text-muted); padding: 24px 10px; font-size:0.96rem;">
             <i class="fa-solid fa-feather-pointed" style="font-size:1.5rem; margin-bottom:6px; opacity:0.5; color:#c084fc;"></i>
             <p>이달에 작성된 일기가 아직 없습니다.<br>[오늘 활동 기반 AI 일기 자동 생성]으로 하루를 남겨보세요! ✨</p>
           </div>
@@ -6646,7 +6646,7 @@ ${content}
           const weather = j.weather || '☀️';
           const snippet = (j.content || '').replace(/[#*`_>]/g, '').trim().substring(0, 80);
           const tags = j.tags || [];
-          const tagsHtml = tags.length > 0 ? `<div style="display:flex; gap:4px; flex-wrap:wrap; margin-top:4px;">${tags.map(t => `<span class="badge" style="background:rgba(192,132,252,0.18); color:#c084fc; font-size:0.65rem; padding:1px 4px;">#${this.escapeHtml(t)}</span>`).join('')}</div>` : '';
+          const tagsHtml = tags.length > 0 ? `<div style="display:flex; gap:4px; flex-wrap:wrap; margin-top:4px;">${tags.map(t => `<span class="badge" style="background:rgba(192,132,252,0.18); color:#c084fc; font-size:0.92rem; padding:1px 4px;">#${this.escapeHtml(t)}</span>`).join('')}</div>` : '';
 
           card.innerHTML = `
             <div class="dash-feed-top">
@@ -6654,7 +6654,7 @@ ${content}
               <span>${weather} ${mood}</span>
             </div>
             <div class="dash-feed-focus" style="color:var(--text-primary); margin-top:2px;">${this.escapeHtml(j.title || `${j.date}의 일기`)}</div>
-            <div style="font-size:0.74rem; color:var(--text-muted); margin-top:2px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${this.escapeHtml(snippet || '내용 없음...')}</div>
+            <div style="font-size:0.92rem; color:var(--text-muted); margin-top:2px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${this.escapeHtml(snippet || '내용 없음...')}</div>
             ${tagsHtml}
           `;
 
@@ -7305,7 +7305,7 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
     const dayLabels = ['월', '화', '수', '목', '금', '토', '일'];
     const todayStr = new Date().toISOString().split('T')[0];
 
-    let headerHtml = `<th style="width:60px; background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.08); padding:8px; font-size:0.75rem; color:var(--text-muted);">시간</th>`;
+    let headerHtml = `<th style="width:60px; background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.08); padding:8px; font-size:0.96rem; color:var(--text-muted);">시간</th>`;
     weekDates.forEach((dStr, idx) => {
       const dObj = new Date(dStr);
       const isToday = dStr === todayStr;
@@ -7402,9 +7402,9 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
       let eventsHtml = '';
       cellEvents.forEach(e => {
         eventsHtml += `
-          <div class="outlook-event-badge cat-${e.category || 'career'}" data-event-id="${e.id}" data-event-date="${dStr}" style="padding:6px 10px; font-size:0.82rem; margin-bottom:4px;" title="${this.escapeHtml(e.title)}">
+          <div class="outlook-event-badge cat-${e.category || 'career'}" data-event-id="${e.id}" data-event-date="${dStr}" style="padding:6px 10px; font-size:0.96rem; margin-bottom:4px;" title="${this.escapeHtml(e.title)}">
             <strong>${this.escapeHtml(e.startTime)} ~ ${this.escapeHtml(e.endTime)}</strong> &nbsp; ${this.escapeHtml(e.title)}
-            ${e.location ? `<span style="font-size:0.75rem; opacity:0.8;">📍 ${this.escapeHtml(e.location)}</span>` : ''}
+            ${e.location ? `<span style="font-size:0.96rem; opacity:0.8;">📍 ${this.escapeHtml(e.location)}</span>` : ''}
           </div>
         `;
       });
@@ -7483,7 +7483,7 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
         `;
       });
       if (events.length > 3) {
-        eventsHtml += `<div style="font-size:0.68rem; color:var(--text-muted); text-align:right;">+${events.length - 3}건 더보기</div>`;
+        eventsHtml += `<div style="font-size:0.92rem; color:var(--text-muted); text-align:right;">+${events.length - 3}건 더보기</div>`;
       }
 
       gridHtml += `
@@ -7546,7 +7546,7 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
               <i class="fa-solid fa-calendar-day text-cyan"></i>
               <span>${dObj.getFullYear()}년 ${dObj.getMonth() + 1}월 ${dObj.getDate()}일 (${dayNames[dObj.getDay()]})</span>
               ${isToday ? `<span class="badge badge-primary">오늘</span>` : ''}
-              <span style="font-size:0.75rem; color:var(--text-muted); margin-left:auto;">${events.length}건의 일정</span>
+              <span style="font-size:0.96rem; color:var(--text-muted); margin-left:auto;">${events.length}건의 일정</span>
             </div>
             <div style="display:flex; flex-direction:column; gap:6px; padding-left:8px;">
         `;
@@ -7560,7 +7560,7 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
                 </span>
                 <div>
                   <div style="font-weight:700; color:var(--text-primary); font-size:0.9rem;">${this.escapeHtml(e.title)}</div>
-                  ${e.notes ? `<div style="font-size:0.78rem; color:var(--text-secondary); margin-top:2px;">${this.escapeHtml(e.notes)}</div>` : ''}
+                  ${e.notes ? `<div style="font-size:0.96rem; color:var(--text-secondary); margin-top:2px;">${this.escapeHtml(e.notes)}</div>` : ''}
                 </div>
               </div>
               <div style="display:flex; gap:6px;">
@@ -8308,7 +8308,7 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
       `;
     });
     if (events.length > 4) {
-      html += `<div style="font-size:0.72rem; color:var(--text-muted); text-align:right; font-weight:700; padding-top:2px;">+${events.length - 4}건 더보기</div>`;
+      html += `<div style="font-size:0.92rem; color:var(--text-muted); text-align:right; font-weight:700; padding-top:2px;">+${events.length - 4}건 더보기</div>`;
     }
     return html;
   }
@@ -8328,10 +8328,10 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
       let eventsHtml = '';
       cellEvents.forEach(e => {
         eventsHtml += `
-          <div class="outlook-event-badge cat-${e.category || 'career'}" data-event-id="${e.id}" data-event-date="${dStr}" style="padding:8px 12px; font-size:0.85rem; margin-bottom:6px;" title="${this.escapeHtml(e.title)}">
+          <div class="outlook-event-badge cat-${e.category || 'career'}" data-event-id="${e.id}" data-event-date="${dStr}" style="padding:8px 12px; font-size:1.02rem; margin-bottom:6px;" title="${this.escapeHtml(e.title)}">
             <div style="font-weight:800;">${this.escapeHtml(e.startTime)} ~ ${this.escapeHtml(e.endTime)} &nbsp; ${this.escapeHtml(e.title)}</div>
-            ${e.location ? `<div style="font-size:0.75rem; opacity:0.85; margin-top:2px;">📍 ${this.escapeHtml(e.location)}</div>` : ''}
-            ${e.notes ? `<div style="font-size:0.75rem; opacity:0.8; margin-top:2px;">📝 ${this.escapeHtml(e.notes)}</div>` : ''}
+            ${e.location ? `<div style="font-size:0.96rem; opacity:0.85; margin-top:2px;">📍 ${this.escapeHtml(e.location)}</div>` : ''}
+            ${e.notes ? `<div style="font-size:0.96rem; opacity:0.8; margin-top:2px;">📝 ${this.escapeHtml(e.notes)}</div>` : ''}
           </div>
         `;
       });
