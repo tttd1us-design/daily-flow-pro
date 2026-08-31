@@ -4949,3 +4949,152 @@ body {
   color: var(--text-secondary);
   border: 1px solid var(--border-color);
 }
+
+/* =========================================================================
+   🎙️ 30분+ 초연속 고품질 실시간 음성인식 엔진 (Continuous 30min+ STT UI)
+   ========================================================================= */
+
+/* 인라인 텍스트 작성란 전용 마이크 버튼 */
+.stt-field-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.stt-mic-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: rgba(37, 99, 235, 0.12);
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  color: #60a5fa;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.stt-mic-btn:hover {
+  background: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
+  transform: scale(1.08);
+}
+
+/* 녹음 중 활성화 상태 (레드 펄스) */
+.stt-mic-btn.recording {
+  background: #ef4444 !important;
+  color: #ffffff !important;
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.7) !important;
+  animation: sttPulse 1.2s infinite ease-in-out;
+}
+
+@keyframes sttPulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+  50% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+/* 🎙️ 화면 우측 하단 30분 연속 음성인식 플로팅 HUD */
+.stt-floating-hud {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6), 0 0 20px rgba(239, 68, 68, 0.25);
+  border-radius: var(--radius-xl);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  color: #ffffff;
+  animation: fadeSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  max-width: 440px;
+}
+
+.stt-hud-pulse-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 10px #ef4444;
+  animation: sttPulse 1s infinite ease-in-out;
+  flex-shrink: 0;
+}
+
+.stt-hud-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.stt-hud-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stt-hud-title {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #f87171;
+  letter-spacing: 0.3px;
+}
+
+.stt-hud-timer {
+  font-size: 0.72rem;
+  font-weight: 900;
+  font-family: var(--font-mono);
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.stt-hud-transcript-preview {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 240px;
+  line-height: 1.3;
+}
+
+.stt-hud-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stt-hud-stop-btn {
+  background: #ef4444;
+  color: #ffffff;
+  border: none;
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all var(--transition-fast);
+}
+
+.stt-hud-stop-btn:hover {
+  background: #dc2626;
+  transform: scale(1.05);
+}

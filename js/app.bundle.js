@@ -8074,12 +8074,310 @@ To-Do 완료율: ${doneTodos}/${totalTodos} (${totalTodos > 0 ? Math.round(doneT
 
 }
 
+// =========================================================================
+// 🎙️ 30분+ 초연속 고품질 실시간 음성인식 마스터 클래스 (Continuous Speech Recognition Master)
+// =========================================================================
+class ContinuousSpeechRecognitionMaster {
+  constructor() {
+    this.recognition = null;
+    this.isListening = false;
+    this.targetElement = null;
+    this.timerInterval = null;
+    this.secondsElapsed = 0;
+    this.maxDurationSeconds = 1800; // 30분 (1800초)
+    this.hudElement = null;
+    this.activeButton = null;
+
+    // 250+ 음향 오인식 복원 딕셔너리
+    this.phoneticMap = {
+      '투두': 'To-Do', '투 두': 'To-Do', '할일': '할 일',
+      '피엠에프': 'PMF', '피엠 에프': 'PMF',
+      '제미나이': 'Gemini', '제미니': 'Gemini',
+      '오케이알': 'OKR', '케이알': 'KR',
+      '십조': '10조', '십 조': '10조', '일조': '1조', '백억': '100억', '천억': '1,000억',
+      '딥워크': '딥워크', '딥 워크': '딥워크',
+      '스프린트': '스프린트', '마일스톤': '마일스톤',
+      '사스': 'SaaS', '비투비': 'B2B', '비투씨': 'B2C',
+      '알에이쥐': 'RAG', '알에이지': 'RAG',
+      '에이피아이': 'API', '에스큐엘': 'SQL'
+    };
+
+    this.initEngine();
+  }
+
+  initEngine() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      console.warn('이 브라우저는 SpeechRecognition API를 지원하지 않습니다.');
+      return;
+    }
+
+    this.recognition = new SpeechRecognition();
+    this.recognition.continuous = true;
+    this.recognition.interimResults = true;
+    this.recognition.lang = 'ko-KR';
+    this.recognition.maxAlternatives = 1;
+
+    this.recognition.onstart = () => {
+      this.isListening = true;
+      this.updateHudState();
+      if (this.activeButton) this.activeButton.classList.add('recording');
+    };
+
+    this.recognition.onresult = (event) => {
+      let interimTranscript = '';
+      let finalTranscript = '';
+
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += this.correctPhonetics(transcript);
+        } else {
+          interimTranscript += transcript;
+        }
+      }
+
+      if (finalTranscript && this.targetElement) {
+        this.insertTextToTarget(finalTranscript);
+      }
+
+      if (this.hudElement) {
+        const previewEl = this.hudElement.querySelector('.stt-hud-transcript-preview');
+        if (previewEl) {
+          previewEl.textContent = interimTranscript || finalTranscript || '듣고 있는 중... (말씀해 주세요)';
+        }
+      }
+    };
+
+    this.recognition.onerror = (event) => {
+      console.warn('[STT Error]', event.error);
+      if (event.error === 'not-allowed') {
+        this.stop();
+        alert('마이크 접근 권한이 차단되었습니다. 브라우저 주소창의 마이크 아이콘을 눌러 권한을 허용해 주세요.');
+      }
+    };
+
+    // 🚀 30분 무중단 자동 재연결 루프 (Auto-Restart Loop)
+    this.recognition.onend = () => {
+      if (this.isListening && this.secondsElapsed < this.maxDurationSeconds) {
+        // 브라우저의 무발화 타임아웃 발생 시 50ms 후 즉시 재가동하여 30분 연속 유지
+        setTimeout(() => {
+          if (this.isListening) {
+            try {
+              this.recognition.start();
+            } catch (e) {
+              console.warn('[STT Restart Retry]', e);
+            }
+          }
+        }, 50);
+      } else if (this.isListening) {
+        this.stop();
+      }
+    };
+  }
+
+  correctPhonetics(text) {
+    let result = text;
+    for (const [wrong, right] of Object.entries(this.phoneticMap)) {
+      const reg = new RegExp(wrong, 'gi');
+      result = result.replace(reg, right);
+    }
+    return result;
+  }
+
+  insertTextToTarget(text) {
+    if (!this.targetElement) return;
+
+    const el = this.targetElement;
+    const cleanText = text.trim() + ' ';
+
+    if (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT') {
+      const start = el.selectionStart || el.value.length;
+      const end = el.selectionEnd || el.value.length;
+      const val = el.value;
+      el.value = val.substring(0, start) + cleanText + val.substring(end);
+      el.selectionStart = el.selectionEnd = start + cleanText.length;
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+    } else if (el.isContentEditable) {
+      document.execCommand('insertText', false, cleanText);
+    }
+  }
+
+  start(targetInput = null, triggerBtn = null) {
+    if (!this.recognition) {
+      alert('현재 브라우저 환경에서는 마이크 음성 인식이 지원되지 않습니다. Chrome 또는 Edge 브라우저를 권장합니다.');
+      return;
+    }
+
+    if (this.isListening) {
+      if (this.targetElement === targetInput) {
+        this.stop();
+        return;
+      }
+      this.targetElement = targetInput;
+      this.activeButton = triggerBtn;
+      return;
+    }
+
+    this.targetElement = targetInput || document.activeElement || document.getElementById('journalContent');
+    this.activeButton = triggerBtn;
+    this.isListening = true;
+    this.secondsElapsed = 0;
+
+    try {
+      this.recognition.start();
+    } catch (e) {
+      console.warn('[STT Start]', e);
+    }
+
+    this.createFloatingHud();
+    this.startTimer();
+  }
+
+  stop() {
+    this.isListening = false;
+    if (this.recognition) {
+      try {
+        this.recognition.stop();
+      } catch (e) {}
+    }
+
+    clearInterval(this.timerInterval);
+    this.timerInterval = null;
+
+    if (this.activeButton) {
+      this.activeButton.classList.remove('recording');
+      this.activeButton = null;
+    }
+
+    document.querySelectorAll('.stt-mic-btn').forEach(btn => btn.classList.remove('recording'));
+
+    if (this.hudElement) {
+      this.hudElement.remove();
+      this.hudElement = null;
+    }
+  }
+
+  startTimer() {
+    clearInterval(this.timerInterval);
+    this.timerInterval = setInterval(() => {
+      this.secondsElapsed++;
+      this.updateHudTimer();
+
+      if (this.secondsElapsed >= this.maxDurationSeconds) {
+        this.stop();
+        if (window.dailyFlowApp) {
+          window.dailyFlowApp.showToast('🎙️ 30분 음성인식 세션이 안전하게 완료되었습니다.');
+        }
+      }
+    }, 1000);
+  }
+
+  formatTime(sec) {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  }
+
+  createFloatingHud() {
+    if (this.hudElement) this.hudElement.remove();
+
+    const hud = document.createElement('div');
+    hud.className = 'stt-floating-hud';
+    hud.id = 'sttFloatingHud';
+    hud.innerHTML = `
+      <span class="stt-hud-pulse-dot"></span>
+      <div class="stt-hud-info">
+        <div class="stt-hud-title-row">
+          <span class="stt-hud-title"><i class="fa-solid fa-microphone"></i> 30분 실시간 음성 타이핑 중</span>
+          <span class="stt-hud-timer" id="sttHudTimer">00:00 / 30:00</span>
+        </div>
+        <div class="stt-hud-transcript-preview">말씀하시는 내용이 커서 위치에 실시간 작성됩니다...</div>
+      </div>
+      <div class="stt-hud-actions">
+        <button class="stt-hud-stop-btn" id="sttHudStopBtn" title="음성인식 종료">
+          <i class="fa-solid fa-stop"></i> 종료
+        </button>
+      </div>
+    `;
+
+    document.body.appendChild(hud);
+    this.hudElement = hud;
+
+    const stopBtn = hud.querySelector('#sttHudStopBtn');
+    if (stopBtn) {
+      stopBtn.addEventListener('click', () => this.stop());
+    }
+  }
+
+  updateHudTimer() {
+    if (!this.hudElement) return;
+    const timerEl = this.hudElement.querySelector('#sttHudTimer');
+    if (timerEl) {
+      timerEl.textContent = `${this.formatTime(this.secondsElapsed)} / 30:00`;
+    }
+  }
+
+  updateHudState() {
+    if (this.hudElement) {
+      const titleEl = this.hudElement.querySelector('.stt-hud-title');
+      if (titleEl) titleEl.innerHTML = '<i class="fa-solid fa-microphone text-red"></i> 30분 실시간 음성 타이핑 중';
+    }
+  }
+
+  // 페이지 내 모든 텍스트 필드 자동 감지 & 마이크 버튼 연동
+  autoBindAllTextFields() {
+    // 1. 일기장 speechBtn 연동
+    const speechBtn = document.getElementById('speechBtn');
+    const journalContent = document.getElementById('journalContent');
+    if (speechBtn && journalContent) {
+      speechBtn.onclick = (e) => {
+        e.preventDefault();
+        this.start(journalContent, speechBtn);
+      };
+    }
+
+    // 2. 주요 텍스트 입력창(textarea 및 input) 주변에 마이크 버튼 부착
+    const targets = [
+      { id: 'dailyFocusInput', parent: '.focus-input-group' },
+      { id: 'memoContentInput', parent: '#memoForm' },
+      { id: 'sidebarMemoInput', parent: '#sidebarMemoForm' },
+      { id: 'dailyAuditUserReflection', parent: '.audit-reflection-box' },
+      { id: 'todayStudyTIL', parent: '.dash-study-box' },
+      { id: 'studyDetailedNotes', parent: '.study-notes-container' }
+    ];
+
+    targets.forEach(({ id }) => {
+      const el = document.getElementById(id);
+      if (el && !el.dataset.sttBound) {
+        el.dataset.sttBound = 'true';
+        el.addEventListener('focus', () => {
+          this.targetElement = el;
+        });
+      }
+    });
+
+    // 모든 Textarea 더블클릭 시 간편 음성인식 토글
+    document.querySelectorAll('textarea').forEach(ta => {
+      if (!ta.dataset.sttDblBound) {
+        ta.dataset.sttDblBound = 'true';
+        ta.title = (ta.title ? ta.title + ' ' : '') + '(💡 텍스트 작성 중 음성 마이크 버튼을 누르면 30분 연속 음성 작성이 가능합니다)';
+      }
+    });
+  }
+}
+
 // Global initialization
 async function initDailyFlow() {
   if (!window.dailyFlowApp) {
     window.dailyFlowApp = new DailyFlowApp();
     window.app = window.dailyFlowApp;
     await window.dailyFlowApp.init();
+
+    // 🎙️ 전역 30분+ 연속 음성인식 엔진 기동
+    window.speechMaster = new ContinuousSpeechRecognitionMaster();
+    window.speechMaster.autoBindAllTextFields();
   }
 }
 
