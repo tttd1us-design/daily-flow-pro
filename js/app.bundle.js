@@ -3736,6 +3736,13 @@ class DailyFlowApp {
     this.keepSelectedColor = 'default';
     this.keepIsPinned = false;
     this.keepChecklistItemsData = [];
+    this.editingMemoId = null;
+
+    // 라벨 저장소 초기화
+    if (!storage.data.labels || !Array.isArray(storage.data.labels) || storage.data.labels.length === 0) {
+      storage.data.labels = ['10조비즈니스', 'Gemini', '생각메모', '10조확언', '성공확언', '유튜브/콘텐츠'];
+      storage.save();
+    }
 
     const creator = document.getElementById('keepNoteCreator');
     const collapsed = document.getElementById('keepCreatorCollapsed');
@@ -3849,7 +3856,7 @@ class DailyFlowApp {
       e.preventDefault();
       const title = titleInput?.value.trim() || '';
       const content = contentInput?.value.trim() || '';
-      const label = document.getElementById('keepNoteLabelSelect')?.value || '기타';
+      const label = document.getElementById('keepNoteLabelSelect')?.value || (storage.data.labels[0] || '기타');
 
       if (!title && !content && this.keepChecklistItemsData.length === 0) {
         this.showToast('⚠️ 메모 내용이나 제목을 입력해주세요!');
@@ -3866,6 +3873,9 @@ class DailyFlowApp {
         category: 'idea',
         color: this.keepSelectedColor,
         pinned: this.keepIsPinned,
+        archived: false,
+        trashed: false,
+        reminder: null,
         date: new Date().toISOString().split('T')[0],
         createdAt: new Date().toISOString()
       };
@@ -3884,26 +3894,350 @@ class DailyFlowApp {
     const searchInput = document.getElementById('keepSearchInput');
     searchInput?.addEventListener('input', () => this.renderMemos());
 
-    document.querySelectorAll('#keepFilterNav .keep-nav-item').forEach(btn => {
+    document.querySelectorAll('#keepFilterNav .keep-nav-item[data-filter]').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('#keepFilterNav .keep-nav-item').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-
-        if (btn.dataset.filter) {
-          this.keepActiveFilter = btn.dataset.filter;
-          this.keepActiveLabel = null;
-        } else if (btn.dataset.label) {
-          this.keepActiveFilter = 'label';
-          this.keepActiveLabel = btn.dataset.label;
-        }
+        this.keepActiveFilter = btn.dataset.filter;
+        this.keepActiveLabel = null;
         this.renderMemos();
       });
     });
 
+    // 9. 🏷️ 라벨 관리 모달 바인딩 (생성 / 이름 수정 / 삭제)
+    this.initKeepLabelManager();
+
+    // 10. 📝 메모 상세 편집 모달 바인딩
+    this.initKeepEditModal();
+
     // 새로고침 버튼
     document.getElementById('keepRefreshBtn')?.addEventListener('click', () => {
+      this.renderKeepLabels();
       this.renderMemos();
       this.showToast('Google Keep 메모 목록을 새로고침했습니다.');
+    });
+
+    // 최초 라벨 렌더링
+    this.renderKeepLabels();
+  }
+
+  // =========================================================================
+  // 🏷️ Google Keep 라벨 관리자 (생성, 이름 수정, 삭제)
+  // =========================================================================
+  initKeepLabelManager() {
+    const modal = document.getElementById('keepLabelManageModal');
+    const openBtn = document.getElementById('keepEditLabelsBtn');
+    const closeBtn = document.getElementById('closeKeepLabelModalBtn');
+    const finishBtn = document.getElementById('finishKeepLabelModalBtn');
+    const newTagInput = document.getElementById('keepNewTagInput');
+    const addTagBtn = document.getElementById('keepAddNewTagBtn');
+
+    const openModal = () => {
+      if (modal) {
+        modal.style.display = 'flex';
+        this.renderKeepLabelsModalList();
+        setTimeout(() => newTagInput?.focus(), 50);
+      }
+    };
+
+    const closeModal = () => {
+      if (modal) modal.style.display = 'none';
+      if (newTagInput) newTagInput.value = '';
+      this.renderKeepLabels();
+      this.renderMemos();
+    };
+
+    openBtn?.addEventListener('click', openModal);
+    closeBtn?.addEventListener('click', closeModal);
+    finishBtn?.addEventListener('click', closeModal);
+
+    modal?.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    const handleAddNewLabel = () => {
+      const name = newTagInput?.value.trim();
+      if (!name) return;
+
+      const labels = storage.data.labels || [];
+      if (labels.includes(name)) {
+        this.showToast('이미 존재하는 라벨 이름입니다.', 'error');
+        return;
+      }
+
+      labels.push(name);
+      storage.data.labels = labels;
+      storage.save();
+
+      newTagInput.value = '';
+      this.renderKeepLabelsModalList();
+      this.renderKeepLabels();
+      this.showToast(`🏷️ '${name}' 라벨이 새로 생성되었습니다! ✨`);
+    };
+
+    addTagBtn?.addEventListener('click', handleAddNewLabel);
+    newTagInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleAddNewLabel();
+      }
+    });
+  }
+
+  renderKeepLabels() {
+    const labelListContainer = document.getElementById('keepLabelList');
+    const creatorSelect = document.getElementById('keepNoteLabelSelect');
+    const editModalSelect = document.getElementById('keepEditModalLabelSelect');
+    const labels = storage.data.labels || [];
+
+    // 1. 사이드바 라벨 네비게이션 렌더링
+    if (labelListContainer) {
+      labelListContainer.innerHTML = '';
+      const colors = ['text-cyan', 'text-yellow', 'text-indigo', 'text-purple', 'text-emerald', 'text-rose'];
+      labels.forEach((lbl, idx) => {
+        const btn = document.createElement('button');
+        btn.className = `keep-nav-item ${this.keepActiveFilter === 'label' && this.keepActiveLabel === lbl ? 'active' : ''}`;
+        btn.dataset.label = lbl;
+        const colorCls = colors[idx % colors.length];
+        btn.innerHTML = `<i class="fa-solid fa-tag ${colorCls}"></i> <span>${this.escapeHtml(lbl)}</span>`;
+        
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#keepFilterNav .keep-nav-item').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          this.keepActiveFilter = 'label';
+          this.keepActiveLabel = lbl;
+          this.renderMemos();
+        });
+
+        labelListContainer.appendChild(btn);
+      });
+    }
+
+    // 2. 퀵 메모 생성기 라벨 옵션 렌더링
+    if (creatorSelect) {
+      creatorSelect.innerHTML = '';
+      labels.forEach(lbl => {
+        const opt = document.createElement('option');
+        opt.value = lbl;
+        opt.textContent = `🏷️ ${lbl}`;
+        creatorSelect.appendChild(opt);
+      });
+    }
+
+    // 3. 편집 모달 라벨 옵션 렌더링
+    if (editModalSelect) {
+      editModalSelect.innerHTML = '';
+      labels.forEach(lbl => {
+        const opt = document.createElement('option');
+        opt.value = lbl;
+        opt.textContent = `🏷️ ${lbl}`;
+        editModalSelect.appendChild(opt);
+      });
+    }
+  }
+
+  renderKeepLabelsModalList() {
+    const container = document.getElementById('keepExistingLabelsList');
+    if (!container) return;
+    container.innerHTML = '';
+    const labels = storage.data.labels || [];
+
+    if (labels.length === 0) {
+      container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted);">등록된 라벨이 없습니다.</div>';
+      return;
+    }
+
+    labels.forEach((lbl, idx) => {
+      const row = document.createElement('div');
+      row.className = 'keep-label-manage-row';
+      row.innerHTML = `
+        <i class="fa-solid fa-tag text-muted"></i>
+        <input type="text" class="keep-label-manage-input" value="${this.escapeHtml(lbl)}">
+        <button type="button" class="keep-label-row-action-btn delete-label-btn" title="라벨 삭제"><i class="fa-solid fa-trash"></i></button>
+      `;
+
+      const input = row.querySelector('.keep-label-manage-input');
+      input?.addEventListener('change', (e) => {
+        const newName = e.target.value.trim();
+        if (!newName || newName === lbl) return;
+
+        // 라벨 이름 변경
+        labels[idx] = newName;
+        storage.data.labels = labels;
+
+        // 해당 라벨을 달고 있던 메모들의 라벨도 업데이트
+        const memos = storage.getMemos();
+        memos.forEach(m => {
+          if (m.label === lbl) m.label = newName;
+        });
+        storage.data.memos = memos;
+        storage.save();
+
+        this.renderKeepLabels();
+        this.renderMemos();
+        this.showToast(`라벨 이름이 '${newName}'(으)로 변경되었습니다.`);
+      });
+
+      row.querySelector('.delete-label-btn')?.addEventListener('click', () => {
+        if (confirm(`'${lbl}' 라벨을 삭제하시겠습니까?\n(메모는 삭제되지 않으며 라벨만 해제됩니다)`)) {
+          labels.splice(idx, 1);
+          storage.data.labels = labels;
+
+          const memos = storage.getMemos();
+          memos.forEach(m => {
+            if (m.label === lbl) m.label = labels[0] || '기타';
+          });
+          storage.data.memos = memos;
+          storage.save();
+
+          this.renderKeepLabelsModalList();
+          this.renderKeepLabels();
+          this.renderMemos();
+          this.showToast(`'${lbl}' 라벨이 안전하게 삭제되었습니다.`);
+        }
+      });
+
+      container.appendChild(row);
+    });
+  }
+
+  // =========================================================================
+  // 📝 Google Keep 메모 상세 편집 모달
+  // =========================================================================
+  initKeepEditModal() {
+    const modal = document.getElementById('keepEditNoteModal');
+    const titleInput = document.getElementById('keepEditModalTitle');
+    const contentInput = document.getElementById('keepEditModalContent');
+    const contentBox = document.getElementById('keepEditModalContentBox');
+    const checklistBox = document.getElementById('keepEditModalChecklistBox');
+    const newItemInput = document.getElementById('keepEditModalNewItem');
+    const pinBtn = document.getElementById('keepEditModalPinBtn');
+    const labelSelect = document.getElementById('keepEditModalLabelSelect');
+    const voiceBtn = document.getElementById('keepEditModalVoiceBtn');
+    const saveBtn = document.getElementById('keepEditModalSaveBtn');
+    const deleteBtn = document.getElementById('keepEditModalDeleteBtn');
+
+    if (voiceBtn && window.speechMaster) {
+      voiceBtn.addEventListener('click', () => {
+        window.speechMaster.start(contentInput, voiceBtn);
+      });
+    }
+
+    pinBtn?.addEventListener('click', () => {
+      this.editModalIsPinned = !this.editModalIsPinned;
+      pinBtn.classList.toggle('active', this.editModalIsPinned);
+    });
+
+    newItemInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const val = newItemInput.value.trim();
+        if (val) {
+          this.editModalItemsData.push({ text: val, done: false });
+          newItemInput.value = '';
+          this.renderEditModalChecklistItems();
+        }
+      }
+    });
+
+    saveBtn?.addEventListener('click', () => {
+      if (!this.editingMemoId) return;
+      const title = titleInput?.value.trim() || '무제 메모';
+      const content = contentInput?.value.trim() || '';
+      const label = labelSelect?.value || '기타';
+
+      storage.updateMemo(this.editingMemoId, {
+        title,
+        content,
+        items: this.editModalItemsData,
+        label,
+        pinned: this.editModalIsPinned
+      });
+
+      modal.style.display = 'none';
+      this.renderMemos();
+      this.showToast('메모가 안전하게 수정되었습니다! 💾');
+    });
+
+    deleteBtn?.addEventListener('click', () => {
+      if (!this.editingMemoId) return;
+      if (confirm('이 메모를 휴지통으로 이동하시겠습니까?')) {
+        storage.updateMemo(this.editingMemoId, { trashed: true });
+        modal.style.display = 'none';
+        this.renderMemos();
+        this.showToast('메모가 휴지통으로 이동되었습니다. 🗑️');
+      }
+    });
+
+    modal?.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        saveBtn?.click();
+      }
+    });
+  }
+
+  openEditNoteModal(memoId) {
+    const memos = storage.getMemos();
+    const memo = memos.find(m => m.id === memoId);
+    if (!memo) return;
+
+    this.editingMemoId = memoId;
+    this.editModalIsPinned = memo.pinned || false;
+    this.editModalItemsData = JSON.parse(JSON.stringify(memo.items || []));
+
+    const modal = document.getElementById('keepEditNoteModal');
+    const titleInput = document.getElementById('keepEditModalTitle');
+    const contentInput = document.getElementById('keepEditModalContent');
+    const contentBox = document.getElementById('keepEditModalContentBox');
+    const checklistBox = document.getElementById('keepEditModalChecklistBox');
+    const pinBtn = document.getElementById('keepEditModalPinBtn');
+    const labelSelect = document.getElementById('keepEditModalLabelSelect');
+
+    if (titleInput) titleInput.value = memo.title || '';
+    if (contentInput) contentInput.value = memo.content || '';
+    if (pinBtn) pinBtn.classList.toggle('active', this.editModalIsPinned);
+    if (labelSelect) labelSelect.value = memo.label || (storage.data.labels[0] || '기타');
+
+    if (memo.type === 'checklist') {
+      if (contentBox) contentBox.style.display = 'none';
+      if (checklistBox) checklistBox.style.display = 'block';
+      this.renderEditModalChecklistItems();
+    } else {
+      if (contentBox) contentBox.style.display = 'block';
+      if (checklistBox) checklistBox.style.display = 'none';
+    }
+
+    if (modal) modal.style.display = 'flex';
+  }
+
+  renderEditModalChecklistItems() {
+    const box = document.getElementById('keepEditModalChecklistItems');
+    if (!box) return;
+    box.innerHTML = '';
+    (this.editModalItemsData || []).forEach((item, idx) => {
+      const row = document.createElement('div');
+      row.className = 'keep-checklist-row';
+      row.innerHTML = `
+        <input type="checkbox" ${item.done ? 'checked' : ''}>
+        <input type="text" class="keep-checklist-text ${item.done ? 'completed' : ''}" value="${this.escapeHtml(item.text)}">
+        <button type="button" class="keep-mini-btn delete-item-btn"><i class="fa-solid fa-xmark"></i></button>
+      `;
+
+      row.querySelector('input[type="checkbox"]')?.addEventListener('change', (e) => {
+        item.done = e.target.checked;
+        this.renderEditModalChecklistItems();
+      });
+
+      row.querySelector('.keep-checklist-text')?.addEventListener('input', (e) => {
+        item.text = e.target.value;
+      });
+
+      row.querySelector('.delete-item-btn')?.addEventListener('click', () => {
+        this.editModalItemsData.splice(idx, 1);
+        this.renderEditModalChecklistItems();
+      });
+
+      box.appendChild(row);
     });
   }
 
@@ -3943,15 +4277,32 @@ class DailyFlowApp {
     const othersGrid = document.getElementById('keepOthersGrid');
     const pinnedSec = document.getElementById('keepPinnedSection');
     const othersSec = document.getElementById('keepOthersSection');
+    const creatorCard = document.getElementById('keepNoteCreator');
     if (!pinnedGrid || !othersGrid) return;
 
     let memos = storage.getMemos();
     const query = document.getElementById('keepSearchInput')?.value.toLowerCase().trim() || '';
 
-    // 필터 적용
+    // 1. 휴지통 / 보관처리 상태에 따른 생성기 노출 제어
+    if (creatorCard) {
+      creatorCard.style.display = (this.keepActiveFilter === 'trash' || this.keepActiveFilter === 'archive') ? 'none' : 'block';
+    }
+
+    // 2. 필터 적용
     let filtered = memos.filter(m => {
+      if (this.keepActiveFilter === 'trash') {
+        return m.trashed === true;
+      }
+      if (m.trashed) return false; // 일반 뷰에서는 휴지통 항목 숨김
+
+      if (this.keepActiveFilter === 'archive') {
+        return m.archived === true;
+      }
+      if (m.archived) return false; // 일반 뷰에서는 보관처리 항목 숨김
+
       if (this.keepActiveFilter === 'pinned' && !m.pinned) return false;
       if (this.keepActiveFilter === 'checklist' && m.type !== 'checklist') return false;
+      if (this.keepActiveFilter === 'reminder' && !m.reminder) return false;
       if (this.keepActiveFilter === 'label' && m.label !== this.keepActiveLabel) return false;
 
       if (query) {
@@ -3967,18 +4318,36 @@ class DailyFlowApp {
     pinnedGrid.innerHTML = '';
     othersGrid.innerHTML = '';
 
-    const pinnedList = filtered.filter(m => m.pinned);
-    const othersList = filtered.filter(m => !m.pinned);
+    const pinnedList = filtered.filter(m => m.pinned && this.keepActiveFilter !== 'trash' && this.keepActiveFilter !== 'archive');
+    const othersList = (this.keepActiveFilter === 'trash' || this.keepActiveFilter === 'archive') ? filtered : filtered.filter(m => !m.pinned);
 
     if (pinnedSec) pinnedSec.style.display = pinnedList.length > 0 ? 'block' : 'none';
     if (othersSec) othersSec.style.display = 'block';
 
     if (filtered.length === 0) {
+      let emptyMsg = '상단의 [메모 작성...]에서 번뜩이는 아이디어와 할 일을 기록해보세요!';
+      let emptyTitle = '메모가 없습니다';
+      let emptyIcon = 'fa-regular fa-lightbulb';
+
+      if (this.keepActiveFilter === 'trash') {
+        emptyTitle = '휴지통이 비어 있습니다';
+        emptyMsg = '삭제된 메모가 여기에 보관됩니다.';
+        emptyIcon = 'fa-regular fa-trash-can';
+      } else if (this.keepActiveFilter === 'archive') {
+        emptyTitle = '보관된 메모가 없습니다';
+        emptyMsg = '보관처리한 메모가 여기에 나타납니다.';
+        emptyIcon = 'fa-solid fa-box-archive';
+      } else if (this.keepActiveFilter === 'reminder') {
+        emptyTitle = '알림이 설정된 메모가 없습니다';
+        emptyMsg = '메모 카드 하단 종 아이콘을 눌러 알림을 설정해보세요!';
+        emptyIcon = 'fa-regular fa-bell';
+      }
+
       othersGrid.innerHTML = `
         <div style="grid-column: 1 / -1; text-align:center; padding:60px 20px; color:var(--text-muted);">
-          <i class="fa-regular fa-lightbulb" style="font-size:3rem; margin-bottom:12px; opacity:0.4; color:#f59e0b;"></i>
-          <p style="font-size:1.1rem; font-weight:700; color:var(--text-primary);">메모가 없습니다</p>
-          <p style="font-size:0.9rem;">상단의 [메모 작성...]에서 번뜩이는 아이디어와 할 일을 기록해보세요!</p>
+          <i class="${emptyIcon}" style="font-size:3rem; margin-bottom:12px; opacity:0.4; color:#f59e0b;"></i>
+          <p style="font-size:1.1rem; font-weight:700; color:var(--text-primary);">${emptyTitle}</p>
+          <p style="font-size:0.9rem;">${emptyMsg}</p>
         </div>
       `;
       return;
@@ -4006,37 +4375,63 @@ class DailyFlowApp {
         bodyHtml = `<div class="keep-card-body">${this.escapeHtml(m.content || '')}</div>`;
       }
 
-      // 라벨 뱃지
+      // 라벨 뱃지 & 알림 뱃지
       const labelBadge = m.label ? `<span class="keep-card-label-badge">🏷️ ${this.escapeHtml(m.label)}</span>` : '';
+      const reminderBadge = m.reminder ? `<span class="keep-reminder-badge"><i class="fa-regular fa-bell"></i> ${m.reminder}</span>` : '';
+
+      // 휴지통 전용 vs 일반 툴바 액션
+      let actionsHtml = '';
+      if (m.trashed) {
+        actionsHtml = `
+          <button class="keep-card-action-btn restore-memo-btn" title="메모 복원"><i class="fa-solid fa-rotate-left text-emerald"></i> 복원</button>
+          <button class="keep-card-action-btn perm-delete-btn" title="완전 삭제" style="color:#ef4444;"><i class="fa-solid fa-trash"></i> 완전 삭제</button>
+        `;
+      } else {
+        actionsHtml = `
+          <button class="keep-card-action-btn reminder-memo-btn" title="알림 설정"><i class="fa-regular fa-bell"></i></button>
+          <button class="keep-card-action-btn copy-memo-btn" title="메모 클립보드 복사"><i class="fa-solid fa-copy"></i></button>
+          <button class="keep-card-action-btn push-todo-btn" title="오늘의 To-Do로 즉시 전환"><i class="fa-solid fa-bolt text-yellow"></i></button>
+          <button class="keep-card-action-btn color-cycle-btn" title="배경 색상 변경"><i class="fa-solid fa-palette"></i></button>
+          <button class="keep-card-action-btn archive-memo-btn" title="${m.archived ? '보관 해제' : '보관처리'}"><i class="fa-solid fa-box-archive"></i></button>
+          <button class="keep-card-action-btn delete-memo-btn" title="휴지통으로 이동"><i class="fa-solid fa-trash"></i></button>
+        `;
+      }
 
       card.innerHTML = `
         <div class="keep-card-header">
           <div class="keep-card-title">${this.escapeHtml(m.title)}</div>
-          <button class="keep-card-pin ${m.pinned ? 'active' : ''}" title="${m.pinned ? '핀 고정 해제' : '상단 핀 고정'}">
-            <i class="fa-solid fa-thumbtack"></i>
-          </button>
+          ${!m.trashed ? `
+            <button class="keep-card-pin ${m.pinned ? 'active' : ''}" title="${m.pinned ? '핀 고정 해제' : '상단 핀 고정'}">
+              <i class="fa-solid fa-thumbtack"></i>
+            </button>
+          ` : ''}
         </div>
 
         ${bodyHtml}
 
         <div class="keep-card-labels">
+          ${reminderBadge}
           ${labelBadge}
           <span style="font-size:0.96rem; color:var(--text-muted);"><i class="fa-regular fa-clock"></i> ${m.date || '오늘'}</span>
         </div>
 
         <div class="keep-card-footer">
           <div class="keep-card-actions">
-            <button class="keep-card-action-btn copy-memo-btn" title="메모 클립보드 복사"><i class="fa-solid fa-copy"></i></button>
-            <button class="keep-card-action-btn push-todo-btn" title="오늘의 To-Do로 즉시 전환"><i class="fa-solid fa-bolt text-yellow"></i></button>
-            <button class="keep-card-action-btn color-cycle-btn" title="배경 색상 변경"><i class="fa-solid fa-palette"></i></button>
-            <button class="keep-card-action-btn delete-memo-btn" title="메모 삭제"><i class="fa-solid fa-trash"></i></button>
+            ${actionsHtml}
           </div>
         </div>
       `;
 
+      // 0. 카드 클릭 시 상세 편집 모달 오픈 (버튼 클릭 제외)
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('button') || e.target.closest('input[type="checkbox"]') || m.trashed) return;
+        this.openEditNoteModal(m.id);
+      });
+
       // 1. 체크박스 클릭
       card.querySelectorAll('input[type="checkbox"][data-item-idx]').forEach(chk => {
         chk.addEventListener('change', (e) => {
+          e.stopPropagation();
           const idx = parseInt(e.target.dataset.itemIdx, 10);
           if (m.items && m.items[idx] !== undefined) {
             m.items[idx].done = e.target.checked;
@@ -4047,14 +4442,27 @@ class DailyFlowApp {
       });
 
       // 2. 핀 토글
-      card.querySelector('.keep-card-pin')?.addEventListener('click', () => {
+      card.querySelector('.keep-card-pin')?.addEventListener('click', (e) => {
+        e.stopPropagation();
         storage.updateMemo(m.id, { pinned: !m.pinned });
         this.renderMemos();
         this.showToast(m.pinned ? '📌 핀 고정이 해제되었습니다.' : '📌 상단에 핀 고정되었습니다!');
       });
 
-      // 3. 복사
-      card.querySelector('.copy-memo-btn')?.addEventListener('click', () => {
+      // 3. 알림 설정
+      card.querySelector('.reminder-memo-btn')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const time = prompt('알림 시간을 입력하세요 (예: 오늘 18:00, 내일 09:00, 2026-08-31 15:00):', m.reminder || '내일 09:00');
+        if (time !== null) {
+          storage.updateMemo(m.id, { reminder: time.trim() || null });
+          this.renderMemos();
+          this.showToast(time.trim() ? `🔔 '${time}' 알림이 설정되었습니다!` : '알림이 해제되었습니다.');
+        }
+      });
+
+      // 4. 복사
+      card.querySelector('.copy-memo-btn')?.addEventListener('click', (e) => {
+        e.stopPropagation();
         let textToCopy = `[${m.title}]\n`;
         if (m.type === 'checklist') {
           m.items.forEach(it => { textToCopy += `${it.done ? '[x]' : '[ ]'} ${it.text}\n`; });
@@ -4066,14 +4474,16 @@ class DailyFlowApp {
         });
       });
 
-      // 4. To-Do로 전환
-      card.querySelector('.push-todo-btn')?.addEventListener('click', () => {
+      // 5. To-Do로 전환
+      card.querySelector('.push-todo-btn')?.addEventListener('click', (e) => {
+        e.stopPropagation();
         this.pushActionToTodayTodo(`[메모 실행] ${m.title}`, 'career');
         this.showToast('⚡ 메모가 오늘의 To-Do로 즉시 전환되었습니다!');
       });
 
-      // 5. 색상 순환 (Palette Cycle)
-      card.querySelector('.color-cycle-btn')?.addEventListener('click', () => {
+      // 6. 색상 순환 (Palette Cycle)
+      card.querySelector('.color-cycle-btn')?.addEventListener('click', (e) => {
+        e.stopPropagation();
         const colors = ['default', 'yellow', 'green', 'blue', 'purple', 'teal'];
         const curIdx = colors.indexOf(m.color || 'default');
         const nextColor = colors[(curIdx + 1) % colors.length];
@@ -4081,12 +4491,38 @@ class DailyFlowApp {
         this.renderMemos();
       });
 
-      // 6. 삭제
-      card.querySelector('.delete-memo-btn')?.addEventListener('click', () => {
-        if (confirm(`'${m.title}' 메모를 삭제하시겠습니까?`)) {
+      // 7. 보관처리 토글
+      card.querySelector('.archive-memo-btn')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const nextArchived = !m.archived;
+        storage.updateMemo(m.id, { archived: nextArchived });
+        this.renderMemos();
+        this.showToast(nextArchived ? '📥 메모가 보관처리되었습니다.' : '📥 메모가 보관 해제되었습니다.');
+      });
+
+      // 8. 휴지통으로 이동
+      card.querySelector('.delete-memo-btn')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        storage.updateMemo(m.id, { trashed: true });
+        this.renderMemos();
+        this.showToast('🗑️ 메모가 휴지통으로 이동되었습니다.');
+      });
+
+      // 9. 휴지통 복원
+      card.querySelector('.restore-memo-btn')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        storage.updateMemo(m.id, { trashed: false });
+        this.renderMemos();
+        this.showToast('✨ 메모가 성공적으로 복원되었습니다!');
+      });
+
+      // 10. 영구 삭제
+      card.querySelector('.perm-delete-btn')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (confirm(`'${m.title}' 메모를 완전히 삭제하시겠습니까? (되돌릴 수 없습니다)`)) {
           storage.deleteMemo(m.id);
           this.renderMemos();
-          this.showToast('메모가 삭제되었습니다.');
+          this.showToast('메모가 영구 삭제되었습니다.');
         }
       });
 
