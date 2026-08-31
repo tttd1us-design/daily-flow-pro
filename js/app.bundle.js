@@ -856,6 +856,35 @@ class DailyFlowApp {
     this.updateThemeIcon(storage.data.settings.theme || 'dark');
 
     // ==========================================
+    // 🎨 3대 프리미엄 상용화 디자인 테마 프리셋 전환
+    // ==========================================
+    const savedPreset = localStorage.getItem('dfp_design_preset') || 'linear-obsidian';
+    document.documentElement.setAttribute('data-design-preset', savedPreset);
+
+    const presetButtons = document.querySelectorAll('.design-theme-btn');
+    presetButtons.forEach(btn => {
+      if (btn.dataset.designPreset === savedPreset) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+      btn.addEventListener('click', () => {
+        presetButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const preset = btn.dataset.designPreset;
+        document.documentElement.setAttribute('data-design-preset', preset);
+        localStorage.setItem('dfp_design_preset', preset);
+
+        const presetNames = {
+          'linear-obsidian': '제안 1: Linear 흑요석 Pro (테크 SaaS & 10조 골드)',
+          'apple-glass': '제안 2: Apple Vision 글래스 (사파이어 럭셔리 & 글래스)',
+          'stripe-titanium': '제안 3: Stripe 티타늄 클린 (코발트 블루 & 극강 가독성)'
+        };
+        this.showToast(`🎨 디자인 테마가 [${presetNames[preset] || preset}]로 즉시 전환되었습니다! ✨`);
+      });
+    });
+
+    // ==========================================
     // 📱 iPhone / iPad Mobile Drawer & Bottom Tab Bar Events
     // ==========================================
     const sidebar = document.getElementById('sidebar');
