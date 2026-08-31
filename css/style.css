@@ -53,120 +53,218 @@
 }
 
 /* =========================================================================
-   🎨 3대 프리미엄 상용화 디자인 테마 프리셋 토큰 (Design Theme Presets)
+   ⚡ Stripe & Notion Titanium Clean - Standard Design System
    ========================================================================= */
 
-/* 1️⃣ 제안 1: Linear & Vercel Obsidian Pro (테크 흑요석 & 10조 골드) */
-[data-design-preset="linear-obsidian"] {
-  --bg-primary: #07090e;
-  --bg-secondary: #0d121f;
-  --bg-tertiary: #131b2e;
-  --bg-card: rgba(14, 21, 37, 0.84);
-  --bg-card-hover: rgba(22, 32, 54, 0.95);
-  --border-color: rgba(255, 255, 255, 0.08);
-  --border-card: rgba(255, 255, 255, 0.09);
-  --accent-primary: #0284c7;
-  --accent-gold: #facc15;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-}
-
-/* 2️⃣ 제안 2: Apple Visionary Glass (사파이어 럭셔리 & 프로스트 글래스) */
-[data-design-preset="apple-glass"] {
-  --bg-primary: #080e1a;
-  --bg-secondary: rgba(13, 23, 42, 0.75);
-  --bg-tertiary: rgba(30, 48, 80, 0.6);
-  --bg-card: rgba(16, 28, 52, 0.65);
-  --bg-card-hover: rgba(24, 40, 72, 0.8);
-  --border-color: rgba(255, 255, 255, 0.12);
-  --border-card: rgba(255, 255, 255, 0.14);
-  --accent-primary: #38bdf8;
-  --accent-gold: #fbbf24;
-  --radius-md: 14px;
-  --radius-lg: 20px;
-  --radius-xl: 26px;
-}
-[data-design-preset="apple-glass"] .card {
-  backdrop-filter: blur(24px) saturate(190%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
-  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
-}
-
-/* 3️⃣ 제안 3: Stripe & Notion Titanium Clean (코발트 블루 & 티타늄 미니멀) */
-[data-design-preset="stripe-titanium"] {
+/* 기본 테마: Stripe 티타늄 (기본 슬레이트 모드) */
+:root {
   --bg-primary: #0f172a;
   --bg-secondary: #1e293b;
   --bg-tertiary: #334155;
-  --bg-card: #1e293b;
-  --bg-card-hover: #273549;
+  --bg-card: rgba(30, 41, 59, 0.88);
+  --bg-card-hover: rgba(39, 53, 73, 0.95);
+  --bg-glass: rgba(30, 41, 59, 0.78);
   --border-color: rgba(255, 255, 255, 0.1);
-  --border-card: rgba(255, 255, 255, 0.1);
+  --border-card: rgba(255, 255, 255, 0.11);
+  --border-focus: #38bdf8;
+  --border-gold: rgba(245, 158, 11, 0.28);
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  /* Stripe Cobalt Blue & Warm Gold Accent */
   --accent-primary: #2563eb;
+  --accent-primary-hover: #1d4ed8;
+  --accent-secondary: #06b6d4;
+  --accent-gemini: linear-gradient(135deg, #6366f1, #2563eb, #06b6d4);
+  --accent-success: #10b981;
+  --accent-warning: #f59e0b;
+  --accent-danger: #ef4444;
   --accent-gold: #f59e0b;
-  --radius-md: 8px;
-  --radius-lg: 10px;
-}
-[data-design-preset="stripe-titanium"] .card {
-  backdrop-filter: none !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
-}
 
-[data-theme="light"] {
-  --bg-primary: #f8fafc;
-  --bg-secondary: #ffffff;
-  --bg-tertiary: #f1f5f9;
-  --bg-card: rgba(255, 255, 255, 0.95);
-  --bg-card-hover: #f8fafc;
-  --bg-glass: rgba(255, 255, 255, 0.85);
-  --border-color: rgba(0, 0, 0, 0.08);
-  --border-card: rgba(0, 0, 0, 0.06);
-  --border-focus: #0284c7;
-  --border-gold: rgba(217, 119, 6, 0.25);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
 
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 8px 24px -6px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 16px 36px -10px rgba(0, 0, 0, 0.6);
 
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 20px 40px -10px rgba(0, 0, 0, 0.12);
+  --font-sans: 'Pretendard', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: 'Nanum Myeongjo', serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --sidebar-width: 250px;
+  --cal-sidebar-width: 290px;
+  --transition-fast: 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-normal: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* 🎨 3대 프리미엄 상용화 디자인 테마 셀렉터 UI 스타일 */
-.design-theme-selector-group {
+/* 🎛️ 1. 딥 티타늄 다크 (20% 심야 초집중 모드) */
+[data-titanium-bright="deep"] {
+  --bg-primary: #070b14 !important;
+  --bg-secondary: #0d1527 !important;
+  --bg-tertiary: #162038 !important;
+  --bg-card: rgba(13, 21, 39, 0.9) !important;
+  --bg-card-hover: rgba(22, 32, 56, 0.95) !important;
+  --border-color: rgba(255, 255, 255, 0.08) !important;
+  --border-card: rgba(255, 255, 255, 0.09) !important;
+  --text-primary: #f8fafc !important;
+  --text-secondary: #8da2be !important;
+}
+
+/* 🎛️ 2. 티타늄 슬레이트 (50% 표준 모드) */
+[data-titanium-bright="slate"] {
+  --bg-primary: #0f172a !important;
+  --bg-secondary: #1e293b !important;
+  --bg-tertiary: #334155 !important;
+  --bg-card: rgba(30, 41, 59, 0.88) !important;
+  --bg-card-hover: rgba(39, 53, 73, 0.95) !important;
+  --border-color: rgba(255, 255, 255, 0.1) !important;
+  --border-card: rgba(255, 255, 255, 0.11) !important;
+  --text-primary: #f8fafc !important;
+  --text-secondary: #94a3b8 !important;
+}
+
+/* 🎛️ 3. 소프트 티타늄 (75% 부드러운 중간 조도 모드) */
+[data-titanium-bright="soft"] {
+  --bg-primary: #1e293b !important;
+  --bg-secondary: #334155 !important;
+  --bg-tertiary: #475569 !important;
+  --bg-card: rgba(51, 65, 85, 0.85) !important;
+  --bg-card-hover: rgba(71, 85, 105, 0.95) !important;
+  --border-color: rgba(255, 255, 255, 0.14) !important;
+  --border-card: rgba(255, 255, 255, 0.16) !important;
+  --text-primary: #ffffff !important;
+  --text-secondary: #cbd5e1 !important;
+}
+
+/* 🎛️ 4. 티타늄 알루미늄 라이트 (100% 퓨어 화이트 모드) */
+[data-titanium-bright="light"] {
+  --bg-primary: #f8fafc !important;
+  --bg-secondary: #ffffff !important;
+  --bg-tertiary: #f1f5f9 !important;
+  --bg-card: rgba(255, 255, 255, 0.96) !important;
+  --bg-card-hover: #f8fafc !important;
+  --bg-glass: rgba(255, 255, 255, 0.88) !important;
+  --border-color: rgba(0, 0, 0, 0.08) !important;
+  --border-card: rgba(0, 0, 0, 0.07) !important;
+  --border-focus: #2563eb !important;
+  --border-gold: rgba(217, 119, 6, 0.25) !important;
+
+  --text-primary: #0f172a !important;
+  --text-secondary: #475569 !important;
+  --text-muted: #94a3b8 !important;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+  --shadow-lg: 0 16px 36px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* =========================================================================
+   🎛️ Stripe 티타늄 실시간 밝기 조절 위젯 (Titanium Brightness Widget UI)
+   ========================================================================= */
+.titanium-brightness-bar {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 8px;
   background: rgba(0, 0, 0, 0.35);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  padding: 3px;
+  padding: 4px 8px;
   backdrop-filter: blur(12px);
 }
-.design-theme-btn {
-  display: inline-flex;
+
+.brightness-badge {
+  display: flex;
   align-items: center;
   gap: 5px;
-  padding: 5px 9px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  padding-right: 6px;
+  border-right: 1px solid var(--border-color);
+}
+
+.brightness-preset-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.bright-preset-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 7px;
   border-radius: var(--radius-sm);
   border: 1px solid transparent;
   background: transparent;
   color: var(--text-secondary);
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
   transition: all var(--transition-fast);
 }
-.design-theme-btn:hover {
+
+.bright-preset-btn:hover {
   background: rgba(255, 255, 255, 0.08);
   color: var(--text-primary);
 }
-.design-theme-btn.active {
-  background: rgba(255, 255, 255, 0.14);
-  color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.25);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+
+.bright-preset-btn.active {
+  background: rgba(37, 99, 235, 0.22);
+  color: #60a5fa;
+  border-color: rgba(96, 165, 250, 0.4);
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+}
+
+.brightness-slider-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 6px;
+  border-left: 1px solid var(--border-color);
+}
+
+.brightness-range-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 70px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  accent-color: #2563eb;
+}
+
+.brightness-range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #38bdf8;
+  cursor: pointer;
+  box-shadow: 0 0 6px rgba(56, 189, 248, 0.6);
+  transition: transform 0.1s ease;
+}
+
+.brightness-range-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.brightness-val-text {
+  font-size: 0.7rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: #38bdf8;
+  min-width: 28px;
 }
 
 /* Reset & Global */

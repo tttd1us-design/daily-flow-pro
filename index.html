@@ -192,27 +192,32 @@
             </button>
           </div>
 
-          <!-- 🎨 3대 프리미엄 상용화 디자인 테마 셀렉터 -->
-          <div class="design-theme-selector-group" id="designThemeSelectorGroup" title="상용화 디자인 테마 프리셋 선택">
-            <button class="design-theme-btn active" data-design-preset="linear-obsidian" title="제안 1: Linear 흑요석 Pro (B2B 테크 SaaS & 10조 골드)">
-              <i class="fa-solid fa-gem text-yellow"></i> <span>Linear 흑요석</span>
-            </button>
-            <button class="design-theme-btn" data-design-preset="apple-glass" title="제안 2: Apple Vision 글래스 (사파이어 럭셔리 & 프로스트 글래스)">
-              <i class="fa-solid fa-cube text-cyan"></i> <span>Apple 글래스</span>
-            </button>
-            <button class="design-theme-btn" data-design-preset="stripe-titanium" title="제안 3: Stripe 티타늄 클린 (코발트 블루 & 극강 가독성)">
-              <i class="fa-solid fa-layer-group text-blue"></i> <span>Stripe 티타늄</span>
-            </button>
-          </div>
+          <!-- 🎛️ Stripe 티타늄 전용 실시간 밝기 조절 위젯 (Titanium Brightness Controller) -->
+          <div class="titanium-brightness-bar" id="titaniumBrightnessBar" title="Stripe 티타늄 테마 실시간 밝기 조절">
+            <div class="brightness-badge">
+              <i class="fa-solid fa-layer-group text-blue"></i>
+              <span class="brightness-label-text">Stripe 티타늄</span>
+            </div>
+            
+            <div class="brightness-preset-group">
+              <button class="bright-preset-btn" data-bright="deep" title="1단계: 딥 다크 (20% 심야 초집중)">
+                <i class="fa-solid fa-moon"></i> <span>딥</span>
+              </button>
+              <button class="bright-preset-btn active" data-bright="slate" title="2단계: 슬레이트 (50% 눈편한 표준)">
+                <i class="fa-solid fa-circle-half-stroke text-cyan"></i> <span>슬레이트</span>
+              </button>
+              <button class="bright-preset-btn" data-bright="soft" title="3단계: 소프트 (75% 부드러운 중간)">
+                <i class="fa-solid fa-cloud-sun text-yellow"></i> <span>소프트</span>
+              </button>
+              <button class="bright-preset-btn" data-bright="light" title="4단계: 라이트 (100% 퓨어 화이트)">
+                <i class="fa-solid fa-sun text-amber"></i> <span>라이트</span>
+              </button>
+            </div>
 
-          <!-- 🌓 바탕색 테마 전환 스위처 (검정 / 흰색) -->
-          <div class="theme-switcher-pill" id="themeSwitcherPill" title="바탕 테마 전환 (검정/흰색)">
-            <button class="theme-pill-btn active" id="themeBtnDark" data-theme="dark" title="검정 (다크 모드)">
-              <i class="fa-solid fa-moon"></i> <span>검정</span>
-            </button>
-            <button class="theme-pill-btn" id="themeBtnLight" data-theme="light" title="흰색 (라이트 모드)">
-              <i class="fa-solid fa-sun text-amber"></i> <span>흰색</span>
-            </button>
+            <div class="brightness-slider-wrapper" title="미세 밝기 조절 (0% ~ 100%)">
+              <input type="range" id="titaniumBrightnessSlider" min="0" max="100" value="50" class="brightness-range-slider" step="5">
+              <span class="brightness-val-text" id="brightnessValText">50%</span>
+            </div>
           </div>
 
           <button id="zenModeHeaderBtn" class="btn btn-zen-mode">

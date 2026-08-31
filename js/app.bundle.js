@@ -856,33 +856,79 @@ class DailyFlowApp {
     this.updateThemeIcon(storage.data.settings.theme || 'dark');
 
     // ==========================================
-    // 🎨 3대 프리미엄 상용화 디자인 테마 프리셋 전환
+    // 🎛️ Stripe 티타늄 실시간 밝기 조절 엔진 (Titanium Brightness Engine)
     // ==========================================
-    const savedPreset = localStorage.getItem('dfp_design_preset') || 'linear-obsidian';
-    document.documentElement.setAttribute('data-design-preset', savedPreset);
+    const brightPresetButtons = document.querySelectorAll('.bright-preset-btn');
+    const brightnessSlider = document.getElementById('titaniumBrightnessSlider');
+    const brightnessValText = document.getElementById('brightnessValText');
 
-    const presetButtons = document.querySelectorAll('.design-theme-btn');
-    presetButtons.forEach(btn => {
-      if (btn.dataset.designPreset === savedPreset) {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
+    const applyTitaniumBrightness = (level, percentVal = null) => {
+      document.documentElement.setAttribute('data-titanium-bright', level);
+      localStorage.setItem('dfp_titanium_bright', level);
+
+      let sliderVal = percentVal;
+      if (sliderVal === null) {
+        if (level === 'deep') sliderVal = 20;
+        else if (level === 'slate') sliderVal = 50;
+        else if (level === 'soft') sliderVal = 75;
+        else if (level === 'light') sliderVal = 100;
+        else sliderVal = 50;
       }
-      btn.addEventListener('click', () => {
-        presetButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const preset = btn.dataset.designPreset;
-        document.documentElement.setAttribute('data-design-preset', preset);
-        localStorage.setItem('dfp_design_preset', preset);
 
-        const presetNames = {
-          'linear-obsidian': '제안 1: Linear 흑요석 Pro (테크 SaaS & 10조 골드)',
-          'apple-glass': '제안 2: Apple Vision 글래스 (사파이어 럭셔리 & 글래스)',
-          'stripe-titanium': '제안 3: Stripe 티타늄 클린 (코발트 블루 & 극강 가독성)'
+      if (brightnessSlider) brightnessSlider.value = sliderVal;
+      if (brightnessValText) brightnessValText.textContent = `${sliderVal}%`;
+      localStorage.setItem('dfp_titanium_slider', sliderVal);
+
+      brightPresetButtons.forEach(btn => {
+        if (btn.dataset.bright === level) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    };
+
+    // 저장된 밝기 복원 (기본값: slate 50%)
+    const savedBrightLevel = localStorage.getItem('dfp_titanium_bright') || 'slate';
+    const savedSliderVal = parseInt(localStorage.getItem('dfp_titanium_slider')) || 50;
+    applyTitaniumBrightness(savedBrightLevel, savedSliderVal);
+
+    // 4단계 퀵 프리셋 버튼 이벤트
+    brightPresetButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const level = btn.dataset.bright;
+        applyTitaniumBrightness(level);
+        const levelNames = {
+          'deep': '1단계: 딥 다크 (20% 심야 초집중)',
+          'slate': '2단계: 슬레이트 (50% 눈편한 표준)',
+          'soft': '3단계: 소프트 (75% 부드러운 중간)',
+          'light': '4단계: 라이트 (100% 퓨어 화이트)'
         };
-        this.showToast(`🎨 디자인 테마가 [${presetNames[preset] || preset}]로 즉시 전환되었습니다! ✨`);
+        this.showToast(`🎛️ Stripe 티타늄 밝기가 [${levelNames[level] || level}]로 설정되었습니다! ✨`);
       });
     });
+
+    // 실시간 미세 슬라이더 이벤트
+    if (brightnessSlider) {
+      brightnessSlider.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value);
+        let level = 'slate';
+        if (val <= 30) level = 'deep';
+        else if (val <= 65) level = 'slate';
+        else if (val <= 85) level = 'soft';
+        else level = 'light';
+
+        document.documentElement.setAttribute('data-titanium-bright', level);
+        localStorage.setItem('dfp_titanium_bright', level);
+        localStorage.setItem('dfp_titanium_slider', val);
+        if (brightnessValText) brightnessValText.textContent = `${val}%`;
+
+        brightPresetButtons.forEach(b => {
+          if (b.dataset.bright === level) b.classList.add('active');
+          else b.classList.remove('active');
+        });
+      });
+    }
 
     // ==========================================
     // 📱 iPhone / iPad Mobile Drawer & Bottom Tab Bar Events
