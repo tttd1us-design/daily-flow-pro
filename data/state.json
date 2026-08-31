@@ -1938,7 +1938,24 @@
         "photoIds": [],
         "updatedAt": null
       },
-      "ees": null,
+      "ees": {
+        "date": "2026-08-24",
+        "authoring": 0,
+        "capital": 0,
+        "transition": 20,
+        "decision": 9,
+        "total": 29,
+        "grade": "D",
+        "color": "#f43f5e",
+        "raw": {
+          "chars": 0,
+          "contacts": 0,
+          "dealMoves": 0,
+          "billableH": 0,
+          "logged": 0,
+          "reviewRate": 60
+        }
+      },
       "commands": []
     },
     "2026-08-25": {
@@ -1981,8 +1998,43 @@
         "photoIds": [],
         "updatedAt": null
       },
-      "ees": null,
-      "commands": []
+      "ees": {
+        "date": "2026-08-25",
+        "authoring": 0,
+        "capital": 0,
+        "transition": 20,
+        "decision": 9,
+        "total": 29,
+        "grade": "D",
+        "color": "#f43f5e",
+        "raw": {
+          "chars": 0,
+          "contacts": 0,
+          "dealMoves": 0,
+          "billableH": 0,
+          "logged": 0,
+          "reviewRate": 60
+        }
+      },
+      "commands": [
+        {
+          "block": "05:30–07:00",
+          "min": 90,
+          "engineId": "E1",
+          "type": "write",
+          "entityId": "bk_1",
+          "text": "『건축사가 읽는 돈의 도면』 Ch.1 「도면에는 가격표가 붙어 있다」 3,600자",
+          "why": "기상 직후는 아무도 요구하지 않는 유일한 시간"
+        },
+        {
+          "block": "20:00–20:50",
+          "min": 50,
+          "engineId": "E1",
+          "type": "write",
+          "text": "집필 보충 블록 — 부족분 채우기",
+          "why": "저작 축 최저"
+        }
+      ]
     },
     "2026-08-26": {
       "focus": "",
@@ -3853,6 +3905,78 @@
         "num": 10,
         "cat": "자본",
         "quote": "현금은 산소와 같아서 쥐고 있으면 인플레이션에 증발한다. 독점적 해자를 지닌 현금흐름 자산으로 즉시 치환하라.",
+        "bookmarked": false
+      }
+    ],
+    "2026-08-25": [
+      {
+        "id": "q_2026-08-25_1",
+        "num": 1,
+        "cat": "시간",
+        "quote": "가장 비싼 자원은 시간이다. 1시간당 수천만 원의 가치를 창출하는 딥워크 시간대에 잡무를 절대 허용하지 마라.",
+        "bookmarked": false
+      },
+      {
+        "id": "q_2026-08-25_2",
+        "num": 2,
+        "cat": "시간",
+        "quote": "내 목표와 무관한 모임, 잡담, 불필요한 감정 소모를 단칼에 거절하라. 거절의 크기가 곧 당신의 자산 규모다.",
+        "bookmarked": false
+      },
+      {
+        "id": "q_2026-08-25_3",
+        "num": 3,
+        "cat": "에너지",
+        "quote": "건강을 잃으면 10조도 무가치하다. 매일 마시는 미온수 500ml와 신체 방어가 복리의 영구 존속을 보장한다.",
+        "bookmarked": false
+      },
+      {
+        "id": "q_2026-08-25_4",
+        "num": 4,
+        "cat": "투자",
+        "quote": "워런 버핏의 제1원칙: 절대로 원금을 잃지 마라. 제2원칙: 제1원칙을 결코 잊지 마라.",
+        "bookmarked": false
+      },
+      {
+        "id": "q_2026-08-25_5",
+        "num": 5,
+        "cat": "시간",
+        "quote": "단순하고 군더더기 없는 삶에서 폭발적인 부가 축적된다. 낭비를 0으로 만들고 본질에만 집중하라.",
+        "bookmarked": false
+      },
+      {
+        "id": "q_2026-08-25_6",
+        "num": 6,
+        "cat": "학습",
+        "quote": "세상의 변화를 앞서 읽는 통찰력은 끊임없는 독서와 거인의 어깨 위에 올라설 때 완성된다.",
+        "bookmarked": false
+      },
+      {
+        "id": "q_2026-08-25_7",
+        "num": 7,
+        "cat": "해자",
+        "quote": "고객에게 대체 불가능한 10배의 가치를 제공할 때, 가격 결정권과 영구적인 시장 지배력이 발생한다.",
+        "bookmarked": false
+      },
+      {
+        "id": "q_2026-08-25_8",
+        "num": 8,
+        "cat": "투자",
+        "quote": "위기는 부의 대이동이다. 현금흐름과 인내심을 갖춘 자만이 시장의 공포를 10조 자산으로 바꾼다.",
+        "bookmarked": false
+      },
+      {
+        "id": "q_2026-08-25_9",
+        "num": 9,
+        "cat": "레버리지",
+        "quote": "내가 없어도 24시간 365일 스스로 성장하는 비즈니스 시스템을 설계하는 것이 진정한 오너의 역할이다.",
+        "bookmarked": false
+      },
+      {
+        "id": "q_2026-08-25_10",
+        "num": 10,
+        "cat": "레버리지",
+        "quote": "한 번의 노력으로 수천만 명에게 복제되어 전달되는 지식 자산(SaaS, 도면, 저작물)을 매일 1줄이라도 구축하라.",
         "bookmarked": false
       }
     ]
