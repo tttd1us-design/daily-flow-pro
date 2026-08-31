@@ -5393,3 +5393,524 @@ body {
   border-color: #38bdf8 !important;
   box-shadow: inset 0 0 12px rgba(56, 189, 248, 0.3);
 }
+
+/* =========================================================================
+   💡 10조 Google Keep 메모장 전용 초호화 핀보드 레이아웃
+   ========================================================================= */
+.keep-layout-container {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 80px);
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+/* 1. 상단 바 */
+.keep-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  gap: 20px;
+}
+
+.keep-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.keep-brand-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.2rem;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+}
+
+.keep-brand-text {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+}
+
+.keep-search-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 9999px;
+  padding: 10px 20px;
+  flex: 1;
+  max-width: 680px;
+  transition: all var(--transition-fast);
+}
+
+.keep-search-box:focus-within {
+  background: var(--bg-secondary);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 14px rgba(37, 99, 235, 0.3);
+}
+
+.keep-search-box input {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1.02rem;
+  outline: none;
+  width: 100%;
+}
+
+.keep-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.keep-icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.keep-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+/* 2. 본체 래퍼 */
+.keep-body-wrapper {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* 좌측 사이드바 */
+.keep-sidebar {
+  width: 240px;
+  min-width: 240px;
+  border-right: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  padding: 14px 10px;
+  overflow-y: auto;
+}
+
+.keep-nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.keep-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 18px;
+  border-radius: 0 24px 24px 0;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.98rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition-fast);
+}
+
+.keep-nav-item i {
+  font-size: 1.15rem;
+  width: 20px;
+  text-align: center;
+}
+
+.keep-nav-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+}
+
+.keep-nav-item.active {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  font-weight: 800;
+  border-left: 4px solid #f59e0b;
+}
+
+.keep-nav-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 10px 0;
+}
+
+.keep-nav-label-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.keep-mini-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.keep-mini-btn:hover { color: var(--text-primary); }
+
+/* 메인 영역 */
+.keep-main-content {
+  flex: 1;
+  padding: 24px 32px;
+  overflow-y: auto;
+}
+
+/* 3. 퀵 메모 생성 카드 */
+.keep-note-creator-card {
+  max-width: 640px;
+  margin: 0 auto 32px auto;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  transition: all var(--transition-fast);
+}
+
+.keep-creator-collapsed {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  cursor: text;
+}
+
+.keep-creator-placeholder {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.keep-creator-quick-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.keep-tool-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.keep-tool-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
+}
+
+.keep-creator-expanded {
+  padding: 16px;
+}
+
+.keep-creator-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.keep-input-title {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1.15rem;
+  font-weight: 800;
+  outline: none;
+}
+
+.keep-pin-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.15rem;
+  cursor: pointer;
+  padding: 4px;
+}
+.keep-pin-btn.active { color: #f59e0b; }
+
+.keep-textarea-body {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1.02rem;
+  line-height: 1.6;
+  outline: none;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.keep-creator-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.keep-creator-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.keep-color-palette {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.color-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: transform var(--transition-fast);
+}
+.color-dot:hover { transform: scale(1.2); }
+.color-dot.active { border-color: #38bdf8; transform: scale(1.15); }
+
+.keep-select-label {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  outline: none;
+  cursor: pointer;
+}
+
+/* 체크리스트 아이템 */
+.keep-checklist-items-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.keep-checklist-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.keep-checklist-row input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #2563eb;
+  cursor: pointer;
+}
+
+.keep-checklist-text {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 0.98rem;
+  outline: none;
+}
+
+.keep-checklist-text.completed {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.keep-add-checklist-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.keep-item-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  outline: none;
+}
+
+/* 4. 메이슨리 핀 카드 그리드 */
+.keep-section {
+  margin-bottom: 36px;
+}
+
+.keep-section-title {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.keep-masonry-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.keep-note-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  position: relative;
+  transition: all var(--transition-fast);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  word-break: break-word;
+}
+
+.keep-note-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* 색상별 카드 배경 */
+.keep-note-card.color-yellow { background: #451a03; border-color: #78350f; }
+.keep-note-card.color-green  { background: #022c22; border-color: #065f46; }
+.keep-note-card.color-blue   { background: #0f172a; border-color: #1e3a8a; }
+.keep-note-card.color-purple { background: #2e1065; border-color: #581c87; }
+.keep-note-card.color-teal   { background: #042f2e; border-color: #134e4a; }
+
+.keep-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.keep-card-title {
+  font-size: 1.08rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.keep-card-pin {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1rem;
+  opacity: 0.6;
+  transition: all var(--transition-fast);
+}
+.keep-note-card:hover .keep-card-pin { opacity: 1; }
+.keep-card-pin.active { color: #f59e0b; opacity: 1; }
+
+.keep-card-body {
+  font-size: 0.96rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+  margin-bottom: 12px;
+  flex: 1;
+}
+
+.keep-card-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.keep-card-label-badge {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 12px;
+}
+
+.keep-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.keep-note-card:hover .keep-card-footer {
+  opacity: 1;
+}
+
+.keep-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.keep-card-action-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  padding: 4px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.keep-card-action-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
+}
+

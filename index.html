@@ -75,10 +75,6 @@
           <i class="fa-solid fa-crown text-yellow"></i>
           <span style="font-weight: 800; color: var(--accent-gold);">10조 자산 & 밸류에이션</span>
         </button>
-        <button class="nav-item" data-tab="quick-memo">
-          <i class="fa-solid fa-lightbulb text-yellow"></i>
-          <span>생각 & 아이디어 뱅크</span>
-        </button>
         <button class="nav-item" data-tab="evening-os">
           <i class="fa-solid fa-moon text-yellow"></i>
           <span>퇴근 후 1시간 딥워크</span>
@@ -106,6 +102,10 @@
         <button class="nav-item" data-tab="principles">
           <i class="fa-solid fa-feather text-cyan"></i>
           <span>인생 원칙 & 결정 로그</span>
+        </button>
+        <button class="nav-item" data-tab="quick-memo">
+          <i class="fa-solid fa-lightbulb text-yellow"></i>
+          <span>💡 10조 구글 메모장</span>
         </button>
         <button class="nav-item" data-tab="calendar">
           <i class="fa-solid fa-calendar-days"></i>
@@ -644,6 +644,9 @@
               </div>
 
               <div class="outlook-toolbar-right">
+                <button class="simple-btn simple-btn-sm" id="gotoKeepFromOutlookBtn" onclick="window.app?.switchTab('quick-memo')" title="10조 구글 Keep 메모장으로 즉시 이동">
+                  <i class="fa-solid fa-lightbulb text-yellow"></i> 💡 구글 메모장
+                </button>
                 <button class="simple-btn simple-btn-sm" id="outlookSyncTodosBtn" title="오늘의 To-Do를 일정표로 자동 시간 배정">
                   <i class="fa-solid fa-bolt text-yellow"></i> To-Do ➔ 일정 배정
                 </button>
@@ -1498,104 +1501,131 @@
       </section>
 
       <!-- ======================================================== -->
-      <!-- 3. 아이디어 퀵 메모장 (Instant Idea Capture & Inbox)      -->
+      <!-- 10. 10조 구글 메모장 (Google Keep Pinboard OS)             -->
       <!-- ======================================================== -->
       <section class="tab-pane" id="pane-quick-memo">
-        <div class="tab-with-calendar-layout">
-          <div class="tab-main-column">
-            
-            <div class="goals-header-bar">
-              <div class="goals-header-info">
-                <h2><i class="fa-solid fa-lightbulb text-yellow"></i> 아이디어 퀵 메모장 (Idea Inbox)</h2>
-                <p>순간 떠오른 번뜩이는 아이디어와 생각을 1초 만에 캡처하고, 실행 To-Do로 즉시 전환합니다.</p>
-              </div>
-              <div style="display:flex; gap:6px;">
-                <button id="aiIdeaBrainstormBtn" class="btn btn-gemini btn-sm">
-                  <i class="fa-solid fa-wand-magic-sparkles"></i> Gemini 아이디어 브레인스토밍
-                </button>
-              </div>
+        <div class="keep-layout-container">
+          
+          <!-- 1. 구글 Keep 상단 헤더 & 검색바 -->
+          <div class="keep-header-bar">
+            <div class="keep-brand">
+              <div class="keep-brand-icon-wrap"><i class="fa-solid fa-lightbulb"></i></div>
+              <span class="keep-brand-text">10조 Google Keep</span>
             </div>
+            <div class="keep-search-box">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="keepSearchInput" placeholder="메모, 체크리스트, 라벨 검색...">
+            </div>
+            <div class="keep-header-actions">
+              <button id="keepRefreshBtn" class="keep-icon-btn" title="새로고침"><i class="fa-solid fa-rotate-right"></i></button>
+              <button id="keepViewToggleBtn" class="keep-icon-btn" title="그리드/목록 보기 전환"><i class="fa-solid fa-table-cells-large"></i></button>
+            </div>
+          </div>
 
-            <!-- 신규 메모 인라인 퀵 입력 카드 -->
-            <div class="card memo-editor-card">
-              <div class="card-header">
-                <h3><i class="fa-solid fa-pen-to-square text-cyan"></i> 새로운 아이디어 / 영감 즉시 캡처</h3>
-                <div class="memo-category-pills" id="memoCategoryPills">
-                  <button type="button" class="mcat-btn active" data-cat="idea">💡 영감/아이디어</button>
-                  <button type="button" class="mcat-btn" data-cat="work">💼 업무/비즈니스</button>
-                  <button type="button" class="mcat-btn" data-cat="study">📚 지식/학습</button>
-                  <button type="button" class="mcat-btn" data-cat="wealth">💰 재테크/투자</button>
-                  <button type="button" class="mcat-btn" data-cat="misc">🛒 일상/기타</button>
+          <div class="keep-body-wrapper">
+            <!-- 2. 좌측 Keep 카테고리/라벨 사이드바 -->
+            <aside class="keep-sidebar">
+              <nav class="keep-nav-list" id="keepFilterNav">
+                <button class="keep-nav-item active" data-filter="all"><i class="fa-regular fa-lightbulb"></i> <span>메모 (전체)</span></button>
+                <button class="keep-nav-item" data-filter="pinned"><i class="fa-solid fa-thumbtack"></i> <span>📌 고정된 메모</span></button>
+                <button class="keep-nav-item" data-filter="checklist"><i class="fa-regular fa-square-check"></i> <span>☑️ 체크리스트</span></button>
+                <div class="keep-nav-divider"></div>
+                <div class="keep-nav-label-header">
+                  <span>🏷️ 라벨</span>
+                  <button id="keepAddLabelBtn" class="keep-mini-btn" title="라벨 추가"><i class="fa-solid fa-plus"></i></button>
                 </div>
-              </div>
-              <div class="card-body">
-                <form id="memoAddForm">
-                  <input type="text" id="memoTitleInput" placeholder="아이디어 핵심 요약 (예: 퇴근 후 자동화 파이프라인 개발 아이디어)..." class="input-focus-hero font-bold" style="margin-bottom:8px;" required>
-                  <textarea id="memoContentInput" rows="3" class="journal-textarea" placeholder="구체적인 생각, 메모, 링크, 떠오른 인사이트를 자유롭게 적어보세요..." style="min-height: 80px;"></textarea>
-                  <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-                    <div style="display:flex; align-items:center; gap:8px;">
-                      <label style="font-size:0.75rem; color:var(--text-secondary); display:flex; align-items:center; gap:4px; cursor:pointer;">
-                        <input type="checkbox" id="memoPinCheck" style="accent-color:var(--accent-gold);">
-                        <span>📌 상단 핀 고정</span>
-                      </label>
+                <div id="keepLabelList" class="keep-label-nav-group">
+                  <button class="keep-nav-item" data-label="Gemini"><i class="fa-solid fa-tag text-cyan"></i> <span>Gemini</span></button>
+                  <button class="keep-nav-item" data-label="10조비즈니스"><i class="fa-solid fa-tag text-yellow"></i> <span>10조비즈니스</span></button>
+                  <button class="keep-nav-item" data-label="생각메모"><i class="fa-solid fa-tag text-indigo"></i> <span>생각메모</span></button>
+                  <button class="keep-nav-item" data-label="10조확언"><i class="fa-solid fa-tag text-purple"></i> <span>10조확언</span></button>
+                  <button class="keep-nav-item" data-label="성공확언"><i class="fa-solid fa-tag text-emerald"></i> <span>성공확언</span></button>
+                  <button class="keep-nav-item" data-label="유튜브/콘텐츠"><i class="fa-solid fa-tag text-rose"></i> <span>유튜브/콘텐츠</span></button>
+                </div>
+              </nav>
+            </aside>
+
+            <!-- 3. 메인 Keep 핀보드 영역 -->
+            <main class="keep-main-content">
+              
+              <!-- 💡 Google Keep 시그니처 퀵 메모 생성기 -->
+              <div class="keep-note-creator-card" id="keepNoteCreator">
+                <!-- 접힌 상태 바 -->
+                <div class="keep-creator-collapsed" id="keepCreatorCollapsed">
+                  <span class="keep-creator-placeholder">메모 작성...</span>
+                  <div class="keep-creator-quick-actions">
+                    <button type="button" id="keepQuickChecklistBtn" class="keep-tool-btn" title="새 체크리스트 목록 작성"><i class="fa-regular fa-square-check"></i></button>
+                    <button type="button" id="keepQuickVoiceBtn" class="keep-tool-btn stt-mic-btn" title="30분 음성 녹음 받아쓰기"><i class="fa-solid fa-microphone"></i></button>
+                  </div>
+                </div>
+
+                <!-- 펼쳐진 상태 폼 -->
+                <form class="keep-creator-expanded" id="keepCreatorExpanded" style="display:none;">
+                  <div class="keep-creator-header">
+                    <input type="text" id="keepNoteTitleInput" placeholder="제목" class="keep-input-title">
+                    <button type="button" id="keepNotePinToggle" class="keep-pin-btn" title="메모 상단 핀 고정"><i class="fa-solid fa-thumbtack"></i></button>
+                  </div>
+                  
+                  <div id="keepNoteContentBox">
+                    <textarea id="keepNoteContentInput" placeholder="메모 작성..." rows="3" class="keep-textarea-body"></textarea>
+                  </div>
+
+                  <!-- 체크리스트 작성 모드일 때의 컨테이너 -->
+                  <div id="keepChecklistContainer" style="display:none;">
+                    <div id="keepChecklistItems" class="keep-checklist-items-box"></div>
+                    <div class="keep-add-checklist-row">
+                      <i class="fa-solid fa-plus text-muted"></i>
+                      <input type="text" id="keepNewItemInput" placeholder="목록 항목 추가... (Enter)" class="keep-item-input">
                     </div>
-                    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus"></i> 아이디어 메모 저장</button>
+                  </div>
+
+                  <!-- 하단 도구바 -->
+                  <div class="keep-creator-footer">
+                    <div class="keep-creator-tools">
+                      <!-- 색상 팔레트 -->
+                      <div class="keep-color-palette" id="keepColorPalette">
+                        <span class="color-dot active" data-color="default" style="background:#1e293b;" title="기본"></span>
+                        <span class="color-dot" data-color="yellow" style="background:#78350f;" title="노랑"></span>
+                        <span class="color-dot" data-color="green" style="background:#064e3b;" title="초록"></span>
+                        <span class="color-dot" data-color="blue" style="background:#1e3a8a;" title="파랑"></span>
+                        <span class="color-dot" data-color="purple" style="background:#581c87;" title="보라"></span>
+                        <span class="color-dot" data-color="teal" style="background:#134e4a;" title="청록"></span>
+                      </div>
+                      <select id="keepNoteLabelSelect" class="keep-select-label" title="라벨 태그">
+                        <option value="10조비즈니스">🏷️ 10조비즈니스</option>
+                        <option value="Gemini">🏷️ Gemini</option>
+                        <option value="생각메모">🏷️ 생각메모</option>
+                        <option value="10조확언">🏷️ 10조확언</option>
+                        <option value="성공확언">🏷️ 성공확언</option>
+                        <option value="유튜브/콘텐츠">🏷️ 유튜브/콘텐츠</option>
+                        <option value="기타">🏷️ 기타</option>
+                      </select>
+                      <button type="button" id="keepExpandedVoiceBtn" class="keep-tool-btn stt-mic-btn" title="30분 음성 받아쓰기"><i class="fa-solid fa-microphone"></i></button>
+                      <button type="button" id="keepToggleModeBtn" class="keep-tool-btn" title="체크리스트/텍스트 전환"><i class="fa-solid fa-list-check"></i></button>
+                    </div>
+                    <div class="keep-creator-actions">
+                      <button type="submit" class="btn btn-primary btn-sm"><i class="fa-solid fa-check"></i> 저장</button>
+                      <button type="button" id="keepCreatorCloseBtn" class="btn btn-secondary btn-sm">닫기</button>
+                    </div>
                   </div>
                 </form>
               </div>
-            </div>
 
-            <!-- 메모 검색 & 카테고리 필터 바 -->
-            <div class="memo-filter-bar">
-              <div class="study-search-box" style="flex:1; margin-bottom:0;">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="memoSearchInput" placeholder="메모 제목, 내용, 키워드 검색...">
+              <!-- 📌 핀 고정된 메모 섹션 -->
+              <div class="keep-section" id="keepPinnedSection">
+                <div class="keep-section-title"><i class="fa-solid fa-thumbtack text-yellow"></i> 고정됨</div>
+                <div class="keep-masonry-grid" id="keepPinnedGrid"></div>
               </div>
-              <div class="filter-pills" id="memoFilterList">
-                <button class="filter-pill active" data-filter="all">전체보기</button>
-                <button class="filter-pill" data-filter="idea">💡 영감</button>
-                <button class="filter-pill" data-filter="work">💼 업무</button>
-                <button class="filter-pill" data-filter="study">📚 지식</button>
-                <button class="filter-pill" data-filter="wealth">💰 재테크</button>
-                <button class="filter-pill" data-filter="misc">🛒 일상</button>
+
+              <!-- 📝 기타 메모 섹션 -->
+              <div class="keep-section" id="keepOthersSection">
+                <div class="keep-section-title"><i class="fa-regular fa-note-sticky text-cyan"></i> 메모</div>
+                <div class="keep-masonry-grid" id="keepOthersGrid"></div>
               </div>
-            </div>
 
-            <!-- 아이디어 메모 포스트잇 그리드 리스트 -->
-            <div class="memo-cards-grid" id="memoCardsGrid"></div>
-
+            </main>
           </div>
 
-          <!-- 우측 아이디어 캘린더 사이드바 -->
-          <div class="tab-calendar-sidebar">
-            <div class="tab-cal-widget card" style="background: linear-gradient(180deg, rgba(19, 27, 46, 0.95), rgba(11, 17, 30, 0.95)); border: 1px solid rgba(250, 204, 21, 0.25);">
-              <div class="tab-cal-header" style="margin-bottom: 8px;">
-                <button class="nav-mini-btn" data-cal-action="prev" data-target="memo" title="이전 달"><i class="fa-solid fa-chevron-left"></i></button>
-                <div style="text-align:center;">
-                  <h4 class="tab-cal-title" id="memoCalTitle" style="font-size:0.9rem; font-weight:800; color:var(--text-primary);">2026년 8월</h4>
-                  <div id="memoCalSubtitle" style="font-size:0.68rem; color:#facc15; font-weight:600; margin-top:2px;">아이디어 캡처 집계 중...</div>
-                </div>
-                <div style="display:flex; align-items:center; gap:4px;">
-                  <button class="nav-mini-btn" data-cal-action="next" data-target="memo" title="다음 달"><i class="fa-solid fa-chevron-right"></i></button>
-                  <button class="btn btn-secondary btn-sm" data-cal-action="today" data-target="memo" style="padding: 2px 7px; font-size: 0.72rem;">오늘</button>
-                </div>
-              </div>
-              <div class="tab-cal-weekdays">
-                <span style="color:#f87171; font-weight:700;">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span style="color:#60a5fa; font-weight:700;">토</span>
-              </div>
-              <div class="tab-cal-days-grid" id="memoCalGrid"></div>
-            </div>
-
-            <div class="card" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08);">
-              <div class="card-header" style="padding: 8px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); display:flex; justify-content:space-between; align-items:center;">
-                <h4 style="font-size: 0.82rem; font-weight: 700; margin: 0; display:flex; align-items:center; gap:6px;">
-                  <i class="fa-solid fa-lightbulb text-yellow"></i> 이달의 아이디어 피드
-                </h4>
-                <span class="badge badge-warning" id="memoMonthCountBadge" style="font-size:0.68rem; padding:2px 6px;">0건</span>
-              </div>
-              <div class="tab-cal-item-list" id="memoCalMonthList" style="padding: 4px 6px; gap: 6px;"></div>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -2489,6 +2519,9 @@
                 <button type="button" id="fullCalQuickVoiceBtn" class="stt-mic-btn" title="30분 음성 입력"><i class="fa-solid fa-microphone"></i></button>
                 <button id="fullCalQuickSubmitBtn" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> 등록</button>
               </div>
+              <button class="btn btn-secondary btn-sm" onclick="window.app?.switchTab('quick-memo')" title="10조 구글 Keep 메모장 열기">
+                <i class="fa-solid fa-lightbulb text-yellow"></i> 💡 구글 메모장
+              </button>
               <button id="calTodayBtn" class="btn btn-secondary btn-sm">이번 달</button>
             </div>
             <div class="card-body">

@@ -2269,9 +2269,13 @@ class DailyFlowApp {
         this.renderPrinciples();
         this.renderAnalytics();
         this.updateGeminiStatusBadge();
-        this.showToast('데이터가 초기화되었습니다.');
       }
     });
+
+    // 💡 10조 Google Keep 메모장 엔진 초기화
+    this.initGoogleKeep();
+    this.initOutlookSchedule();
+    this.initRootOutlookCalendar();
   }
 
   // =========================================================================
@@ -3722,114 +3726,375 @@ class DailyFlowApp {
 
     return total;
   }
+  // =========================================================================
+  // 💡 10조 Google Keep 메모장 전용 인터랙션 & 렌더링 엔진 (Google Keep OS)
+  // =========================================================================
+  initGoogleKeep() {
+    this.keepActiveFilter = 'all';
+    this.keepActiveLabel = null;
+    this.keepCreatorMode = 'text'; // 'text' or 'checklist'
+    this.keepSelectedColor = 'default';
+    this.keepIsPinned = false;
+    this.keepChecklistItemsData = [];
+
+    const creator = document.getElementById('keepNoteCreator');
+    const collapsed = document.getElementById('keepCreatorCollapsed');
+    const expanded = document.getElementById('keepCreatorExpanded');
+    const closeBtn = document.getElementById('keepCreatorCloseBtn');
+    const titleInput = document.getElementById('keepNoteTitleInput');
+    const contentInput = document.getElementById('keepNoteContentInput');
+    const pinToggleBtn = document.getElementById('keepNotePinToggle');
+    const toggleModeBtn = document.getElementById('keepToggleModeBtn');
+    const checklistBox = document.getElementById('keepChecklistContainer');
+    const contentBox = document.getElementById('keepNoteContentBox');
+    const newItemInput = document.getElementById('keepNewItemInput');
+    const voiceBtn1 = document.getElementById('keepQuickVoiceBtn');
+    const voiceBtn2 = document.getElementById('keepExpandedVoiceBtn');
+    const quickChecklistBtn = document.getElementById('keepQuickChecklistBtn');
+
+    // 1. 펼치기 / 닫기 인터랙션
+    const openExpanded = (mode = 'text') => {
+      this.keepCreatorMode = mode;
+      if (collapsed) collapsed.style.display = 'none';
+      if (expanded) expanded.style.display = 'block';
+
+      if (mode === 'checklist') {
+        if (contentBox) contentBox.style.display = 'none';
+        if (checklistBox) checklistBox.style.display = 'block';
+        setTimeout(() => newItemInput?.focus(), 50);
+      } else {
+        if (contentBox) contentBox.style.display = 'block';
+        if (checklistBox) checklistBox.style.display = 'none';
+        setTimeout(() => contentInput?.focus(), 50);
+      }
+    };
+
+    const closeExpanded = () => {
+      if (collapsed) collapsed.style.display = 'flex';
+      if (expanded) expanded.style.display = 'none';
+      if (titleInput) titleInput.value = '';
+      if (contentInput) contentInput.value = '';
+      this.keepChecklistItemsData = [];
+      this.renderKeepChecklistItems();
+      this.keepIsPinned = false;
+      this.keepSelectedColor = 'default';
+      if (pinToggleBtn) pinToggleBtn.classList.remove('active');
+    };
+
+    collapsed?.addEventListener('click', (e) => {
+      if (e.target.closest('.keep-tool-btn')) return;
+      openExpanded('text');
+    });
+
+    quickChecklistBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openExpanded('checklist');
+    });
+
+    closeBtn?.addEventListener('click', closeExpanded);
+
+    // 2. 핀 토글
+    pinToggleBtn?.addEventListener('click', () => {
+      this.keepIsPinned = !this.keepIsPinned;
+      pinToggleBtn.classList.toggle('active', this.keepIsPinned);
+    });
+
+    // 3. 텍스트 / 체크리스트 모드 전환
+    toggleModeBtn?.addEventListener('click', () => {
+      if (this.keepCreatorMode === 'text') {
+        openExpanded('checklist');
+      } else {
+        openExpanded('text');
+      }
+    });
+
+    // 4. 체크리스트 아이템 추가
+    newItemInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const val = newItemInput.value.trim();
+        if (val) {
+          this.keepChecklistItemsData.push({ text: val, done: false });
+          newItemInput.value = '';
+          this.renderKeepChecklistItems();
+        }
+      }
+    });
+
+    // 5. 색상 팔레트 선택
+    document.querySelectorAll('#keepColorPalette .color-dot').forEach(dot => {
+      dot.addEventListener('click', () => {
+        document.querySelectorAll('#keepColorPalette .color-dot').forEach(d => d.classList.remove('active'));
+        dot.classList.add('active');
+        this.keepSelectedColor = dot.dataset.color || 'default';
+      });
+    });
+
+    // 6. 30분 음성 인식 마이크 연동
+    if (voiceBtn1 && window.speechMaster) {
+      voiceBtn1.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openExpanded('text');
+        window.speechMaster.start(contentInput, voiceBtn1);
+      });
+    }
+    if (voiceBtn2 && window.speechMaster) {
+      voiceBtn2.addEventListener('click', () => {
+        window.speechMaster.start(contentInput, voiceBtn2);
+      });
+    }
+
+    // 7. 메모 저장 (Submit)
+    expanded?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const title = titleInput?.value.trim() || '';
+      const content = contentInput?.value.trim() || '';
+      const label = document.getElementById('keepNoteLabelSelect')?.value || '기타';
+
+      if (!title && !content && this.keepChecklistItemsData.length === 0) {
+        this.showToast('⚠️ 메모 내용이나 제목을 입력해주세요!');
+        return;
+      }
+
+      const newMemo = {
+        id: 'memo_' + Date.now() + Math.floor(Math.random() * 1000),
+        title: title || (this.keepCreatorMode === 'checklist' ? '체크리스트' : '새 메모'),
+        type: this.keepCreatorMode,
+        content: content,
+        items: this.keepChecklistItemsData,
+        label: label,
+        category: 'idea',
+        color: this.keepSelectedColor,
+        pinned: this.keepIsPinned,
+        date: new Date().toISOString().split('T')[0],
+        createdAt: new Date().toISOString()
+      };
+
+      const memos = storage.getMemos();
+      memos.unshift(newMemo);
+      storage.data.memos = memos;
+      storage.save();
+
+      closeExpanded();
+      this.renderMemos();
+      this.showToast('💡 Google Keep 메모가 안전하게 저장되었습니다! ✨');
+    });
+
+    // 8. 검색 & 사이드바 필터 바인딩
+    const searchInput = document.getElementById('keepSearchInput');
+    searchInput?.addEventListener('input', () => this.renderMemos());
+
+    document.querySelectorAll('#keepFilterNav .keep-nav-item').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#keepFilterNav .keep-nav-item').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        if (btn.dataset.filter) {
+          this.keepActiveFilter = btn.dataset.filter;
+          this.keepActiveLabel = null;
+        } else if (btn.dataset.label) {
+          this.keepActiveFilter = 'label';
+          this.keepActiveLabel = btn.dataset.label;
+        }
+        this.renderMemos();
+      });
+    });
+
+    // 새로고침 버튼
+    document.getElementById('keepRefreshBtn')?.addEventListener('click', () => {
+      this.renderMemos();
+      this.showToast('Google Keep 메모 목록을 새로고침했습니다.');
+    });
+  }
+
+  renderKeepChecklistItems() {
+    const box = document.getElementById('keepChecklistItems');
+    if (!box) return;
+    box.innerHTML = '';
+    this.keepChecklistItemsData.forEach((item, idx) => {
+      const row = document.createElement('div');
+      row.className = 'keep-checklist-row';
+      row.innerHTML = `
+        <input type="checkbox" ${item.done ? 'checked' : ''}>
+        <input type="text" class="keep-checklist-text ${item.done ? 'completed' : ''}" value="${this.escapeHtml(item.text)}">
+        <button type="button" class="keep-mini-btn delete-item-btn"><i class="fa-solid fa-xmark"></i></button>
+      `;
+
+      row.querySelector('input[type="checkbox"]')?.addEventListener('change', (e) => {
+        item.done = e.target.checked;
+        this.renderKeepChecklistItems();
+      });
+
+      row.querySelector('.keep-checklist-text')?.addEventListener('input', (e) => {
+        item.text = e.target.value;
+      });
+
+      row.querySelector('.delete-item-btn')?.addEventListener('click', () => {
+        this.keepChecklistItemsData.splice(idx, 1);
+        this.renderKeepChecklistItems();
+      });
+
+      box.appendChild(row);
+    });
+  }
+
   renderMemos() {
-    if (!this.memoCardsGrid) return;
-    const memos = storage.getMemos();
-    this.memoCardsGrid.innerHTML = '';
+    const pinnedGrid = document.getElementById('keepPinnedGrid');
+    const othersGrid = document.getElementById('keepOthersGrid');
+    const pinnedSec = document.getElementById('keepPinnedSection');
+    const othersSec = document.getElementById('keepOthersSection');
+    if (!pinnedGrid || !othersGrid) return;
 
-    const query = this.memoSearchInput ? this.memoSearchInput.value.toLowerCase().trim() : '';
+    let memos = storage.getMemos();
+    const query = document.getElementById('keepSearchInput')?.value.toLowerCase().trim() || '';
 
-    const filtered = memos.filter(m => {
-      if (this.activeMemoFilter !== 'all' && m.category !== this.activeMemoFilter) return false;
-      if (query && !m.title.toLowerCase().includes(query) && !m.content.toLowerCase().includes(query)) return false;
+    // 필터 적용
+    let filtered = memos.filter(m => {
+      if (this.keepActiveFilter === 'pinned' && !m.pinned) return false;
+      if (this.keepActiveFilter === 'checklist' && m.type !== 'checklist') return false;
+      if (this.keepActiveFilter === 'label' && m.label !== this.keepActiveLabel) return false;
+
+      if (query) {
+        const tMatch = (m.title || '').toLowerCase().includes(query);
+        const cMatch = (m.content || '').toLowerCase().includes(query);
+        const lMatch = (m.label || '').toLowerCase().includes(query);
+        const iMatch = (m.items || []).some(it => it.text.toLowerCase().includes(query));
+        if (!tMatch && !cMatch && !lMatch && !iMatch) return false;
+      }
       return true;
     });
 
-    // 핀 고정 우선 정렬
-    filtered.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+    pinnedGrid.innerHTML = '';
+    othersGrid.innerHTML = '';
+
+    const pinnedList = filtered.filter(m => m.pinned);
+    const othersList = filtered.filter(m => !m.pinned);
+
+    if (pinnedSec) pinnedSec.style.display = pinnedList.length > 0 ? 'block' : 'none';
+    if (othersSec) othersSec.style.display = 'block';
 
     if (filtered.length === 0) {
-      this.memoCardsGrid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 40px;">
-        <i class="fa-solid fa-lightbulb" style="font-size: 2rem; margin-bottom: 8px; opacity: 0.5;"></i>
-        <p>등록된 아이디어 메모가 없습니다. 상단 입력창이나 사이드바에서 1초 만에 생각을 기록해보세요!</p>
-      </div>`;
+      othersGrid.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align:center; padding:60px 20px; color:var(--text-muted);">
+          <i class="fa-regular fa-lightbulb" style="font-size:3rem; margin-bottom:12px; opacity:0.4; color:#f59e0b;"></i>
+          <p style="font-size:1.1rem; font-weight:700; color:var(--text-primary);">메모가 없습니다</p>
+          <p style="font-size:0.9rem;">상단의 [메모 작성...]에서 번뜩이는 아이디어와 할 일을 기록해보세요!</p>
+        </div>
+      `;
       return;
     }
 
-    const catMap = {
-      idea: { label: '💡 영감', cls: 'category-career' },
-      work: { label: '💼 업무', cls: 'category-career' },
-      study: { label: '📚 지식', cls: 'category-study' },
-      wealth: { label: '💰 재테크', cls: 'category-wealth' },
-      misc: { label: '🛒 일상', cls: 'category-routine' }
-    };
-
-    filtered.forEach(memo => {
+    const renderCard = (m) => {
       const card = document.createElement('div');
-      card.className = `memo-card ${memo.pinned ? 'pinned' : ''}`;
-      const cat = catMap[memo.category] || { label: '메모', cls: 'category-career' };
+      card.className = `keep-note-card color-${m.color || 'default'}`;
+      card.dataset.memoId = m.id;
+
+      // 본문 HTML 구성
+      let bodyHtml = '';
+      if (m.type === 'checklist' && m.items && m.items.length > 0) {
+        bodyHtml = '<div class="keep-checklist-items-box">';
+        m.items.forEach((item, itemIdx) => {
+          bodyHtml += `
+            <div class="keep-checklist-row" style="margin-bottom:4px;">
+              <input type="checkbox" ${item.done ? 'checked' : ''} data-item-idx="${itemIdx}">
+              <span class="keep-checklist-text ${item.done ? 'completed' : ''}">${this.escapeHtml(item.text)}</span>
+            </div>
+          `;
+        });
+        bodyHtml += '</div>';
+      } else {
+        bodyHtml = `<div class="keep-card-body">${this.escapeHtml(m.content || '')}</div>`;
+      }
+
+      // 라벨 뱃지
+      const labelBadge = m.label ? `<span class="keep-card-label-badge">🏷️ ${this.escapeHtml(m.label)}</span>` : '';
 
       card.innerHTML = `
-        <div class="memo-card-header">
-          <div style="display:flex; align-items:center; gap:6px;">
-            <span class="category-tag ${cat.cls}">${cat.label}</span>
-            ${memo.pinned ? '<span style="color:var(--accent-gold); font-size:0.75rem;"><i class="fa-solid fa-thumbtack"></i> 핀고정</span>' : ''}
-          </div>
-          <button class="todo-delete-btn delete-memo-btn" title="메모 삭제"><i class="fa-solid fa-trash"></i></button>
+        <div class="keep-card-header">
+          <div class="keep-card-title">${this.escapeHtml(m.title)}</div>
+          <button class="keep-card-pin ${m.pinned ? 'active' : ''}" title="${m.pinned ? '핀 고정 해제' : '상단 핀 고정'}">
+            <i class="fa-solid fa-thumbtack"></i>
+          </button>
         </div>
 
-        <div class="memo-card-title">${this.escapeHtml(memo.title)}</div>
-        <div class="memo-card-content">${this.escapeHtml(memo.content || '내용 없음')}</div>
+        ${bodyHtml}
 
-        <div class="memo-card-footer">
-          <span><i class="fa-regular fa-clock"></i> ${memo.date || '오늘'}</span>
-          <div class="memo-actions-group">
-            <button class="memo-action-btn pin-memo-btn" title="${memo.pinned ? '핀 해제' : '상단 핀 고정'}">
-              <i class="fa-solid fa-thumbtack"></i>
-            </button>
-            <button class="memo-action-btn ai-expand-memo-btn" title="Gemini AI로 아이디어 구체화 기획서 발전">
-              <i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> AI 기획
-            </button>
-            <button class="memo-action-btn push-memo-todo-btn" title="오늘의 실행 To-Do로 즉시 전환">
-              <i class="fa-solid fa-bolt text-yellow"></i> To-Do 전환
-            </button>
+        <div class="keep-card-labels">
+          ${labelBadge}
+          <span style="font-size:0.75rem; color:var(--text-muted);"><i class="fa-regular fa-clock"></i> ${m.date || '오늘'}</span>
+        </div>
+
+        <div class="keep-card-footer">
+          <div class="keep-card-actions">
+            <button class="keep-card-action-btn copy-memo-btn" title="메모 클립보드 복사"><i class="fa-solid fa-copy"></i></button>
+            <button class="keep-card-action-btn push-todo-btn" title="오늘의 To-Do로 즉시 전환"><i class="fa-solid fa-bolt text-yellow"></i></button>
+            <button class="keep-card-action-btn color-cycle-btn" title="배경 색상 변경"><i class="fa-solid fa-palette"></i></button>
+            <button class="keep-card-action-btn delete-memo-btn" title="메모 삭제"><i class="fa-solid fa-trash"></i></button>
           </div>
         </div>
       `;
 
-      // Pin toggle
-      card.querySelector('.pin-memo-btn')?.addEventListener('click', () => {
-        storage.updateMemo(memo.id, { pinned: !memo.pinned });
+      // 1. 체크박스 클릭
+      card.querySelectorAll('input[type="checkbox"][data-item-idx]').forEach(chk => {
+        chk.addEventListener('change', (e) => {
+          const idx = parseInt(e.target.dataset.itemIdx, 10);
+          if (m.items && m.items[idx] !== undefined) {
+            m.items[idx].done = e.target.checked;
+            storage.updateMemo(m.id, { items: m.items });
+            this.renderMemos();
+          }
+        });
+      });
+
+      // 2. 핀 토글
+      card.querySelector('.keep-card-pin')?.addEventListener('click', () => {
+        storage.updateMemo(m.id, { pinned: !m.pinned });
         this.renderMemos();
-        this.showToast(memo.pinned ? '핀 고정이 해제되었습니다.' : '상단에 핀 고정되었습니다! 📌');
+        this.showToast(m.pinned ? '📌 핀 고정이 해제되었습니다.' : '📌 상단에 핀 고정되었습니다!');
       });
 
-      // Push to Todo
-      card.querySelector('.push-memo-todo-btn')?.addEventListener('click', () => {
-        this.pushActionToTodayTodo(`[아이디어 실행] ${memo.title}`, memo.category || 'career');
-        this.showToast('아이디어가 오늘의 To-Do로 즉시 전환되었습니다! ⚡');
+      // 3. 복사
+      card.querySelector('.copy-memo-btn')?.addEventListener('click', () => {
+        let textToCopy = `[${m.title}]\n`;
+        if (m.type === 'checklist') {
+          m.items.forEach(it => { textToCopy += `${it.done ? '[x]' : '[ ]'} ${it.text}\n`; });
+        } else {
+          textToCopy += m.content || '';
+        }
+        navigator.clipboard.writeText(textToCopy).then(() => {
+          this.showToast('📋 메모가 클립보드에 복사되었습니다!');
+        });
       });
 
-      // AI Expand
-      card.querySelector('.ai-expand-memo-btn')?.addEventListener('click', async () => {
-        const btn = card.querySelector('.ai-expand-memo-btn');
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 기획 중...';
+      // 4. To-Do로 전환
+      card.querySelector('.push-todo-btn')?.addEventListener('click', () => {
+        this.pushActionToTodayTodo(`[메모 실행] ${m.title}`, 'career');
+        this.showToast('⚡ 메모가 오늘의 To-Do로 즉시 전환되었습니다!');
+      });
 
-        const prompt = `아이디어 메모: [${memo.title}]
-내용: [${memo.content}]
-
-위 아이디어를 실전에 바로 적용할 수 있도록 3단계 구체적 실행 기획서(1. 핵심 가치, 2. 프로토타입/실험 1단계, 3. 당장 착수할 구체적 행동 2개)로 확장 발전시켜줘.`;
-
-        const res = await geminiClient.generateText(prompt);
-        btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> AI 기획';
-
-        storage.updateMemo(memo.id, { content: `${memo.content}\n\n---\n### 🤖 Gemini AI 심화 기획\n${res}` });
+      // 5. 색상 순환 (Palette Cycle)
+      card.querySelector('.color-cycle-btn')?.addEventListener('click', () => {
+        const colors = ['default', 'yellow', 'green', 'blue', 'purple', 'teal'];
+        const curIdx = colors.indexOf(m.color || 'default');
+        const nextColor = colors[(curIdx + 1) % colors.length];
+        storage.updateMemo(m.id, { color: nextColor });
         this.renderMemos();
-        this.showToast('Gemini가 아이디어를 실행 기획서로 발전시켰습니다! 🚀');
       });
 
-      // Delete
+      // 6. 삭제
       card.querySelector('.delete-memo-btn')?.addEventListener('click', () => {
-        if (confirm(`'${memo.title}' 메모를 삭제하시겠습니까?`)) {
-          storage.deleteMemo(memo.id);
+        if (confirm(`'${m.title}' 메모를 삭제하시겠습니까?`)) {
+          storage.deleteMemo(m.id);
           this.renderMemos();
-          this.renderTabCalendar('memo');
           this.showToast('메모가 삭제되었습니다.');
         }
       });
 
-      this.memoCardsGrid.appendChild(card);
-    });
+      return card;
+    };
+
+    pinnedList.forEach(m => pinnedGrid.appendChild(renderCard(m)));
+    othersList.forEach(m => othersGrid.appendChild(renderCard(m)));
   }
 
   loadDate(dateStr) {
