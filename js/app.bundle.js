@@ -930,6 +930,31 @@ class DailyFlowApp {
       });
     }
 
+    // 🎛️ 상/하 단추 (▲ +5% 밝게 / ▼ -5% 어둡게) 이벤트
+    const brightnessUpBtn = document.getElementById('brightnessUpBtn');
+    const brightnessDownBtn = document.getElementById('brightnessDownBtn');
+
+    const stepBrightness = (delta) => {
+      let currentVal = parseInt(brightnessSlider ? brightnessSlider.value : (localStorage.getItem('dfp_titanium_slider') || 50));
+      let newVal = Math.max(0, Math.min(100, currentVal + delta));
+
+      let level = 'slate';
+      if (newVal <= 30) level = 'deep';
+      else if (newVal <= 65) level = 'slate';
+      else if (newVal <= 85) level = 'soft';
+      else level = 'light';
+
+      applyTitaniumBrightness(level, newVal);
+      this.showToast(`🎛️ 밝기: ${newVal}% (${level.toUpperCase()})`);
+    };
+
+    if (brightnessUpBtn) {
+      brightnessUpBtn.addEventListener('click', () => stepBrightness(5));
+    }
+    if (brightnessDownBtn) {
+      brightnessDownBtn.addEventListener('click', () => stepBrightness(-5));
+    }
+
     // ==========================================
     // 📱 iPhone / iPad Mobile Drawer & Bottom Tab Bar Events
     // ==========================================

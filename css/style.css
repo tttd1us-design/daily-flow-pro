@@ -226,15 +226,42 @@
 .brightness-slider-wrapper {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   padding-left: 6px;
   border-left: 1px solid var(--border-color);
+}
+
+.bright-step-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.65rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.bright-step-btn:hover {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #38bdf8;
+  transform: scale(1.1);
+}
+
+.bright-step-btn:active {
+  transform: scale(0.95);
 }
 
 .brightness-range-slider {
   -webkit-appearance: none;
   appearance: none;
-  width: 70px;
+  width: 65px;
   height: 4px;
   background: rgba(255, 255, 255, 0.2);
   border-radius: 2px;
