@@ -1,3 +1,11 @@
 Set WshShell = CreateObject("WScript.Shell")
-psCmd = "powershell -NoProfile -WindowStyle Hidden -Command ""if (-not (Test-NetConnection -ComputerName 127.0.0.1 -Port 8000 -InformationLevel Quiet -WarningAction SilentlyContinue)) { Start-Process python -ArgumentList 'server.py' -WorkingDirectory 'C:\Users\tttd1\.gemini\antigravity\scratch\daily-dashboard-journal' -WindowStyle Hidden; Start-Sleep -Milliseconds 1000 }; Start-Process 'http://127.0.0.1:8000'"""
-WshShell.Run psCmd, 0, False
+Dim http
+On Error Resume Next
+Set http = CreateObject("MSXML2.ServerXMLHTTP.6.0")
+http.open "GET", "http://localhost:3005", False
+http.send
+If Err.Number <> 0 Then
+    WshShell.Run "powershell.exe -WindowStyle Hidden -Command cd "C:/Users/tttd1/.gemini/antigravity/scratch/daily-dashboard-journal"; npx serve -s . -l 3005", 0, False
+    WScript.Sleep 1500
+End If
+WshShell.Run "http://localhost:3005"
